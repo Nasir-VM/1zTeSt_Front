@@ -1,0 +1,191 @@
+# ═══════════════════════════════════════════════════
+#  1zTeSt — Anti-AI-Scraping robots.txt
+#  SEO 正常收錄 / AI 爬蟲全面封鎖
+# ═══════════════════════════════════════════════════
+
+# ── 默认：允许所有 SEO 搜寻引擎 ──
+User-agent: *
+Allow: /
+
+# ── AI 训练/摘要爬虫 ── 封锁 ──
+
+# OpenAI
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: OAI-SearchBot
+Disallow: /
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: ClaudeForWeb
+Disallow: /
+
+# Google AI (训练用)
+User-agent: Google-Extended
+Disallow: /
+
+# Common Crawl (大量数据集)
+User-agent: CCBot
+Disallow: /
+
+# ByteDance / TikTok
+User-agent: Bytespider
+Disallow: /
+
+# Amazon AI
+User-agent: Amazonbot
+Disallow: /
+
+# Meta / Facebook
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# Apple AI
+User-agent: Applebot-Extended
+Disallow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Disallow: /
+
+# Cohere
+User-agent: cohere-ai
+Disallow: /
+
+# Diffbot
+User-agent: Diffbot
+Disallow: /
+
+# You.com
+User-agent: YouBot
+Disallow: /
+
+# Omgilibot
+User-agent: omgilibot
+Disallow: /
+
+# Scrapy / generic scrapers
+User-agent: Scrapy
+Disallow: /
+
+User-agent: scrapy
+Disallow: /
+
+User-agent: python-requests
+Disallow: /
+
+User-agent: python-urllib
+Disallow: /
+
+User-agent: curl
+Disallow: /
+
+User-agent: wget
+Disallow: /
+
+User-agent: HTTPie
+Disallow: /
+
+# SEO tool scrapers (不付费的爬虫)
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# AI 搜索引擎
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: FriendlyCrawler
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: Voltron
+Disallow: /
+
+User-agent: Velen
+Disallow: /
+
+User-agent: VELen
+Disallow: /
+
+User-agent: TGM-bot
+Disallow: /
+
+# ── 允许 SEO 搜索引擎 ──
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Pinterest
+Allow: /
+
+User-agent: Sogou
+Allow: /
+
+# ── 站点地图 ──
+Sitemap: https://1ztests.nsir.uk/sitemap.xml
+
+# ── 爬取速率限制 ──
+# 建议爬虫每次请求间隔至少 1 秒
+Crawl-delay: 1

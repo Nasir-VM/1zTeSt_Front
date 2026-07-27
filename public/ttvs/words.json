@@ -1,0 +1,2582 @@
+﻿[
+  {
+    "en": "access point",
+    "zh": "無線網路存取器；"
+  },
+  {
+    "en": "access time",
+    "zh": "存取時間"
+  },
+  {
+    "en": "accounting information system",
+    "zh": "會計資訊系統"
+  },
+  {
+    "en": "Acer",
+    "zh": "宏碁"
+  },
+  {
+    "en": "act",
+    "zh": "法案"
+  },
+  {
+    "en": "administrator",
+    "zh": "管理員；監督人"
+  },
+  {
+    "en": "ADSL",
+    "zh": "非對稱數位用戶迴路"
+  },
+  {
+    "en": "adware",
+    "zh": "廣告軟體"
+  },
+  {
+    "en": "agent",
+    "zh": "代理人；代理商"
+  },
+  {
+    "en": "AI",
+    "zh": "人工智慧"
+  },
+  {
+    "en": "algorithm",
+    "zh": "演算法"
+  },
+  {
+    "en": "all rights reserved",
+    "zh": "版權所有"
+  },
+  {
+    "en": "ALU",
+    "zh": "算術邏輯單元"
+  },
+  {
+    "en": "analog",
+    "zh": "類比"
+  },
+  {
+    "en": "analysis",
+    "zh": "分析"
+  },
+  {
+    "en": "Android",
+    "zh": "安卓"
+  },
+  {
+    "en": "ANSI",
+    "zh": "美國國家標準協會"
+  },
+  {
+    "en": "antivirus",
+    "zh": "防毒"
+  },
+  {
+    "en": "antivirus software",
+    "zh": "防毒軟體"
+  },
+  {
+    "en": "Apple",
+    "zh": "蘋果"
+  },
+  {
+    "en": "architecture",
+    "zh": "架構"
+  },
+  {
+    "en": "array",
+    "zh": "陣列"
+  },
+  {
+    "en": "ASCII",
+    "zh": "美國資訊交換標準碼"
+  },
+  {
+    "en": "ASP",
+    "zh": "應用服務供應商"
+  },
+  {
+    "en": "asset",
+    "zh": "資產"
+  },
+  {
+    "en": "ASUS",
+    "zh": "華碩"
+  },
+  {
+    "en": "auction",
+    "zh": "拍賣"
+  },
+  {
+    "en": "audio",
+    "zh": "音訊"
+  },
+  {
+    "en": "audit",
+    "zh": "審核；審計；查帳"
+  },
+  {
+    "en": "authority",
+    "zh": "權威；權力（機構）"
+  },
+  {
+    "en": "autocomplete",
+    "zh": "自動完成"
+  },
+  {
+    "en": "autoformat",
+    "zh": "自動套用格式"
+  },
+  {
+    "en": "autosum",
+    "zh": "自動加總"
+  },
+  {
+    "en": "B2G",
+    "zh": "企業對政府之間的相互交易"
+  },
+  {
+    "en": "back color",
+    "zh": "背景顏色"
+  },
+  {
+    "en": "back up data",
+    "zh": "備份資料"
+  },
+  {
+    "en": "backbone",
+    "zh": "骨幹網路"
+  },
+  {
+    "en": "bandwidth",
+    "zh": "頻寬"
+  },
+  {
+    "en": "base",
+    "zh": "基底"
+  },
+  {
+    "en": "baseband transmmission",
+    "zh": "基頻傳輸"
+  },
+  {
+    "en": "batch processing",
+    "zh": "批次處理"
+  },
+  {
+    "en": "battery",
+    "zh": "電池"
+  },
+  {
+    "en": "BBS",
+    "zh": "電子佈告欄系統"
+  },
+  {
+    "en": "benefit",
+    "zh": "效益"
+  },
+  {
+    "en": "biometrics",
+    "zh": "生物測定學"
+  },
+  {
+    "en": "BIOS",
+    "zh": "基本輸入輸出系統"
+  },
+  {
+    "en": "bit",
+    "zh": "位元"
+  },
+  {
+    "en": "bitmap",
+    "zh": "點陣圖"
+  },
+  {
+    "en": "blog",
+    "zh": "部落格"
+  },
+  {
+    "en": "bluetooth",
+    "zh": "藍芽"
+  },
+  {
+    "en": "bps",
+    "zh": "每秒的位元數"
+  },
+  {
+    "en": "bridge",
+    "zh": "橋接器"
+  },
+  {
+    "en": "broadband",
+    "zh": "寬頻"
+  },
+  {
+    "en": "broadband transmission",
+    "zh": "寬頻傳輸"
+  },
+  {
+    "en": "broadcast",
+    "zh": "廣播"
+  },
+  {
+    "en": "broker",
+    "zh": "仲介商"
+  },
+  {
+    "en": "browser",
+    "zh": "瀏覽器"
+  },
+  {
+    "en": "buffer",
+    "zh": "緩衝器"
+  },
+  {
+    "en": "bug",
+    "zh": "瑕疵；（程式）錯誤"
+  },
+  {
+    "en": "bulletin board system",
+    "zh": "電子佈告欄系統"
+  },
+  {
+    "en": "business",
+    "zh": "企業或商務"
+  },
+  {
+    "en": "business intelligence",
+    "zh": "商業智慧（BI）"
+  },
+  {
+    "en": "business model",
+    "zh": "商業模式"
+  },
+  {
+    "en": "business process and operation",
+    "zh": "企業流程與營運"
+  },
+  {
+    "en": "byte",
+    "zh": "位元組"
+  },
+  {
+    "en": "C2C",
+    "zh": "消費者對消費者之間的相互交易"
+  },
+  {
+    "en": "CA",
+    "zh": "認證機構"
+  },
+  {
+    "en": "cache",
+    "zh": "快取"
+  },
+  {
+    "en": "cache memory",
+    "zh": "快取記憶體"
+  },
+  {
+    "en": "CAI",
+    "zh": "電腦輔助教學"
+  },
+  {
+    "en": "call",
+    "zh": "呼叫"
+  },
+  {
+    "en": "catalog",
+    "zh": "型錄"
+  },
+  {
+    "en": "CD-R",
+    "zh": "可錄式光碟"
+  },
+  {
+    "en": "cell",
+    "zh": "儲存格"
+  },
+  {
+    "en": "cell phone",
+    "zh": "行動電話"
+  },
+  {
+    "en": "central processing unit",
+    "zh": "中央處理單元"
+  },
+  {
+    "en": "certificate",
+    "zh": "憑證；認證"
+  },
+  {
+    "en": "certificate authority",
+    "zh": "憑證授權認證機構"
+  },
+  {
+    "en": "character",
+    "zh": "字元"
+  },
+  {
+    "en": "chat",
+    "zh": "聊天"
+  },
+  {
+    "en": "chief information officer",
+    "zh": "資訊長"
+  },
+  {
+    "en": "child domain",
+    "zh": "子網域"
+  },
+  {
+    "en": "CIO",
+    "zh": "資訊長"
+  },
+  {
+    "en": "click",
+    "zh": "單擊滴答聲"
+  },
+  {
+    "en": "client",
+    "zh": "用戶端"
+  },
+  {
+    "en": "client-server LAN",
+    "zh": "主從式區域網路"
+  },
+  {
+    "en": "clone computer",
+    "zh": "克隆電腦"
+  },
+  {
+    "en": "cloud computing",
+    "zh": "雲端運算"
+  },
+  {
+    "en": "coaxial cable",
+    "zh": "同軸電纜"
+  },
+  {
+    "en": "co-location",
+    "zh": "主機代管"
+  },
+  {
+    "en": "communication",
+    "zh": "通訊"
+  },
+  {
+    "en": "community",
+    "zh": "社群"
+  },
+  {
+    "en": "compatible",
+    "zh": "相容的"
+  },
+  {
+    "en": "compile",
+    "zh": "編譯"
+  },
+  {
+    "en": "computer crime",
+    "zh": "電腦犯罪"
+  },
+  {
+    "en": "computer forensics",
+    "zh": "電腦鑑識"
+  },
+  {
+    "en": "computer monitoring",
+    "zh": "電腦監控"
+  },
+  {
+    "en": "computer software",
+    "zh": "電腦軟體"
+  },
+  {
+    "en": "computer vision",
+    "zh": "電腦視覺"
+  },
+  {
+    "en": "computer-aided design",
+    "zh": "電腦輔助設計"
+  },
+  {
+    "en": "computer-aided manufacturing",
+    "zh": "電腦輔助製造"
+  },
+  {
+    "en": "computer-assisted instruction",
+    "zh": "電腦輔助教學"
+  },
+  {
+    "en": "computing",
+    "zh": "運算"
+  },
+  {
+    "en": "conference call",
+    "zh": "電話會議"
+  },
+  {
+    "en": "confidentiality",
+    "zh": "機密性"
+  },
+  {
+    "en": "constant",
+    "zh": "常數"
+  },
+  {
+    "en": "content",
+    "zh": "內容"
+  },
+  {
+    "en": "content management",
+    "zh": "內容管理"
+  },
+  {
+    "en": "control unit",
+    "zh": "控制單元"
+  },
+  {
+    "en": "control",
+    "zh": "控制"
+  },
+  {
+    "en": "conversion",
+    "zh": "轉換"
+  },
+  {
+    "en": "copyright",
+    "zh": "版權"
+  },
+  {
+    "en": "core",
+    "zh": "核心"
+  },
+  {
+    "en": "cost",
+    "zh": "成本"
+  },
+  {
+    "en": "CPU",
+    "zh": "中央處理單元"
+  },
+  {
+    "en": "cracker",
+    "zh": "怪客；破壞者"
+  },
+  {
+    "en": "critical thinking",
+    "zh": "批判性思考"
+  },
+  {
+    "en": "CRM",
+    "zh": "顧客關係管理"
+  },
+  {
+    "en": "CTO",
+    "zh": "科技長"
+  },
+  {
+    "en": "culture",
+    "zh": "文化"
+  },
+  {
+    "en": "customer relationship management",
+    "zh": "顧客關係管理"
+  },
+  {
+    "en": "customization",
+    "zh": "客製化"
+  },
+  {
+    "en": "cyber",
+    "zh": "網路的"
+  },
+  {
+    "en": "cycle",
+    "zh": "週期；循環"
+  },
+  {
+    "en": "dashboard",
+    "zh": "儀錶板"
+  },
+  {
+    "en": "data",
+    "zh": "資料"
+  },
+  {
+    "en": "data bus",
+    "zh": "資料匯流排"
+  },
+  {
+    "en": "data center",
+    "zh": "資訊中心"
+  },
+  {
+    "en": "data conversion",
+    "zh": "資料轉換"
+  },
+  {
+    "en": "data definition",
+    "zh": "資料定義"
+  },
+  {
+    "en": "data dictionary",
+    "zh": "資料字典"
+  },
+  {
+    "en": "data flow",
+    "zh": "資料流"
+  },
+  {
+    "en": "data fiow diagram",
+    "zh": "資料流程圖"
+  },
+  {
+    "en": "data integration",
+    "zh": "資料整合"
+  },
+  {
+    "en": "data management",
+    "zh": "資料管理"
+  },
+  {
+    "en": "data management software",
+    "zh": "資料管理軟體"
+  },
+  {
+    "en": "data manipulation",
+    "zh": "資料操縱（尤指操作性技術）"
+  },
+  {
+    "en": "data mining",
+    "zh": "資料探勘；資料挖掘"
+  },
+  {
+    "en": "data processing",
+    "zh": "資料處理"
+  },
+  {
+    "en": "data redundancy",
+    "zh": "資料重複（多餘）"
+  },
+  {
+    "en": "data structure",
+    "zh": "資料結構"
+  },
+  {
+    "en": "data transfer rate",
+    "zh": "資料傳輸率"
+  },
+  {
+    "en": "data warehouse",
+    "zh": "資料倉儲"
+  },
+  {
+    "en": "data worker",
+    "zh": "資料工作者"
+  },
+  {
+    "en": "database",
+    "zh": "資料庫"
+  },
+  {
+    "en": "database administrator",
+    "zh": "資料庫管理員（DBA）"
+  },
+  {
+    "en": "data management system",
+    "zh": "資料庫管理系統"
+  },
+  {
+    "en": "database server",
+    "zh": "資料庫伺服器"
+  },
+  {
+    "en": "data-driven",
+    "zh": "資料導向"
+  },
+  {
+    "en": "datagram",
+    "zh": "數據包；資料包"
+  },
+  {
+    "en": "date",
+    "zh": "日期"
+  },
+  {
+    "en": "DB",
+    "zh": "資料庫（的英文簡稱）"
+  },
+  {
+    "en": "DBA",
+    "zh": "資料庫管理員"
+  },
+  {
+    "en": "DBMS",
+    "zh": "資料庫管理系統"
+  },
+  {
+    "en": "DDoS",
+    "zh": "分裂（散）式阻斷服務"
+  },
+  {
+    "en": "debug",
+    "zh": "除錯；偵錯"
+  },
+  {
+    "en": "decision support system",
+    "zh": "決策支援系統"
+  },
+  {
+    "en": "decryption",
+    "zh": "解密"
+  },
+  {
+    "en": "deep packet",
+    "zh": "深層封包"
+  },
+  {
+    "en": "demand",
+    "zh": "需求"
+  },
+  {
+    "en": "design",
+    "zh": "設計"
+  },
+  {
+    "en": "desktop",
+    "zh": "桌面"
+  },
+  {
+    "en": "desktop computer",
+    "zh": "桌上電腦"
+  },
+  {
+    "en": "detection system",
+    "zh": "偵測系統"
+  },
+  {
+    "en": "development",
+    "zh": "開發"
+  },
+  {
+    "en": "DFD",
+    "zh": "資料流程圖"
+  },
+  {
+    "en": "diagram",
+    "zh": "圖表"
+  },
+  {
+    "en": "digital",
+    "zh": "數位"
+  },
+  {
+    "en": "digital asset",
+    "zh": "數位資產"
+  },
+  {
+    "en": "digital camera",
+    "zh": "數位相機"
+  },
+  {
+    "en": "digital certificate",
+    "zh": "數位憑證"
+  },
+  {
+    "en": "digital content",
+    "zh": "數位內容"
+  },
+  {
+    "en": "digital divide",
+    "zh": "數位區隔"
+  },
+  {
+    "en": "digital signal",
+    "zh": "數位信號"
+  },
+  {
+    "en": "digital video disc",
+    "zh": "數位影音光碟（DVD）"
+  },
+  {
+    "en": "direct",
+    "zh": "直接的"
+  },
+  {
+    "en": "disaster",
+    "zh": "災難"
+  },
+  {
+    "en": "disaster recovery",
+    "zh": "災難復原"
+  },
+  {
+    "en": "disk cache",
+    "zh": "磁碟快取"
+  },
+  {
+    "en": "display",
+    "zh": "顯示器"
+  },
+  {
+    "en": "disruptive",
+    "zh": "破壞性的"
+  },
+  {
+    "en": "disruptive technology",
+    "zh": "破壞性科技"
+  },
+  {
+    "en": "distance instruction",
+    "zh": "遠距教學"
+  },
+  {
+    "en": "distribute",
+    "zh": "分散"
+  },
+  {
+    "en": "distributed",
+    "zh": "分散式"
+  },
+  {
+    "en": "distributed processing",
+    "zh": "分散式處理"
+  },
+  {
+    "en": "distributed processing system",
+    "zh": "分散式處理系統"
+  },
+  {
+    "en": "DIY",
+    "zh": "自己做（組裝）"
+  },
+  {
+    "en": "DNS",
+    "zh": "網域名稱系統"
+  },
+  {
+    "en": "do it yourself",
+    "zh": "自己做（組裝）"
+  },
+  {
+    "en": "documentation",
+    "zh": "使用說明"
+  },
+  {
+    "en": "domain",
+    "zh": "網域"
+  },
+  {
+    "en": "domain name",
+    "zh": "網域名稱"
+  },
+  {
+    "en": "domain name system",
+    "zh": "網域名稱系統"
+  },
+  {
+    "en": "domestic exporter",
+    "zh": "（國內的）出口商"
+  },
+  {
+    "en": "DOS",
+    "zh": "磁片作業系統"
+  },
+  {
+    "en": "DoS",
+    "zh": "阻斷服務"
+  },
+  {
+    "en": "double click",
+    "zh": "按兩下"
+  },
+  {
+    "en": "download",
+    "zh": "下載"
+  },
+  {
+    "en": "download information",
+    "zh": "下載資料"
+  },
+  {
+    "en": "downstream",
+    "zh": "下游的；下傳的（資料）"
+  },
+  {
+    "en": "downstream data",
+    "zh": "下流（游）的資料"
+  },
+  {
+    "en": "downtime",
+    "zh": "停機時間"
+  },
+  {
+    "en": "doze mode",
+    "zh": "休眠模式"
+  },
+  {
+    "en": "DPI",
+    "zh": "每英吋的點數"
+  },
+  {
+    "en": "DRAM",
+    "zh": "動態隨機存取記憶體"
+  },
+  {
+    "en": "drill down",
+    "zh": "向下探究"
+  },
+  {
+    "en": "DSL",
+    "zh": "數位用戶路線"
+  },
+  {
+    "en": "DSS",
+    "zh": "決策支援系統"
+  },
+  {
+    "en": "due",
+    "zh": "應有的；到期的"
+  },
+  {
+    "en": "duplication",
+    "zh": "複製"
+  },
+  {
+    "en": "DVD",
+    "zh": "光碟"
+  },
+  {
+    "en": "dynamic",
+    "zh": "動態的"
+  },
+  {
+    "en": "e-book",
+    "zh": "電子書"
+  },
+  {
+    "en": "e-business",
+    "zh": "電子化企業"
+  },
+  {
+    "en": "EC",
+    "zh": "電子商務"
+  },
+  {
+    "en": "e-commerce",
+    "zh": "電子商務"
+  },
+  {
+    "en": "EFT",
+    "zh": "電子金融轉帳"
+  },
+  {
+    "en": "e-government",
+    "zh": "電子化政府"
+  },
+  {
+    "en": "EIS",
+    "zh": "高階主管資訊系統"
+  },
+  {
+    "en": "e-learning",
+    "zh": "數位學習"
+  },
+  {
+    "en": "electronic business",
+    "zh": "電子化企業"
+  },
+  {
+    "en": "electronic commerce",
+    "zh": "電子商務"
+  },
+  {
+    "en": "electronic government",
+    "zh": "電子化政府"
+  },
+  {
+    "en": "electronic payment services",
+    "zh": "電子付費服務"
+  },
+  {
+    "en": "electronic payment system",
+    "zh": "電子付款服務"
+  },
+  {
+    "en": "electronic signature",
+    "zh": "電子簽章"
+  },
+  {
+    "en": "e-mail",
+    "zh": "電子郵件"
+  },
+  {
+    "en": "encryption",
+    "zh": "加密"
+  },
+  {
+    "en": "end users",
+    "zh": "終端使用者"
+  },
+  {
+    "en": "engineering",
+    "zh": "工程"
+  },
+  {
+    "en": "enterprise",
+    "zh": "企業"
+  },
+  {
+    "en": "enterprise information portal",
+    "zh": "企業資訊入口網站"
+  },
+  {
+    "en": "entity relationship",
+    "zh": "實體關係"
+  },
+  {
+    "en": "EPS",
+    "zh": "電子付費服務"
+  },
+  {
+    "en": "ERP",
+    "zh": "企業資源規劃"
+  },
+  {
+    "en": "ES",
+    "zh": "專家系統"
+  },
+  {
+    "en": "Ethernet",
+    "zh": "乙太網路"
+  },
+  {
+    "en": "exchange",
+    "zh": "交易"
+  },
+  {
+    "en": "executable code",
+    "zh": "可執行碼"
+  },
+  {
+    "en": "executive",
+    "zh": "行政主管；決策者"
+  },
+  {
+    "en": "executive information system",
+    "zh": "高階主管資訊系統"
+  },
+  {
+    "en": "Facebook",
+    "zh": "臉書"
+  },
+  {
+    "en": "FALSE",
+    "zh": "假"
+  },
+  {
+    "en": "FAT",
+    "zh": "檔案配置表"
+  },
+  {
+    "en": "feedback",
+    "zh": "回饋"
+  },
+  {
+    "en": "fiber",
+    "zh": "光纖"
+  },
+  {
+    "en": "field",
+    "zh": "欄位或區域"
+  },
+  {
+    "en": "field name",
+    "zh": "欄位名稱"
+  },
+  {
+    "en": "FIFO",
+    "zh": "先進先出"
+  },
+  {
+    "en": "file",
+    "zh": "檔案"
+  },
+  {
+    "en": "file processing",
+    "zh": "檔案處理"
+  },
+  {
+    "en": "file type",
+    "zh": "檔案類型"
+  },
+  {
+    "en": "firewall",
+    "zh": "防火牆"
+  },
+  {
+    "en": "flash ROM",
+    "zh": "快閃記憶體"
+  },
+  {
+    "en": "flowchart",
+    "zh": "流程圖"
+  },
+  {
+    "en": "font",
+    "zh": "字型"
+  },
+  {
+    "en": "forensics",
+    "zh": "鑑識"
+  },
+  {
+    "en": "formatted disk",
+    "zh": "已格式化的磁碟"
+  },
+  {
+    "en": "frame",
+    "zh": "框架"
+  },
+  {
+    "en": "freeware",
+    "zh": "自由軟體；免費軟體"
+  },
+  {
+    "en": "FTP",
+    "zh": "檔案傳輸協定"
+  },
+  {
+    "en": "function",
+    "zh": "函數"
+  },
+  {
+    "en": "gateway",
+    "zh": "閘道器"
+  },
+  {
+    "en": "GB",
+    "zh": "十億位元組"
+  },
+  {
+    "en": "geographic information system",
+    "zh": "地理資訊系統（GlS）"
+  },
+  {
+    "en": "GHz",
+    "zh": "十億赫茲"
+  },
+  {
+    "en": "gigabyte",
+    "zh": "十億位元組"
+  },
+  {
+    "en": "gigahertz",
+    "zh": "十億赫茲"
+  },
+  {
+    "en": "GlS",
+    "zh": "地理資訊系統"
+  },
+  {
+    "en": "global positioning system",
+    "zh": "全球定位系統"
+  },
+  {
+    "en": "GPS",
+    "zh": "全球定位系統"
+  },
+  {
+    "en": "graphics",
+    "zh": "圖形"
+  },
+  {
+    "en": "GUI",
+    "zh": "圖形化使用介面"
+  },
+  {
+    "en": "hacker",
+    "zh": "駭客"
+  },
+  {
+    "en": "hard disk",
+    "zh": "硬碟"
+  },
+  {
+    "en": "HDD",
+    "zh": "硬式磁碟機"
+  },
+  {
+    "en": "HDMl",
+    "zh": "高清晰度多謀體介面"
+  },
+  {
+    "en": "Hertz",
+    "zh": "赫茲"
+  },
+  {
+    "en": "hide",
+    "zh": "隱藏"
+  },
+  {
+    "en": "home page",
+    "zh": "首頁"
+  },
+  {
+    "en": "host",
+    "zh": "主機"
+  },
+  {
+    "en": "HTML",
+    "zh": "超文字標記語言"
+  },
+  {
+    "en": "hub",
+    "zh": "集線器"
+  },
+  {
+    "en": "hyperlink",
+    "zh": "超連結"
+  },
+  {
+    "en": "hypemedia",
+    "zh": "超媒體"
+  },
+  {
+    "en": "hypertext",
+    "zh": "超文件"
+  },
+  {
+    "en": "hypertext markup language",
+    "zh": "超文字標記語言"
+  },
+  {
+    "en": "hypertext transfer protocol",
+    "zh": "超文字傳輸協定"
+  },
+  {
+    "en": "IaaS",
+    "zh": "基礎建設即服務"
+  },
+  {
+    "en": "IC",
+    "zh": "積體電路"
+  },
+  {
+    "en": "icon",
+    "zh": "圖示"
+  },
+  {
+    "en": "ICT",
+    "zh": "資訊與網路通訊科技"
+  },
+  {
+    "en": "IEEE",
+    "zh": "國際電機電子工程協會"
+  },
+  {
+    "en": "IM",
+    "zh": "即時通訊"
+  },
+  {
+    "en": "image",
+    "zh": "影像"
+  },
+  {
+    "en": "impact",
+    "zh": "影響；衝擊；撞擊力"
+  },
+  {
+    "en": "implementation process",
+    "zh": "建置流程"
+  },
+  {
+    "en": "infomediary",
+    "zh": "資訊中介"
+  },
+  {
+    "en": "inform",
+    "zh": "告知後；通知"
+  },
+  {
+    "en": "information",
+    "zh": "資訊"
+  },
+  {
+    "en": "information and communication technology",
+    "zh": "資訊與網路通訊科技"
+  },
+  {
+    "en": "information appliance",
+    "zh": "資訊家電"
+  },
+  {
+    "en": "information processing",
+    "zh": "資訊處理"
+  },
+  {
+    "en": "information requirement",
+    "zh": "資訊需求"
+  },
+  {
+    "en": "information system",
+    "zh": "資訊系統"
+  },
+  {
+    "en": "information technology",
+    "zh": "資訊科技"
+  },
+  {
+    "en": "infrastructure",
+    "zh": "基礎建設"
+  },
+  {
+    "en": "infrastructure as a service",
+    "zh": "基礎建設即服務"
+  },
+  {
+    "en": "input",
+    "zh": "輸入"
+  },
+  {
+    "en": "input device",
+    "zh": "輸入設備"
+  },
+  {
+    "en": "input unit",
+    "zh": "輸入單元"
+  },
+  {
+    "en": "insertion sort",
+    "zh": "插入排序法"
+  },
+  {
+    "en": "installation",
+    "zh": "安裝"
+  },
+  {
+    "en": "instant messaging",
+    "zh": "即時通訊"
+  },
+  {
+    "en": "intangible",
+    "zh": "無形的；不明確的"
+  },
+  {
+    "en": "integrated circuit",
+    "zh": "積體電路"
+  },
+  {
+    "en": "integrated circuit card",
+    "zh": "ＩＣ卡"
+  },
+  {
+    "en": "integrated package",
+    "zh": "整合式套件"
+  },
+  {
+    "en": "integrity",
+    "zh": "完整性"
+  },
+  {
+    "en": "Intel",
+    "zh": "英特爾"
+  },
+  {
+    "en": "intellectual property",
+    "zh": "智慧財產"
+  },
+  {
+    "en": "intelligence",
+    "zh": "智慧"
+  },
+  {
+    "en": "internal code",
+    "zh": "內碼"
+  },
+  {
+    "en": "internal modem",
+    "zh": "內置式數據機"
+  },
+  {
+    "en": "Internet",
+    "zh": "網際網路"
+  },
+  {
+    "en": "Internet bank",
+    "zh": "網路銀行"
+  },
+  {
+    "en": "Internet protocol",
+    "zh": "網際網路協定（IP）"
+  },
+  {
+    "en": "internetwork processor",
+    "zh": "跨網處理器"
+  },
+  {
+    "en": "iOS",
+    "zh": "iPhone 的作業系統"
+  },
+  {
+    "en": "IP",
+    "zh": "網際網路協定"
+  },
+  {
+    "en": "IS",
+    "zh": "資訊系統"
+  },
+  {
+    "en": "ISBN",
+    "zh": "國際標準書號"
+  },
+  {
+    "en": "ISO",
+    "zh": "國際標準組織"
+  },
+  {
+    "en": "jumper",
+    "zh": "跳線"
+  },
+  {
+    "en": "KB",
+    "zh": "千位元組"
+  },
+  {
+    "en": "key word",
+    "zh": "關鍵字"
+  },
+  {
+    "en": "keyboard",
+    "zh": "鍵盤"
+  },
+  {
+    "en": "KHz",
+    "zh": "千赫茲"
+  },
+  {
+    "en": "kilobyte",
+    "zh": "千位元組（KB）"
+  },
+  {
+    "en": "kilohertz",
+    "zh": "千赫茲"
+  },
+  {
+    "en": "knowledge engineer",
+    "zh": "知識工程師"
+  },
+  {
+    "en": "knowledge worker",
+    "zh": "知識工作者"
+  },
+  {
+    "en": "label",
+    "zh": "標籤"
+  },
+  {
+    "en": "LAN",
+    "zh": "區域網路"
+  },
+  {
+    "en": "language",
+    "zh": "語言"
+  },
+  {
+    "en": "laptop",
+    "zh": "膝上型電腦"
+  },
+  {
+    "en": "laser printer",
+    "zh": "雷射印表機"
+  },
+  {
+    "en": "LCD",
+    "zh": "液晶顯示器"
+  },
+  {
+    "en": "LED",
+    "zh": "發光二極體"
+  },
+  {
+    "en": "Lenovo",
+    "zh": "聯想"
+  },
+  {
+    "en": "life cycle",
+    "zh": "生命週期"
+  },
+  {
+    "en": "LIFO",
+    "zh": "後進先出"
+  },
+  {
+    "en": "light emitting diode",
+    "zh": "發光二極體（LED）"
+  },
+  {
+    "en": "Line",
+    "zh": "在線"
+  },
+  {
+    "en": "line interactive",
+    "zh": "在線互動式"
+  },
+  {
+    "en": "link",
+    "zh": "連結"
+  },
+  {
+    "en": "linker",
+    "zh": "連結程式"
+  },
+  {
+    "en": "Linux",
+    "zh": "多工的作業系統"
+  },
+  {
+    "en": "liquid crystal display",
+    "zh": "液晶顯示器"
+  },
+  {
+    "en": "literacy",
+    "zh": "素養"
+  },
+  {
+    "en": "loader",
+    "zh": "載入程式"
+  },
+  {
+    "en": "local area network",
+    "zh": "區域網路"
+  },
+  {
+    "en": "log off",
+    "zh": "登出"
+  },
+  {
+    "en": "log on",
+    "zh": "登入"
+  },
+  {
+    "en": "logical partition",
+    "zh": "邏輯分割區"
+  },
+  {
+    "en": "machine",
+    "zh": "機器"
+  },
+  {
+    "en": "Macintosh",
+    "zh": "麥金塔"
+  },
+  {
+    "en": "macro",
+    "zh": "巨集"
+  },
+  {
+    "en": "main memory",
+    "zh": "主記憶體"
+  },
+  {
+    "en": "malicious program",
+    "zh": "惡意程式"
+  },
+  {
+    "en": "MAN",
+    "zh": "都會網路"
+  },
+  {
+    "en": "management",
+    "zh": "管理"
+  },
+  {
+    "en": "management information systems",
+    "zh": "資訊管理系統"
+  },
+  {
+    "en": "manipulation",
+    "zh": "操縱"
+  },
+  {
+    "en": "marketing",
+    "zh": "行銷"
+  },
+  {
+    "en": "marketplace",
+    "zh": "市集"
+  },
+  {
+    "en": "MB",
+    "zh": "百萬位元組"
+  },
+  {
+    "en": "medium",
+    "zh": "媒體"
+  },
+  {
+    "en": "megabyte",
+    "zh": "百萬位元組"
+  },
+  {
+    "en": "megahertz",
+    "zh": "百萬赫茲"
+  },
+  {
+    "en": "memory",
+    "zh": "記憶體"
+  },
+  {
+    "en": "memory unit",
+    "zh": "記憶單元"
+  },
+  {
+    "en": "menu",
+    "zh": "功能表"
+  },
+  {
+    "en": "message box",
+    "zh": "訊息視窗"
+  },
+  {
+    "en": "metadata",
+    "zh": "定義的資料"
+  },
+  {
+    "en": "Metcalfe's law",
+    "zh": "梅特卡夫定律"
+  },
+  {
+    "en": "method",
+    "zh": "方法"
+  },
+  {
+    "en": "MHz",
+    "zh": "百萬赫茲"
+  },
+  {
+    "en": "microphone",
+    "zh": "麥克風"
+  },
+  {
+    "en": "microprocessor",
+    "zh": "微處理器"
+  },
+  {
+    "en": "microsecond",
+    "zh": "微秒"
+  },
+  {
+    "en": "Microsoft",
+    "zh": "微軟"
+  },
+  {
+    "en": "microwave",
+    "zh": "微波"
+  },
+  {
+    "en": "midrange system",
+    "zh": "中型系統"
+  },
+  {
+    "en": "millennium",
+    "zh": "千禧年"
+  },
+  {
+    "en": "millisecond",
+    "zh": "毫秒"
+  },
+  {
+    "en": "mobile communication",
+    "zh": "行動通訊"
+  },
+  {
+    "en": "mobile network",
+    "zh": "行動網路"
+  },
+  {
+    "en": "mobile wallet",
+    "zh": "手機錢包"
+  },
+  {
+    "en": "model",
+    "zh": "模型"
+  },
+  {
+    "en": "modem",
+    "zh": "數據機"
+  },
+  {
+    "en": "modulation",
+    "zh": "調變"
+  },
+  {
+    "en": "module",
+    "zh": "模組"
+  },
+  {
+    "en": "monitor",
+    "zh": "顯示器"
+  },
+  {
+    "en": "motherboard",
+    "zh": "主機板"
+  },
+  {
+    "en": "mouse",
+    "zh": "滑鼠"
+  },
+  {
+    "en": "MU",
+    "zh": "記憶單元"
+  },
+  {
+    "en": "multicore",
+    "zh": "多核心的"
+  },
+  {
+    "en": "multiplexer",
+    "zh": "多工器"
+  },
+  {
+    "en": "nano",
+    "zh": "奈米"
+  },
+  {
+    "en": "nanosecond",
+    "zh": "奈秒"
+  },
+  {
+    "en": "NAT",
+    "zh": "網址解析"
+  },
+  {
+    "en": "network",
+    "zh": "網路"
+  },
+  {
+    "en": "network address translation",
+    "zh": "網址解析"
+  },
+  {
+    "en": "network interface card",
+    "zh": "網路介面卡（NIC）"
+  },
+  {
+    "en": "network operating system",
+    "zh": "網路作業系統"
+  },
+  {
+    "en": "network server",
+    "zh": "網路伺服器"
+  },
+  {
+    "en": "network terminal",
+    "zh": "網路終端機"
+  },
+  {
+    "en": "NIC",
+    "zh": "網路卡"
+  },
+  {
+    "en": "NII",
+    "zh": "國家資訊基礎建設"
+  },
+  {
+    "en": "node",
+    "zh": "節點"
+  },
+  {
+    "en": "Nokia",
+    "zh": "諾基亞"
+  },
+  {
+    "en": "non-repudiation",
+    "zh": "不可否認性"
+  },
+  {
+    "en": "normalization",
+    "zh": "正規化"
+  },
+  {
+    "en": "notebook",
+    "zh": "筆記型"
+  },
+  {
+    "en": "N-tier client-server architecture",
+    "zh": "多層式主從式架構"
+  },
+  {
+    "en": "OA",
+    "zh": "辦公室自動化"
+  },
+  {
+    "en": "object",
+    "zh": "物件"
+  },
+  {
+    "en": "object-oriented language",
+    "zh": "物件導向語言"
+  },
+  {
+    "en": "OCR",
+    "zh": "光學字元辨識軟體"
+  },
+  {
+    "en": "office automation",
+    "zh": "辦公室自動化"
+  },
+  {
+    "en": "offine",
+    "zh": "離線"
+  },
+  {
+    "en": "offshoring",
+    "zh": "境外"
+  },
+  {
+    "en": "OLAP",
+    "zh": "線上分析處理"
+  },
+  {
+    "en": "OLE",
+    "zh": "物件連結與崁入"
+  },
+  {
+    "en": "OLTP",
+    "zh": "線上交易處理"
+  },
+  {
+    "en": "on-demand",
+    "zh": "隨需；即需"
+  },
+  {
+    "en": "online analytical processing",
+    "zh": "線上分析處理"
+  },
+  {
+    "en": "online transaction",
+    "zh": "線上交易"
+  },
+  {
+    "en": "online transaction processing",
+    "zh": "線上交易處理"
+  },
+  {
+    "en": "open source",
+    "zh": "開放原始（碼）"
+  },
+  {
+    "en": "open standard",
+    "zh": "開放式標準"
+  },
+  {
+    "en": "open system",
+    "zh": "開放式系統"
+  },
+  {
+    "en": "operating system",
+    "zh": "作業系統"
+  },
+  {
+    "en": "operation",
+    "zh": "營運"
+  },
+  {
+    "en": "optical disc",
+    "zh": "光碟"
+  },
+  {
+    "en": "optimization",
+    "zh": "優化；最佳化"
+  },
+  {
+    "en": "option button",
+    "zh": "選項按鈕"
+  },
+  {
+    "en": "OSI",
+    "zh": "開放式系統互聯"
+  },
+  {
+    "en": "OSI model",
+    "zh": "開放式系統互聯模型"
+  },
+  {
+    "en": "OU",
+    "zh": "輸出單元"
+  },
+  {
+    "en": "output",
+    "zh": "輸出"
+  },
+  {
+    "en": "output unit",
+    "zh": "輸出單元"
+  },
+  {
+    "en": "outsourcing",
+    "zh": "外包"
+  },
+  {
+    "en": "P2P",
+    "zh": "點對點對等式"
+  },
+  {
+    "en": "pad",
+    "zh": "平板；墊子"
+  },
+  {
+    "en": "pages per minute",
+    "zh": "每分鐘列印的頁數"
+  },
+  {
+    "en": "parallel transmission",
+    "zh": "並列傳輸"
+  },
+  {
+    "en": "parameter",
+    "zh": "參數"
+  },
+  {
+    "en": "password",
+    "zh": "密碼"
+  },
+  {
+    "en": "patch",
+    "zh": "（軟體）修補"
+  },
+  {
+    "en": "patent",
+    "zh": "專利"
+  },
+  {
+    "en": "payment",
+    "zh": "付費"
+  },
+  {
+    "en": "PC",
+    "zh": "個人電腦"
+  },
+  {
+    "en": "PCI",
+    "zh": "周邊元件互聯（擴充槽）"
+  },
+  {
+    "en": "PDA",
+    "zh": "個人數位助理"
+  },
+  {
+    "en": "people resource",
+    "zh": "人力資源"
+  },
+  {
+    "en": "peripheral",
+    "zh": "周邊設備"
+  },
+  {
+    "en": "personal computer",
+    "zh": "個人電腦"
+  },
+  {
+    "en": "personal information",
+    "zh": "個人資訊"
+  },
+  {
+    "en": "pharming",
+    "zh": "網址嫁接；網域欺騙技術"
+  },
+  {
+    "en": "phishing",
+    "zh": "網路釣魚"
+  },
+  {
+    "en": "pivot table",
+    "zh": "樞紐分析表"
+  },
+  {
+    "en": "pixel",
+    "zh": "像素"
+  },
+  {
+    "en": "plan",
+    "zh": "計畫"
+  },
+  {
+    "en": "PnP",
+    "zh": "隨插即用"
+  },
+  {
+    "en": "point-point protocol",
+    "zh": "點對點協定"
+  },
+  {
+    "en": "POP",
+    "zh": "（收信）郵件通訊協定"
+  },
+  {
+    "en": "portability",
+    "zh": "可攜型"
+  },
+  {
+    "en": "portable computer",
+    "zh": "筆記型電腦"
+  },
+  {
+    "en": "portal",
+    "zh": "入口網站"
+  },
+  {
+    "en": "POS",
+    "zh": "銷售時點"
+  },
+  {
+    "en": "POST",
+    "zh": "開機自我測試"
+  },
+  {
+    "en": "post office protocol",
+    "zh": "郵局（收信）協定"
+  },
+  {
+    "en": "power cord",
+    "zh": "電源線"
+  },
+  {
+    "en": "power supply",
+    "zh": "電源供應器"
+  },
+  {
+    "en": "power-on self test",
+    "zh": "開機自我測試"
+  },
+  {
+    "en": "PPM",
+    "zh": "每分鐘列印的頁數"
+  },
+  {
+    "en": "PPTP",
+    "zh": "點對點通道協定"
+  },
+  {
+    "en": "presentation",
+    "zh": "簡報"
+  },
+  {
+    "en": "primary key",
+    "zh": "主鍵"
+  },
+  {
+    "en": "primary partition",
+    "zh": "主要分割區"
+  },
+  {
+    "en": "printer",
+    "zh": "印表機"
+  },
+  {
+    "en": "private",
+    "zh": "私有的"
+  },
+  {
+    "en": "private key",
+    "zh": "私密金鑰"
+  },
+  {
+    "en": "procedure",
+    "zh": "程序"
+  },
+  {
+    "en": "process",
+    "zh": "過程；處理"
+  },
+  {
+    "en": "process control system",
+    "zh": "流程控制系統"
+  },
+  {
+    "en": "processor",
+    "zh": "處理器"
+  },
+  {
+    "en": "production",
+    "zh": "生產"
+  },
+  {
+    "en": "progam",
+    "zh": "程式"
+  },
+  {
+    "en": "programming",
+    "zh": "程式（設計）"
+  },
+  {
+    "en": "programming language",
+    "zh": "程式語言"
+  },
+  {
+    "en": "project",
+    "zh": "專案"
+  },
+  {
+    "en": "projector",
+    "zh": "投影機"
+  },
+  {
+    "en": "property",
+    "zh": "屬性；所有權"
+  },
+  {
+    "en": "protocol",
+    "zh": "協定"
+  },
+  {
+    "en": "pseudo code",
+    "zh": "虛擬碼"
+  },
+  {
+    "en": "PSTN",
+    "zh": "公眾電話網路"
+  },
+  {
+    "en": "public key",
+    "zh": "公開金鑰"
+  },
+  {
+    "en": "QR code",
+    "zh": "快速反應（二維）碼"
+  },
+  {
+    "en": "queue",
+    "zh": "佇列"
+  },
+  {
+    "en": "quick response code",
+    "zh": "快速反應（二維）碼"
+  },
+  {
+    "en": "quick sort",
+    "zh": "快速排序法"
+  },
+  {
+    "en": "radio frequency",
+    "zh": "無線電射頻（ＲＦ）"
+  },
+  {
+    "en": "RAID",
+    "zh": "磁碟陣列"
+  },
+  {
+    "en": "RAM",
+    "zh": "隨機存取記憶體"
+  },
+  {
+    "en": "radom access memory",
+    "zh": "隨機存取記憶體"
+  },
+  {
+    "en": "read-only memory",
+    "zh": "唯讀記憶體"
+  },
+  {
+    "en": "recharge battery",
+    "zh": "可充電式電池"
+  },
+  {
+    "en": "record",
+    "zh": "紀錄"
+  },
+  {
+    "en": "recovery",
+    "zh": "恢復"
+  },
+  {
+    "en": "referential integrity",
+    "zh": "參照完整性"
+  },
+  {
+    "en": "refresh rate",
+    "zh": "更新率"
+  },
+  {
+    "en": "relational database",
+    "zh": "關聯式資料庫"
+  },
+  {
+    "en": "relational model",
+    "zh": "關聯式模型"
+  },
+  {
+    "en": "relationship",
+    "zh": "關係"
+  },
+  {
+    "en": "replication",
+    "zh": "覆寫；複製品"
+  },
+  {
+    "en": "requirement",
+    "zh": "需求；要求"
+  },
+  {
+    "en": "resolution",
+    "zh": "解析度"
+  },
+  {
+    "en": "revenue model",
+    "zh": "獲利模式"
+  },
+  {
+    "en": "RFID",
+    "zh": "無線射頻辨識"
+  },
+  {
+    "en": "ring",
+    "zh": "環狀"
+  },
+  {
+    "en": "risk",
+    "zh": "風險"
+  },
+  {
+    "en": "ROM",
+    "zh": "唯讀記憶體"
+  },
+  {
+    "en": "router",
+    "zh": "路由器"
+  },
+  {
+    "en": "routing",
+    "zh": "規劃路徑（網路）"
+  },
+  {
+    "en": "RPM",
+    "zh": "每分鐘旋轉圈數"
+  },
+  {
+    "en": "SaaS",
+    "zh": "軟體即時服務"
+  },
+  {
+    "en": "Samsung",
+    "zh": "三星"
+  },
+  {
+    "en": "SATA",
+    "zh": "串（序）列電腦匯流排"
+  },
+  {
+    "en": "satellite",
+    "zh": "通訊衛星"
+  },
+  {
+    "en": "scanner",
+    "zh": "掃描器"
+  },
+  {
+    "en": "SCM",
+    "zh": "供應鏈管理"
+  },
+  {
+    "en": "SCSI",
+    "zh": "小型電腦系統介面"
+  },
+  {
+    "en": "SD",
+    "zh": "安全數位（卡）"
+  },
+  {
+    "en": "SDHC",
+    "zh": "安全數位高容量（卡）"
+  },
+  {
+    "en": "SDLC",
+    "zh": "系統開發生命週期"
+  },
+  {
+    "en": "SDRAM",
+    "zh": "同步動態隨機存取記憶體"
+  },
+  {
+    "en": "SDXC",
+    "zh": "安全數位延伸高容量（卡）"
+  },
+  {
+    "en": "search engine",
+    "zh": "搜尋引擎"
+  },
+  {
+    "en": "secondary storge",
+    "zh": "次級儲存體"
+  },
+  {
+    "en": "sector",
+    "zh": "磁區"
+  },
+  {
+    "en": "secure digital",
+    "zh": "安全數位（卡）（ＳＤ）"
+  },
+  {
+    "en": "secure digital extended capacity",
+    "zh": "安全數位延伸高容量（卡）"
+  },
+  {
+    "en": "secure digital high capacity",
+    "zh": "安全數位高容量（卡）"
+  },
+  {
+    "en": "secure electronic transactions",
+    "zh": "安全電子交易"
+  },
+  {
+    "en": "semiconductor memory",
+    "zh": "半導體記憶體"
+  },
+  {
+    "en": "senior",
+    "zh": "高階的；資深的；大四學生；長輩"
+  },
+  {
+    "en": "serial port",
+    "zh": "序列埠"
+  },
+  {
+    "en": "serial transmission",
+    "zh": "串列傳輸"
+  },
+  {
+    "en": "server",
+    "zh": "伺服器"
+  },
+  {
+    "en": "SET",
+    "zh": "安全電子交易"
+  },
+  {
+    "en": "shareware",
+    "zh": "共享軟體"
+  },
+  {
+    "en": "show",
+    "zh": "顯示"
+  },
+  {
+    "en": "six sigma",
+    "zh": "六個標準差"
+  },
+  {
+    "en": "sizing handles",
+    "zh": "尺寸（大小）控點（ｓ）"
+  },
+  {
+    "en": "Skype",
+    "zh": "免費通話與聊天通訊工具"
+  },
+  {
+    "en": "slide",
+    "zh": "投影片"
+  },
+  {
+    "en": "smart card",
+    "zh": "智慧卡"
+  },
+  {
+    "en": "smart phone",
+    "zh": "智慧型電話"
+  },
+  {
+    "en": "sniffer",
+    "zh": "網路監聽"
+  },
+  {
+    "en": "software",
+    "zh": "軟體"
+  },
+  {
+    "en": "software resource",
+    "zh": "軟體資源"
+  },
+  {
+    "en": "solid state",
+    "zh": "固態"
+  },
+  {
+    "en": "sort",
+    "zh": "排序"
+  },
+  {
+    "en": "spam",
+    "zh": "垃圾郵件"
+  },
+  {
+    "en": "specification",
+    "zh": "規格（範）式算表軟體"
+  },
+  {
+    "en": "spreadsheet software",
+    "zh": "試算表軟體"
+  },
+  {
+    "en": "SQL",
+    "zh": "結構話查詢語言"
+  },
+  {
+    "en": "SRAM",
+    "zh": "靜態隨機存取記憶體"
+  },
+  {
+    "en": "standby mode",
+    "zh": "待命模式"
+  },
+  {
+    "en": "star",
+    "zh": "星狀"
+  },
+  {
+    "en": "statement",
+    "zh": "敘述"
+  },
+  {
+    "en": "storage",
+    "zh": "儲存；貯藏（量）"
+  },
+  {
+    "en": "strategy",
+    "zh": "策略；戰略"
+  },
+  {
+    "en": "structure",
+    "zh": "結構化"
+  },
+  {
+    "en": "swapping",
+    "zh": "交換；交換技術"
+  },
+  {
+    "en": "switch",
+    "zh": "交換器"
+  },
+  {
+    "en": "system",
+    "zh": "系統"
+  },
+  {
+    "en": "systems specification",
+    "zh": "系統規格"
+  },
+  {
+    "en": "table",
+    "zh": "表格"
+  },
+  {
+    "en": "task",
+    "zh": "工作；任務"
+  },
+  {
+    "en": "TB",
+    "zh": "兆位元組"
+  },
+  {
+    "en": "TCP",
+    "zh": "傳輸控制協定"
+  },
+  {
+    "en": "TCP/IP",
+    "zh": "傳輸控制協定／網路協定"
+  },
+  {
+    "en": "technical feasibility",
+    "zh": "技術可行性"
+  },
+  {
+    "en": "technology",
+    "zh": "科技；技術；工藝"
+  },
+  {
+    "en": "telecommunication media",
+    "zh": "電信通訊媒體"
+  },
+  {
+    "en": "telecommunication network",
+    "zh": "電信通訊網路"
+  },
+  {
+    "en": "telecommunication software",
+    "zh": "電信通訊軟體"
+  },
+  {
+    "en": "telnet",
+    "zh": "遠端登入"
+  },
+  {
+    "en": "terabyte",
+    "zh": "兆位元組（ＴＧ）"
+  },
+  {
+    "en": "terminal",
+    "zh": "終端機"
+  },
+  {
+    "en": "text",
+    "zh": "文字"
+  },
+  {
+    "en": "textbox",
+    "zh": "文字方塊"
+  },
+  {
+    "en": "THz",
+    "zh": "兆赫茲"
+  },
+  {
+    "en": "timer",
+    "zh": "計時器"
+  },
+  {
+    "en": "transistor",
+    "zh": "電晶體"
+  },
+  {
+    "en": "transparency",
+    "zh": "透明度"
+  },
+  {
+    "en": "TRUE",
+    "zh": "真"
+  },
+  {
+    "en": "unicode",
+    "zh": "萬國碼"
+  },
+  {
+    "en": "upstream",
+    "zh": "升級；上升"
+  },
+  {
+    "en": "upload",
+    "zh": "上傳"
+  },
+  {
+    "en": "upstream",
+    "zh": "上游的；向上串流的"
+  },
+  {
+    "en": "URL",
+    "zh": "全球資源定位器"
+  },
+  {
+    "en": "USB",
+    "zh": "萬用序列匯流排"
+  },
+  {
+    "en": "user name",
+    "zh": "用戶名稱"
+  },
+  {
+    "en": "utility",
+    "zh": "公用程式"
+  },
+  {
+    "en": "value chain model",
+    "zh": "價值鏈模型"
+  },
+  {
+    "en": "variable",
+    "zh": "變數"
+  },
+  {
+    "en": "vector",
+    "zh": "向量"
+  },
+  {
+    "en": "virtual",
+    "zh": "虛擬的"
+  },
+  {
+    "en": "virus",
+    "zh": "病毒"
+  },
+  {
+    "en": "visualization",
+    "zh": "視覺化；形象化"
+  },
+  {
+    "en": "VOD",
+    "zh": "隨選視訊系統"
+  },
+  {
+    "en": "VoIP",
+    "zh": "透過 IP 做語音傳送"
+  },
+  {
+    "en": "WAN",
+    "zh": "廣域網路"
+  },
+  {
+    "en": "warehouse",
+    "zh": "倉儲；倉庫"
+  },
+  {
+    "en": "webcam",
+    "zh": "網路攝像機"
+  },
+  {
+    "en": "weblog",
+    "zh": "網誌；網站的紀錄"
+  },
+  {
+    "en": "WEP",
+    "zh": "有線等效加密（協定）"
+  },
+  {
+    "en": "wiki",
+    "zh": "維基（百科全書）"
+  },
+  {
+    "en": "window",
+    "zh": "視窗"
+  },
+  {
+    "en": "Windows",
+    "zh": "微軟公司開發的作業系統"
+  },
+  {
+    "en": "wireless",
+    "zh": "無線"
+  },
+  {
+    "en": "wireless LAN",
+    "zh": "無線區域網路"
+  },
+  {
+    "en": "wireless technology",
+    "zh": "無線科技"
+  },
+  {
+    "en": "wizard",
+    "zh": "精靈"
+  },
+  {
+    "en": "word processing",
+    "zh": "文字（書）處理"
+  },
+  {
+    "en": "worm",
+    "zh": "蠕蟲"
+  },
+  {
+    "en": "WWW",
+    "zh": "全球資訊網（的英文簡稱）"
+  },
+  {
+    "en": "XML",
+    "zh": "延伸性標示語言"
+  },
+  {
+    "en": "YouTube",
+    "zh": "影片搜尋和分享平臺"
+  }
+]

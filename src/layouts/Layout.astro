@@ -1,0 +1,322 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+const FB_CONFIG = JSON.stringify({
+  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
+  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID,
+});
+const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
+---
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} | 1zTeSt 輕鬆試 - 最佳的校園測驗平台，讓你輕輕鬆鬆的考試！</title>
+  <meta name="description" content="1zTeSt 免費校園測驗平台，讓你輕輕鬆鬆的考試！" />
+  <!-- Anti-AI-scraping meta tags -->
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="bingbot" content="index, follow" />
+  <meta name="ai-content-declaration" content="human-authored" />
+  <meta name="noai" content="true" />
+  <meta name="notranslate" content="true" />
+  <link rel="icon" href="https://i.imgur.com/9fl3wsq.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://accounts.google.com" />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="https://accounts.google.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC:wght@400;500;700&family=LXGW+WenKai+Lite&family=Pacifico&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" is:inline></script>
+  <!-- GSAP Animation Library -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" is:inline></script>
+  <!-- html2canvas & html2pdf.js for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" is:inline></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" is:inline></script>
+  <!-- Firebase Compat SDK (v8-style API via CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" is:inline></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" is:inline></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js" is:inline></script>
+  <style is:global>
+    @import url('https://cdn.jsdelivr.net/fontsource/fonts/iansui@latest/index.css');
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    :root {
+      --font-yuansui: "Iansui", "LXGW WenKai Lite", "Klee One", sans-serif;
+      --font-serif: "Noto Serif TC", serif;
+      --color-primary: #16a34a;
+    }
+
+    ::selection {
+      background: #16a34a;
+      color: white;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-yuansui);
+      background: #f8fafb;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(22,163,74,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.03) 0%, transparent 50%);
+      background-attachment: fixed;
+      color: #334155;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    .font-serif { font-family: var(--font-serif); }
+    .font-script { font-family: "Dancing Script", cursive; }
+    .font-logo { font-family: "Pacifico", cursive; }
+
+    .dot-grid {
+      background-color: #fff;
+      background-image: radial-gradient(#f0f0f0 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .blur-circle {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(120px);
+      pointer-events: none;
+    }
+
+    .card-shadow {
+      box-shadow: 8px 8px 0px 0px rgba(22, 163, 74, 0.08);
+    }
+    .card-shadow-sm {
+      box-shadow: 4px 4px 0px 0px rgba(22, 163, 74, 0.06);
+    }
+
+    /* ── Anti-copy for quiz pages ── */
+    .no-select {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .no-select * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* ── Smooth fade-in for page load ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* ── Card hover lift ── */
+    .card {
+      border-radius: 1rem;
+      border: 1px solid #e2e8f0;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+    .card:hover {
+      box-shadow: 8px 8px 0px 0px rgba(22, 163, 74, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 0.75rem;
+      padding: 0.625rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #fff;
+      background: #16a34a;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { background: #15803d; box-shadow: 0 4px 12px rgba(22,163,74,0.25); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+      padding: 0.625rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #475569;
+      background: #fff;
+      transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    }
+    .btn-outline:hover { border-color: #16a34a; background: #f0fdf4; }
+    .btn-outline:active { transform: scale(0.97); }
+
+    a { transition: color 0.15s; }
+
+    /* Apple-style reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(48px) scale(0.97);
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .reveal-child {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-child.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Premium Page Transition Overlay */
+    .page-transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.99) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .page-transition-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .spin-pulse {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(22, 163, 74, 0.1);
+      border-left: 3px solid #16a34a;
+      border-radius: 50%;
+      animation: spin-pulse-anim 0.85s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+    }
+    @keyframes spin-pulse-anim {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+  <div id="page-transition" class="page-transition-overlay">
+    <div class="spin-pulse mb-4"></div>
+    <p id="page-transition-text" class="text-sm font-medium text-slate-500 tracking-wider">載入中，請稍後...</p>
+  </div>
+  <script is:inline define:vars={{ FB_CONFIG, ADMIN_EMAILS }}>
+    
+    window.FB_CONFIG = JSON.parse(FB_CONFIG);
+    window.ADMIN_EMAILS = (ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(e => e.length > 0);
+
+    if (!window._firebaseInitialized && typeof firebase !== 'undefined' && firebase.initializeApp) {
+      firebase.initializeApp(window.FB_CONFIG);
+      window._firebaseInitialized = true;
+    }
+    window.fbAuth = firebase.auth();
+    window.fbDB = firebase.database();
+
+    window.sanitizeEmail = function(email) {
+      return email.replace(/[.#$/]/g, ',');
+    };
+
+    window.getFirebaseUser = function() {
+      return window.fbAuth.currentUser;
+    };
+
+    window.isAdminEmail = function(email) {
+      return window.ADMIN_EMAILS.includes((email || '').toLowerCase());
+    };
+
+    window.BASE_PATH = '';
+    window.appURL = function(path) {
+      return window.BASE_PATH + (path.startsWith('/') ? path : '/' + path);
+    };
+
+    window.smoothRedirect = function(url, message) {
+      const overlay = document.getElementById('page-transition');
+      const text = document.getElementById('page-transition-text');
+      if (overlay) {
+        if (text && message) text.textContent = message;
+        overlay.classList.add('active');
+        setTimeout(() => {
+          window.location.href = url;
+        }, 1100);
+      } else {
+        window.location.href = url;
+      }
+    };
+
+    (function() {
+      if (!localStorage.getItem('fb_user')) return;
+
+      if (!localStorage.getItem('last_activity')) {
+        localStorage.setItem('last_activity', Date.now());
+      }
+
+      const resetTimer = () => {
+        localStorage.setItem('last_activity', Date.now());
+      };
+
+      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+      events.forEach(name => {
+        document.addEventListener(name, resetTimer, { passive: true });
+      });
+
+      setInterval(() => {
+        const lastActivity = parseInt(localStorage.getItem('last_activity') || '0', 10);
+        const idleTime = Date.now() - lastActivity;
+        if (idleTime > 30 * 60 * 1000) {
+          localStorage.removeItem('fb_user');
+          localStorage.removeItem('last_activity');
+          
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              title: '登出通知',
+              text: '由於您已閒置超過 30 分鐘，系統已自動將您登出。',
+              icon: 'warning',
+              confirmButtonText: '確定',
+              confirmButtonColor: '#16a34a'
+            }).then(() => {
+              window.location.href = '/';
+            });
+          } else {
+            window.location.href = '/';
+          }
+        }
+      }, 10000);
+    })();
+  </script>
+  <slot />
+</body>
+</html>
