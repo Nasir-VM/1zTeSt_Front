@@ -46,6 +46,14 @@ const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" is:inline></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" is:inline></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js" is:inline></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF" is:inline></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-2J28ZVEPZF');
+  </script>
   <style is:global>
     @import url('https://cdn.jsdelivr.net/fontsource/fonts/iansui@latest/index.css');
     @tailwind base;
