@@ -64,31 +64,67 @@ const { isLoggedIn = false, role = '' } = Astro.props;
 
 <style>
   .nav-link {
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    color: #64748b;
-    transition: color 0.15s, background 0.15s;
+    position: relative;
+    padding: 0.5rem 0.875rem;
+    color: #475569;
+    font-weight: 500;
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
-    background: none;
+    background: transparent;
     border: none;
     font: inherit;
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--color-primary, #16a34a);
+    border-radius: 9999px;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .nav-link:hover {
-    color: #16a34a;
-    background: rgba(22,163,74,0.06);
+    color: var(--color-primary, #16a34a);
   }
+  .nav-link:hover::after {
+    width: 75%;
+    left: 12.5%;
+  }
+
   .mobile-nav-link {
+    position: relative;
     padding: 0.5rem 0;
-    color: #64748b;
-    transition: color 0.15s;
+    color: #475569;
+    font-weight: 500;
+    transition: color 0.2s ease;
     cursor: pointer;
-    background: none;
+    background: transparent;
     border: none;
     font: inherit;
     text-align: left;
+    display: block;
+    width: 100%;
+  }
+  .mobile-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-primary, #16a34a);
+    border-radius: 9999px;
+    transition: width 0.25s ease;
   }
   .mobile-nav-link:hover {
-    color: #16a34a;
+    color: var(--color-primary, #16a34a);
+  }
+  .mobile-nav-link:hover::after {
+    width: 2rem;
   }
   #header-avatar-circle img,
   #mobile-header-avatar img {
