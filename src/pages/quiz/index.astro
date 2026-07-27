@@ -337,6 +337,25 @@ let autoSubmitted = false;
 let notesMode = false;
 let quizFontSize = 100;
 
+/* ── Advanced Security & Anti-Bot Defense ── */
+let humanInteractions = 0;
+window.addEventListener('mousemove', () => { humanInteractions++; }, { passive: true });
+window.addEventListener('touchmove', () => { humanInteractions++; }, { passive: true });
+window.addEventListener('keydown', () => { humanInteractions++; }, { passive: true });
+
+function isAutomatedBot() {
+  return !!(
+    navigator.webdriver ||
+    window.document.documentElement?.getAttribute('webdriver') ||
+    window._phantom || window.callPhantom || window.__nightmare ||
+    window.domAutomation || window.Cypress
+  );
+}
+
+function createAnsToken(letter, key) {
+  try { return btoa((letter || '') + '_1zSecret_' + key); } catch(e) { return ''; }
+}
+
 /* ── Anti-cheat ── */
 function requestFullscreen() {
   const el = document.documentElement;
@@ -679,16 +698,20 @@ document.getElementById('chapter-select').addEventListener('change', async () =>
     }
 
     const questionsData = questionsSnap.val();
-    let allQuestions = Object.keys(questionsData).map(key => ({
-      _key: key,
-      question: questionsData[key].question || '',
-      A: questionsData[key].A || '',
-      B: questionsData[key].B || '',
-      C: questionsData[key].C || '',
-      D: questionsData[key].D || '',
-      answer: questionsData[key].answer || '',
-      explanation: questionsData[key].explanation || ''
-    }));
+    let allQuestions = Object.keys(questionsData).map(key => {
+      const realAns = questionsData[key].answer || '';
+      return {
+        _key: key,
+        question: questionsData[key].question || '',
+        A: questionsData[key].A || '',
+        B: questionsData[key].B || '',
+        C: questionsData[key].C || '',
+        D: questionsData[key].D || '',
+        answer: realAns,
+        ansToken: createAnsToken(realAns, key),
+        explanation: questionsData[key].explanation || ''
+      };
+    });
 
     allQuestions.sort(() => Math.random() - 0.5);
     if (limit > 0 && allQuestions.length > limit) {
@@ -739,6 +762,14 @@ document.getElementById('chapter-select').addEventListener('change', async () =>
 
 document.getElementById('btn-submit').addEventListener('click', async () => {
   if (hasSubmitted) return;
+  if (isAutomatedBot()) {
+    Swal.fire({ icon: 'error', title: '安全防護系統阻擋', text: '檢測到自動化機器人/腳本執行環境，已被系統安全機制攔截。' });
+    return;
+  }
+  if (seconds < 2 && humanInteractions < 2) {
+    Swal.fire({ icon: 'warning', title: '異常作答行為', text: '作答時間過短且未檢測到人工閱讀軌跡，請確認答題後再提交。' });
+    return;
+  }
   saveAnswers();
   const answered = Object.values(userAnswers).filter(a => a !== null).length;
   const unanswered = questions.length - answered;
