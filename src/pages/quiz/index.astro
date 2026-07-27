@@ -1,0 +1,1000 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+<Layout title="學生測驗">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+  <Header isLoggedIn={true} role="student" />
+  <main class="relative min-h-screen pt-16">
+    <div class="blur-circle right-[-10%] top-[10%] h-[300px] w-[300px] bg-green-400/10"></div>
+    <div class="mx-auto max-w-3xl px-4 py-12">
+      <h1 class="mb-8 text-2xl font-bold text-slate-800">測驗 GOGOGO</h1>
+
+      <!-- Student Info Banner -->
+      <div id="student-info-banner" class="mb-6 rounded-xl border border-slate-100 bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex-1 text-center">
+          <span class="text-xs text-slate-400 block mb-0.5">目前登入學生</span>
+          <span id="student-display-info" class="text-sm font-bold text-slate-700">載入中...</span>
+        </div>
+        <a href="/login/setup" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-green-600">修改個人資料</a>
+      </div>
+
+      <div id="step-teacher" class="card p-6 mb-6">
+        <div class="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+          <img src="/student-online.png" alt="線上學習" class="h-32 sm:h-40 w-auto object-contain shrink-0 pointer-events-none" loading="lazy" />
+          <div class="min-w-0 flex-1">
+            <p class="mb-4 text-slate-500">輸入老師提供的帳號，就可以進入老師開的考場。</p>
+            <div class="flex gap-3">
+              <input id="teacher-email" type="email" placeholder="teacher@example.com" class="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100" />
+              <button id="btn-load-chapters" class="btn-primary">查詢章節</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-chapter" class="card p-6 mb-6 hidden">
+        <label class="mb-2 block text-sm font-medium text-slate-500">選擇章節：</label>
+        <select id="chapter-select" class="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-green-400 focus:outline-none">
+          <option value="">-- 選擇章節 --</option>
+        </select>
+      </div>
+
+      <div id="step-quiz" class="hidden">
+        <div id="timer-bar" class="card mb-4 flex items-center justify-between px-6 py-4 sticky top-16 z-30 backdrop-blur-sm bg-white/90 border border-slate-100">
+          <div class="flex items-center gap-4">
+            <button id="btn-exit-quiz" class="text-sm text-slate-400 transition hover:text-red-500">← 離開測驗</button>
+            <span id="timer" class="font-mono text-lg font-bold" style="color: var(--color-primary);">00:00</span>
+            <span id="anti-cheat-badge" class="hidden items-center gap-1 rounded-md bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-500">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              防作弊模式
+            </span>
+            <span id="bookmark-counter" class="hidden items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-500">
+              <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span id="bookmark-count-text">0</span> 題
+            </span>
+          </div>
+          <span id="q-count" class="text-sm text-slate-500"></span>
+        </div>
+        <div class="mb-6 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div id="progress-bar" class="h-full rounded-full bg-green-500 transition-all duration-300" style="width:0%"></div>
+        </div>
+        <div id="quiz-paper" class="quiz-paper">
+          <div class="quiz-paper-header">
+            <h3 id="quiz-paper-title" style="font-family: 'Noto Serif TC', 'Source Han Serif TC', '新細明體', serif;">測驗卷</h3>
+            <p id="quiz-paper-subject" class="hidden text-sm font-medium mt-1" style="font-family: 'Noto Serif TC', 'Source Han Serif TC', '新細明體', serif; color: #475569;"></p>
+            <p id="quiz-paper-info">請仔细作答，完成後點擊下方提交按鈕</p>
+          </div>
+          <div id="quiz-container" class="space-y-4 no-select"></div>
+        </div>
+
+        <!-- ── Floating Toolbar ── -->
+        <div id="quiz-toolbar" class="fixed bottom-6 right-6 z-40 flex flex-col gap-2">
+          <!-- Font size controls -->
+          <div class="rounded-2xl border border-slate-100 bg-white/95 backdrop-blur-md p-2 flex flex-col items-center gap-1 shadow-sm">
+            <span class="text-[10px] font-bold text-slate-400 mb-0.5 tracking-wide">字型</span>
+            <button id="btn-font-up" class="flex h-8 w-8 items-center justify-center rounded-xl text-slate-500 transition hover:bg-green-50 hover:text-green-600 active:scale-95" title="放大字型">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+            </button>
+            <span id="font-size-display" class="text-[10px] font-mono text-slate-400">100%</span>
+            <button id="btn-font-down" class="flex h-8 w-8 items-center justify-center rounded-xl text-slate-500 transition hover:bg-green-50 hover:text-green-600 active:scale-95" title="縮小字型">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6"/></svg>
+            </button>
+          </div>
+          <!-- Notes toggle -->
+          <button id="btn-notes-toggle" class="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-100 bg-white/95 backdrop-blur-md text-slate-400 shadow-sm transition hover:border-green-200 hover:bg-green-50 hover:text-green-500 active:scale-95" title="開啟註記模式">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </button>
+        </div>
+
+        <div class="mt-6 flex flex-col items-center gap-4">
+          <button id="btn-submit" class="btn-primary !rounded-xl !px-10 !py-3 !font-bold">提交測驗</button>
+        </div>
+      </div>
+
+      <div id="step-result" class="card p-8 hidden">
+        <h2 class="mb-2 text-center text-2xl font-bold text-slate-800">測驗結果</h2>
+        <p id="result-score" class="mb-6 text-center text-4xl font-bold" style="color: var(--color-primary);"></p>
+        <div id="result-review" class="space-y-4"></div>
+        <div class="mt-8 flex justify-center gap-3 flex-wrap">
+          <button id="btn-export-pdf" class="inline-flex items-center gap-2 rounded-xl bg-blue-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-950 hover:shadow active:scale-[0.98]">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            匯出 PDF 考卷
+          </button>
+          <button id="btn-retry-wrong" class="hidden inline-flex items-center gap-2 rounded-xl bg-blue-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-950 hover:shadow active:scale-[0.98]">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            重新測驗錯題
+          </button>
+          <button id="btn-reload" class="btn-primary">重新測驗</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style is:global>
+  /* ── Strict Mobile RWD & Zero Overflow ── */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100vw;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  svg, video, iframe {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  /* ── Global Print Stylesheet for PDF Export ── */
+  @media print {
+    body > * {
+      display: none !important;
+    }
+    body > #print-paper-container {
+      display: block !important;
+      visibility: visible !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      background: #ffffff !important;
+      color: #000000 !important;
+      padding: 10px !important;
+      margin: 0 !important;
+      z-index: 9999999 !important;
+    }
+    #print-paper-container, #print-paper-container * {
+      visibility: visible !important;
+    }
+  }
+
+  /* ── Quiz paper — desktop looks like exam sheet ── */
+  .quiz-paper {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  .quiz-paper-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px dashed #e2e8f0;
+  }
+  .quiz-paper-header h3 {
+    font-family: 'Noto Serif TC', 'Source Han Serif TC', '新細明體', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: 0.08em;
+  }
+  .quiz-paper-header p {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  .quiz-paper-header #quiz-paper-subject {
+    font-family: 'Noto Serif TC', 'Source Han Serif TC', '新細明體', serif;
+    color: #475569;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .quiz-card {
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    background: transparent;
+    padding: 1.5rem 1rem;
+    transition: background 0.2s;
+    width: 100%;
+    max-width: 100%;
+  }
+  .quiz-card:last-child {
+    border-bottom: none;
+  }
+  .quiz-card:hover {
+    background: #fafafa;
+  }
+  .quiz-card .quiz-question-text span:first-child {
+    color: #16a34a;
+    font-weight: 700;
+  }
+
+  /* ── Mobile: flat paper, divider lines between questions ── */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important; /* Prevents iOS Safari auto-zoom on input focus */
+    }
+    .quiz-paper {
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+      background: transparent;
+      width: 100%;
+    }
+    .quiz-paper-header { display: none; }
+    .quiz-card {
+      padding: 1.25rem 0.5rem;
+      border-bottom: 1px solid #e2e5e9;
+    }
+    .quiz-card:last-child {
+      border-bottom: none;
+    }
+    .quiz-card .space-y-2 label {
+      padding: 0.625rem 0.75rem;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      width: 100%;
+    }
+    .quiz-card .quiz-question-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    #quiz-container > * + * {
+      margin-top: 0 !important;
+    }
+    #timer-bar {
+      padding: 0.625rem 0.875rem !important;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-width: 100%;
+    }
+    #timer-bar .flex.items-center.gap-4 {
+      gap: 0.375rem !important;
+      flex-wrap: wrap;
+    }
+    #timer-bar #q-count {
+      font-size: 0.75rem;
+    }
+    #student-info-banner {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+      padding: 0.875rem 1rem;
+    }
+    #student-info-banner a {
+      align-self: center;
+    }
+    #step-result {
+      border-radius: 12px !important;
+      padding: 1.25rem 1rem !important;
+      margin: 0;
+      width: 100%;
+    }
+    #step-result .rounded-xl {
+      border-radius: 10px !important;
+      padding: 0.875rem;
+    }
+  }
+  /* Allow text selection in note areas even with no-select */
+  .note-area, .note-area * {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: auto !important;
+  }
+  /* Hide toolbar when not in quiz */
+  #quiz-toolbar {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  #quiz-toolbar.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email) { window.location.href = BP + '/'; } else { document.getElementById('auth-guard')?.remove(); }
+
+function html(strings, ...vals) {
+  return strings.reduce((acc, s, i) => acc + s + (vals[i] !== undefined ? vals[i] : ''), '');
+}
+
+function show(selector) { document.querySelector(selector)?.classList.remove('hidden'); }
+function hide(selector) { document.querySelector(selector)?.classList.add('hidden'); }
+
+let teacherEmail = '';
+let currentChapterKey = '';
+let currentChapterSubject = '';
+let currentChapterName = '';
+let questions = [];
+let userAnswers = {};
+let bookmarks = new Set();
+let notes = {};
+let timerInterval = null;
+let seconds = 0;
+let hasSubmitted = false;
+let antiCheatEnabled = false;
+let autoSubmitted = false;
+let notesMode = false;
+let quizFontSize = 100;
+
+/* ── Anti-cheat ── */
+function requestFullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+}
+
+function exitFullscreen() {
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen)?.call(document);
+  }
+}
+
+function handleAntiCheatViolation() {
+  if (autoSubmitted || hasSubmitted || document.getElementById('step-quiz').classList.contains('hidden')) return;
+  autoSubmitted = true;
+  clearInterval(timerInterval);
+  saveAnswers();
+  submitQuiz('視窗切換交卷');
+}
+
+function setupAntiCheatListeners() {
+  document.addEventListener('visibilitychange', () => {
+    if (antiCheatEnabled && document.visibilityState === 'hidden') handleAntiCheatViolation();
+  });
+  window.addEventListener('blur', () => {
+    if (antiCheatEnabled) handleAntiCheatViolation();
+  });
+}
+
+function startTimer() {
+  seconds = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => { seconds++; document.getElementById('timer').textContent = formatTime(seconds); }, 1000);
+}
+
+function formatTime(sec) {
+  return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+}
+
+function renderQuestions(qs) {
+  const container = document.getElementById('quiz-container');
+  document.getElementById('q-count').textContent = '共 ' + qs.length + ' 題';
+  document.getElementById('progress-bar').style.width = '0%';
+
+  const markup = qs.map((q, idx) => {
+    const optionsHtml = [q.A, q.B, q.C, q.D].filter(Boolean).map(opt => html`
+      <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-100 px-4 py-3 text-sm transition hover:border-green-200 hover:bg-green-50 opt-label" data-qid="${q._key}">
+        <input type="radio" name="q_${q._key}" value="${opt.replace(/"/g, '&quot;')}" class="text-green-500 focus:ring-green-400">
+        <span>${opt}</span>
+      </label>
+    `).join('');
+
+    const isBookmarked = bookmarks.has(q._key);
+    return html`
+      <div class="quiz-card relative" data-qidx="${idx}">
+        <div class="flex items-start justify-between gap-2 mb-3">
+          <p class="font-medium text-slate-800 pr-2 flex-1 quiz-question-text">
+            <span class="mr-1.5 text-xs font-semibold text-slate-400">${idx + 1}.</span>
+            ${q.question}
+          </p>
+          <div class="flex items-center gap-1 shrink-0">
+            <button class="note-btn flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 transition hover:bg-green-50 hover:text-green-500 ${q._key in notes ? 'text-green-500 bg-green-50' : ''}" data-qid="${q._key}" title="註記">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button class="bookmark-btn flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 transition hover:bg-amber-50 hover:text-amber-400 ${isBookmarked ? 'text-amber-400' : ''}" data-qid="${q._key}" title="標記此題">
+              <svg class="h-3.5 w-3.5" fill="${isBookmarked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="space-y-2" data-qid="${q._key}">
+          ${optionsHtml}
+        </div>
+        <div class="note-area hidden mt-3 pt-3 border-t border-dashed border-slate-200">
+          <textarea class="note-textarea w-full rounded-lg border border-slate-200 bg-green-50/40 px-3 py-2 text-xs text-slate-600 placeholder:text-slate-300 focus:border-green-300 focus:outline-none focus:ring-1 focus:ring-green-200 resize-none" rows="2" placeholder="在這裡寫下你的想法..." data-qid="${q._key}">${q._key in notes ? notes[q._key] : ''}</textarea>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = markup;
+
+  container.querySelectorAll('.opt-label input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const labels = inp.closest('[data-qidx]').querySelectorAll('.opt-label');
+      labels.forEach(l => l.classList.remove('bg-green-50', 'border-green-300'));
+      if (inp.checked) inp.closest('.opt-label').classList.add('bg-green-50', 'border-green-300');
+    });
+  });
+
+  container.querySelectorAll('.bookmark-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.qid;
+      if (bookmarks.has(qid)) {
+        bookmarks.delete(qid);
+        btn.classList.remove('text-amber-400');
+        btn.classList.add('text-slate-300');
+        btn.querySelector('svg').setAttribute('fill', 'none');
+      } else {
+        bookmarks.add(qid);
+        btn.classList.add('text-amber-400');
+        btn.classList.remove('text-slate-300');
+        btn.querySelector('svg').setAttribute('fill', 'currentColor');
+      }
+      updateBookmarkCounter();
+    });
+  });
+
+  /* ── Note buttons ── */
+  container.querySelectorAll('.note-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.qid;
+      const card = btn.closest('.quiz-card');
+      const noteArea = card.querySelector('.note-area');
+      const textarea = card.querySelector('.note-textarea');
+      if (noteArea.classList.contains('hidden')) {
+        noteArea.classList.remove('hidden');
+        textarea.focus();
+      } else {
+        noteArea.classList.add('hidden');
+      }
+    });
+  });
+
+  /* ── Note textareas ── */
+  container.querySelectorAll('.note-textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const qid = ta.dataset.qid;
+      const val = ta.value.trim();
+      if (val) {
+        notes[qid] = val;
+      } else {
+        delete notes[qid];
+      }
+      updateNotesIcon();
+    });
+  });
+}
+
+function updateBookmarkCounter() {
+  const counter = document.getElementById('bookmark-counter');
+  const text = document.getElementById('bookmark-count-text');
+  if (bookmarks.size > 0) {
+    counter?.classList.remove('hidden');
+    counter?.classList.add('flex');
+    text.textContent = bookmarks.size;
+  } else {
+    counter?.classList.add('hidden');
+    counter?.classList.remove('flex');
+  }
+}
+
+function updateNotesIcon() {
+  document.querySelectorAll('.note-btn').forEach(btn => {
+    const qid = btn.dataset.qid;
+    if (notes[qid]) {
+      btn.classList.add('text-green-500', 'bg-green-50');
+      btn.classList.remove('text-slate-300');
+    } else {
+      btn.classList.remove('text-green-500', 'bg-green-50');
+      btn.classList.add('text-slate-300');
+    }
+  });
+}
+
+/* ── Font zoom ── */
+document.getElementById('btn-font-up')?.addEventListener('click', () => {
+  if (quizFontSize >= 140) return;
+  quizFontSize += 10;
+  applyFontSize();
+});
+document.getElementById('btn-font-down')?.addEventListener('click', () => {
+  if (quizFontSize <= 70) return;
+  quizFontSize -= 10;
+  applyFontSize();
+});
+function applyFontSize() {
+  document.querySelectorAll('.quiz-question-text, .opt-label span').forEach(el => {
+    el.style.fontSize = '';
+  });
+  const qTexts = document.querySelectorAll('.quiz-question-text');
+  const optTexts = document.querySelectorAll('.opt-label span');
+  const base = quizFontSize / 100;
+  qTexts.forEach(el => { el.style.fontSize = (0.875 * base) + 'rem'; });
+  optTexts.forEach(el => { el.style.fontSize = (0.875 * base) + 'rem'; });
+  document.getElementById('font-size-display').textContent = quizFontSize + '%';
+}
+
+/* ── Notes toggle ── */
+document.getElementById('btn-notes-toggle')?.addEventListener('click', () => {
+  notesMode = !notesMode;
+  const btn = document.getElementById('btn-notes-toggle');
+  document.querySelectorAll('.note-area').forEach(el => {
+    el.classList.toggle('hidden', !notesMode);
+  });
+  if (notesMode) {
+    btn?.classList.add('border-green-200', 'bg-green-50', 'text-green-500');
+    btn?.classList.remove('border-slate-100', 'bg-white/95', 'text-slate-400');
+    Swal.fire({ icon: 'info', title: '註記模式已開啟', text: '每題下方會出現備註欄，可以寫下你的想法。', timer: 2000, showConfirmButton: false, toast: true, position: 'top-end' });
+  } else {
+    btn?.classList.remove('border-green-200', 'bg-green-50', 'text-green-500');
+    btn?.classList.add('border-slate-100', 'bg-white/95', 'text-slate-400');
+  }
+});
+
+function saveAnswers() {
+  questions.forEach(q => {
+    const checked = document.querySelector('input[name="q_' + q._key + '"]:checked');
+    userAnswers[q._key] = checked ? checked.value : null;
+  });
+}
+
+async function exitQuiz() {
+  if (!hasSubmitted && !document.getElementById('step-quiz').classList.contains('hidden')) {
+    const confirmResult = await Swal.fire({
+      title: '確定要離開測驗嗎？',
+      text: '進度將不會被儲存。',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '確定離開',
+      cancelButtonText: '繼續測驗',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#16a34a'
+    });
+    if (!confirmResult.isConfirmed) return;
+  }
+  clearInterval(timerInterval);
+  hasSubmitted = false;
+  autoSubmitted = false;
+  antiCheatEnabled = false;
+  userAnswers = {};
+  bookmarks = new Set();
+  notes = {};
+  notesMode = false;
+  quizFontSize = 100;
+  questions = [];
+  seconds = 0;
+  hide('#step-quiz');
+  hide('#step-result');
+  hide('#step-chapter');
+  show('#step-teacher');
+  document.getElementById('quiz-toolbar')?.classList.remove('active');
+  document.getElementById('chapter-select').innerHTML = '<option value="">-- 選擇章節 --</option>';
+  document.getElementById('quiz-container').innerHTML = '';
+  document.getElementById('timer').textContent = '00:00';
+  document.getElementById('anti-cheat-badge')?.classList.add('hidden');
+  document.getElementById('anti-cheat-badge')?.classList.remove('flex');
+  const noteToggle = document.getElementById('btn-notes-toggle');
+  noteToggle?.classList.remove('border-amber-200', 'bg-amber-50', 'text-amber-500');
+  noteToggle?.classList.add('border-slate-100', 'bg-white/95', 'text-slate-400');
+  document.getElementById('font-size-display').textContent = '100%';
+  exitFullscreen();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('teacher-email')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('btn-load-chapters')?.click();
+  }
+});
+
+document.getElementById('btn-load-chapters').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-load-chapters');
+  const email = document.getElementById('teacher-email').value.trim();
+  if (!email) { Swal.fire({ icon: 'warning', title: '請輸入教師帳號' }); return; }
+
+  btn.disabled = true;
+  btn.textContent = '查詢中...';
+  teacherEmail = email;
+  const san = window.sanitizeEmail(email);
+
+  try {
+    const chaptersSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters').once('value');
+    if (!chaptersSnap.exists()) {
+      Swal.fire({ icon: 'error', title: '找不到此教師' });
+      btn.disabled = false;
+      btn.textContent = '查詢章節';
+      return;
+    }
+
+    const chaptersData = chaptersSnap.val();
+    const chapters = [];
+    Object.keys(chaptersData).forEach(key => {
+      const ch = chaptersData[key];
+      if (ch.open === true || ch.open === 'true') {
+        const qCount = ch.question_count != null ? ch.question_count : (ch.questions ? Object.keys(ch.questions).length : 0);
+        chapters.push({ key, name: ch.name || key, questionCount: qCount, limit: ch.limit || 0 });
+      }
+    });
+
+    if (!chapters.length) {
+      Swal.fire({ icon: 'info', title: '此教師目前沒有開放的章節' });
+      btn.disabled = false;
+      btn.textContent = '查詢章節';
+      return;
+    }
+
+    const sel = document.getElementById('chapter-select');
+    sel.innerHTML = '<option value="">-- 選擇章節 --</option>' +
+      chapters.map(ch => `<option value='${ch.key}'>${ch.name}（${ch.questionCount} 題）</option>`).join('');
+    show('#step-chapter');
+    localStorage.setItem('teacherEmail', email);
+  } catch (e) {
+    console.error(e);
+    Swal.fire({ icon: 'error', title: '網路錯誤' });
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '查詢章節';
+  }
+});
+
+document.getElementById('chapter-select').addEventListener('change', async () => {
+  const chKey = document.getElementById('chapter-select').value;
+  if (!chKey) return;
+  currentChapterKey = chKey;
+  currentChapterSubject = '';
+  currentChapterName = document.getElementById('chapter-select').selectedOptions[0]?.textContent?.replace(/\（.*）$/, '') || chKey;
+  hasSubmitted = false;
+  userAnswers = {};
+  bookmarks = new Set();
+
+  const san = window.sanitizeEmail(teacherEmail);
+  try {
+    const limitSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters/' + chKey + '/limit').once('value');
+    const limit = limitSnap.val() || 0;
+
+    const antiCheatSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters/' + chKey + '/antiChe').once('value');
+    antiCheatEnabled = antiCheatSnap.val() === true;
+
+    /* Read subject from chapter node (single read, zero extra cost) */
+    const subjectSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters/' + chKey + '/subject').once('value');
+    currentChapterSubject = subjectSnap.val() || '';
+
+    const questionsSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters/' + chKey + '/questions').once('value');
+    if (!questionsSnap.exists()) {
+      Swal.fire({ icon: 'info', title: '這個章節還沒有題目喔～', text: '請稍後再試，或請老師出題。', timer: 2500, showConfirmButton: false });
+      return;
+    }
+
+    const questionsData = questionsSnap.val();
+    let allQuestions = Object.keys(questionsData).map(key => ({
+      _key: key,
+      question: questionsData[key].question || '',
+      A: questionsData[key].A || '',
+      B: questionsData[key].B || '',
+      C: questionsData[key].C || '',
+      D: questionsData[key].D || '',
+      answer: questionsData[key].answer || '',
+      explanation: questionsData[key].explanation || ''
+    }));
+
+    allQuestions.sort(() => Math.random() - 0.5);
+    if (limit > 0 && allQuestions.length > limit) {
+      allQuestions = allQuestions.slice(0, limit);
+    }
+
+    questions = allQuestions;
+    show('#step-quiz');
+    hide('#step-result');
+    /* Show subject in quiz paper header */
+    const subjectEl = document.getElementById('quiz-paper-subject');
+    const infoEl = document.getElementById('quiz-paper-info');
+    const titleEl = document.getElementById('quiz-paper-title');
+    if (currentChapterName) {
+      titleEl.textContent = currentChapterName;
+    }
+    if (currentChapterSubject) {
+      subjectEl.textContent = currentChapterSubject;
+      subjectEl.classList.remove('hidden');
+    } else {
+      subjectEl.classList.add('hidden');
+    }
+    if (currentChapterSubject || currentChapterName) {
+      infoEl.textContent = '請仔細作答，完成後點擊下方提交按鈕';
+    }
+    renderQuestions(questions);
+    startTimer();
+    autoSubmitted = false;
+    document.getElementById('quiz-toolbar')?.classList.add('active');
+
+    const badge = document.getElementById('anti-cheat-badge');
+    if (antiCheatEnabled) {
+      badge?.classList.remove('hidden');
+      badge?.classList.add('flex');
+      setupAntiCheatListeners();
+      requestFullscreen();
+    } else {
+      badge?.classList.add('hidden');
+      badge?.classList.remove('flex');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    console.error(e);
+    Swal.fire({ icon: 'error', title: '網路錯誤' });
+  }
+});
+
+document.getElementById('btn-submit').addEventListener('click', async () => {
+  if (hasSubmitted) return;
+  saveAnswers();
+  const answered = Object.values(userAnswers).filter(a => a !== null).length;
+  const unanswered = questions.length - answered;
+  const confirmResult = await Swal.fire({
+    title: '確定提交嗎？',
+    text: `已作答 ${answered} 題，未作答 ${unanswered} 題。`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '確定提交',
+    cancelButtonText: '繼續作答',
+    confirmButtonColor: '#16a34a',
+    cancelButtonColor: '#ef4444'
+  });
+  if (!confirmResult.isConfirmed) return;
+  submitQuiz('');
+});
+
+async function submitQuiz(notes) {
+  if (hasSubmitted) return;
+  hasSubmitted = true;
+
+  let correct = 0;
+  questions.forEach(q => {
+    if (userAnswers[q._key] && userAnswers[q._key] === q.answer) correct++;
+  });
+  const score = questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0;
+
+  const san = window.sanitizeEmail(teacherEmail);
+  const studentSan = window.sanitizeEmail(user.email);
+  const now = new Date();
+  const dateKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  const timeStr = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+
+  try {
+    /* Save to QUIZSCORES (separate from PVQC): QUIZSCORES/{san}/{YYYY-MM-DD}/{studentSan}/{chapterKey} */
+    await firebase.database().ref('QUIZSCORES/' + san + '/' + dateKey + '/' + studentSan + '/' + currentChapterKey).push({
+      student: user.email,
+      name: user.name || user.email,
+      score: score,
+      total: questions.length,
+      correct: correct,
+      type: 'quiz',
+      time: timeStr,
+      date: dateKey,
+      notes: notes || ''
+    });
+  } catch (e) {
+    console.error('Failed to save score:', e);
+  }
+
+  exitFullscreen();
+  document.getElementById('result-score').textContent = score + ' 分（' + correct + '/' + questions.length + '）';
+  hide('#step-quiz');
+  show('#step-result');
+
+  const reviewMarkup = questions.map((q, idx) => {
+    const ua = userAnswers[q._key];
+    const isCorrect = ua === q.answer;
+    const ansText = ua || '未作答';
+    const optionsList = [q.A, q.B, q.C, q.D].filter(Boolean).map((opt, i) => {
+      const letter = ['A', 'B', 'C', 'D'][i];
+      const isThisAnswer = letter === q.answer;
+      const isThisUserChoice = letter === ua;
+      let optLines = [];
+      if (isThisAnswer) optLines.push('font-weight:700;background:#fef9c3;padding:2px 6px;border-radius:4px;');
+      if (isThisUserChoice && !isCorrect) optLines.push('text-decoration:line-through;color:#999;');
+      const optStyle = 'padding:4px 0;font-size:15px;display:flex;align-items:center;gap:6px;' + optLines.join('');
+      let marker = '';
+      if (isThisAnswer) marker = '<span style="color:#16a34a;font-weight:700;">✓</span> ';
+      else if (isThisUserChoice && !isCorrect) marker = '<span style="color:#dc2626;font-weight:700;">✗</span> ';
+      return '<div style="' + optStyle + '">' + marker + '<span style="color:#94a3b8;min-width:18px;">' + letter + '.</span> ' + opt + '</div>';
+    }).join('');
+    let extra = '';
+    if (!isCorrect && q.explanation) {
+      extra = '<p style="margin-top:6px;font-size:13px;color:#64748b;padding-top:4px;border-top:1px dashed #e2e8f0;">詳解：' + q.explanation + '</p>';
+    }
+    const ansLine = isCorrect
+      ? '<p style="font-size:13px;color:#16a34a;margin-top:6px;">✓ 正確</p>'
+      : '<p style="font-size:13px;margin-top:6px;"><span style="color:#dc2626;font-weight:600;">✗ 你的答案：' + ansText + '</span>　<span style="color:#16a34a;font-weight:600;">正確答案：' + q.answer + '</span></p>';
+    return `
+      <div style="padding:14px 0;border-bottom:1px solid #f1f5f9;">
+        <p style="font-size:16px;color:#1e293b;margin-bottom:8px;line-height:1.7;"><span style="color:#94a3b8;margin-right:4px;">${idx + 1}.</span>${q.question}</p>
+        <div>${optionsList}</div>
+        ${ansLine}
+        ${extra}
+      </div>
+    `;
+  }).join('');
+  document.getElementById('result-review').innerHTML = reviewMarkup;
+
+  document.getElementById('btn-retry-wrong').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('btn-retry-wrong').addEventListener('click', () => {
+  const wrongKeys = [];
+  questions.forEach(q => {
+    if (userAnswers[q._key] !== q.answer) wrongKeys.push(q._key);
+  });
+  if (!wrongKeys.length) { Swal.fire({ icon: 'success', title: '恭喜！沒有錯題！' }); return; }
+
+  questions = questions.filter(q => wrongKeys.includes(q._key));
+  hasSubmitted = false;
+  userAnswers = {};
+  hide('#step-result');
+  show('#step-quiz');
+  renderQuestions(questions);
+  startTimer();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('btn-exit-quiz')?.addEventListener('click', exitQuiz);
+document.getElementById('btn-reload').addEventListener('click', () => location.reload());
+
+/* ── PDF Export (System Font & Print Fallback) ── */
+document.getElementById('btn-export-pdf')?.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-export-pdf');
+  btn.disabled = true;
+
+  Swal.fire({
+    title: '正在產生 PDF 考卷',
+    html: '<p style="margin-top:8px;font-size:13px;color:#64748b;">請稍候，正在為您排版與生成 PDF…</p>',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => { Swal.showLoading(); }
+  });
+
+  try {
+    let studentName = user.name || user.email;
+    let studentId = '';
+    try {
+      const san = window.sanitizeEmail(user.email);
+      const profileSnap = await firebase.database().ref('1zTeStsys/Studentaccount/' + san).once('value');
+      if (profileSnap.exists()) {
+        const p = profileSnap.val();
+        studentName = p.name || studentName;
+        studentId = p.stunum || '';
+      }
+    } catch(e) {}
+
+    const score = questions.length > 0 ? Math.round((questions.filter(q => userAnswers[q._key] === q.answer).length / questions.length) * 100) : 0;
+    const correct = questions.filter(q => userAnswers[q._key] === q.answer).length;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
+
+    const subjectLine = currentChapterSubject
+      ? '<p style="font-size:13px;color:#475569;margin:2px 0 0;font-weight:600;">' + currentChapterSubject + '</p>'
+      : '';
+
+    const scoreColor = score >= 60 ? '#16a34a' : '#dc2626';
+    const scoreStamp = '<div style="float:right;text-align:center;border:3px solid ' + scoreColor + ';border-radius:10px;padding:8px 14px;background:#ffffff;box-shadow:2px 2px 6px rgba(0,0,0,0.06);">'
+      + '<div style="font-size:28px;font-weight:800;color:' + scoreColor + ';line-height:1;">' + score + ' 分</div>'
+      + '<div style="font-size:11px;color:' + scoreColor + ';margin-top:2px;font-weight:600;">' + correct + ' / ' + questions.length + ' 題</div>'
+      + '</div>';
+
+    let questionsHtml = '';
+    questions.forEach((q, idx) => {
+      const ua = userAnswers[q._key];
+      const isCorrect = ua === q.answer;
+      const opts = [q.A, q.B, q.C, q.D].filter(Boolean).map(opt => {
+        const letter = opt === q.A ? 'A' : opt === q.B ? 'B' : opt === q.C ? 'C' : 'D';
+        const isUserChoice = ua === opt;
+        const isCorrectAnswer = q.answer && q.answer.includes(letter);
+        let optStyle = 'padding:4px 8px;font-size:13px;border-radius:4px;margin-bottom:2px;';
+        if (isCorrectAnswer) optStyle += 'background:#fef9c3;font-weight:600;color:#854d0e;';
+        else if (isUserChoice && !isCorrect) optStyle += 'background:#fee2e2;color:#991b1b;text-decoration:line-through;';
+        else optStyle += 'color:#334155;';
+        return '<div style="' + optStyle + '">' + letter + '. ' + opt + '</div>';
+      }).join('');
+
+      let ansLine = '';
+      if (!isCorrect) {
+        ansLine = '<div style="margin-top:6px;padding:6px 10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:12px;">'
+          + '<span style="color:#dc2626;font-weight:600;">✗ 你的答案：' + (ua || '未作答') + '</span>'
+          + '　<span style="color:#16a34a;font-weight:600;">✓ 正確答案：' + q.answer + '</span>'
+          + (q.explanation ? '<div style="color:#475569;margin-top:4px;padding-top:4px;border-top:1px dashed #fca5a5;">詳解：' + q.explanation + '</div>' : '')
+          + '</div>';
+      } else {
+        ansLine = '<div style="margin-top:4px;padding:3px 8px;font-size:12px;color:#16a34a;font-weight:600;">✓ 正確</div>';
+      }
+
+      questionsHtml += '<div style="page-break-inside:avoid;margin-bottom:12px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#ffffff;">'
+        + '<p style="font-size:14px;font-weight:700;color:#0f172a;margin:0 0 6px;">' + (idx + 1) + '. ' + q.question + '</p>'
+        + '<div>' + opts + '</div>'
+        + ansLine
+        + '</div>';
+    });
+
+    const examTitle = (currentChapterSubject && currentChapterName)
+      ? (currentChapterSubject + ' — ' + currentChapterName)
+      : (currentChapterSubject || currentChapterName || '線上測驗考卷');
+
+    const fullHtml = '<div style="width:750px;margin:0 auto;padding:24px;background:#ffffff;font-family:\'Iansui\', \'LXGW WenKai Lite\', serif, sans-serif;box-sizing:border-box;color:#0f172a;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:12px;border-bottom:1px solid #cbd5e1;font-size:11px;color:#64748b;">'
+      + '<span>1zTeSt 輕鬆試 — https://1ztests.nsir.uk</span>'
+      + '<span>測驗成績報告單</span>'
+      + '</div>'
+      + scoreStamp
+      + '<div style="padding-bottom:12px;margin-bottom:16px;border-bottom:2px dashed #94a3b8;">'
+      + '<h1 style="font-size:24px;font-weight:800;color:#0f172a;margin:0 0 6px;font-family:\'Iansui\', serif;">' + examTitle + '</h1>'
+      + '<p style="font-size:12px;color:#64748b;margin:0;">日期：' + dateStr + '　|　考生：' + studentName + (studentId ? ' (學號 ' + studentId + ')' : '') + '</p>'
+      + '</div>'
+      + '<div style="clear:both;"></div>'
+      + questionsHtml
+      + '<div style="margin-top:24px;padding-top:12px;border-top:1px solid #cbd5e1;font-size:11px;color:#64748b;text-align:center;">'
+      + '1zTeSt 輕鬆試 — https://1ztests.nsir.uk'
+      + '</div>'
+      + '</div>';
+
+    const printWindowHtml = '<!DOCTYPE html><html><head><meta charset="utf-8"/><title>' + examTitle + '</title>'
+      + '<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/iansui@latest/index.css">'
+      + '<style>'
+      + 'body { margin:0; padding:24px; font-family:"Iansui", serif, sans-serif; background:#ffffff; color:#0f172a; box-sizing:border-box; }'
+      + '@media print { body { padding:0; } @page { margin: 12mm; } }'
+      + '</style></head><body>'
+      + fullHtml
+      + '</body></html>';
+
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(printWindowHtml);
+      printWin.document.close();
+      let printed = false;
+      const triggerPrint = () => {
+        if (printed) return;
+        printed = true;
+        printWin.focus();
+        printWin.print();
+      };
+      printWin.onload = triggerPrint;
+      setTimeout(triggerPrint, 500);
+    } else {
+      let printWrap = document.getElementById('print-paper-container');
+      if (!printWrap) {
+        printWrap = document.createElement('div');
+        printWrap.id = 'print-paper-container';
+        document.body.appendChild(printWrap);
+      }
+      printWrap.innerHTML = fullHtml;
+      window.print();
+    }
+  } catch(e) {
+    console.error('PDF export error:', e);
+    Swal.fire({ icon: 'error', title: 'PDF 匯出失敗', text: e.message || '未知錯誤' });
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+const saved = localStorage.getItem('teacherEmail');
+if (saved) document.getElementById('teacher-email').value = saved;
+
+(function() {
+  if (!user || !user.email) return;
+  const san = window.sanitizeEmail(user.email);
+  firebase.database().ref('1zTeStsys/Studentaccount/' + san).once('value')
+    .then(snap => {
+      if (snap.exists()) {
+        const profile = snap.val();
+        document.getElementById('student-display-info').textContent =
+          `${profile.name || '未填寫'}（學號: ${profile.stunum || '未填寫'}）`;
+      } else {
+        document.getElementById('student-display-info').textContent = user.name || user.email;
+      }
+    })
+    .catch(() => {
+      document.getElementById('student-display-info').textContent = user.name || user.email;
+    });
+})();
+</script>
