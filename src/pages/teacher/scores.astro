@@ -112,10 +112,47 @@ import Footer from '../../components/Footer.astro';
   .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
   .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
   .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
-  .topnav-tabs { display: flex; align-items: center; gap: 4px; }
-  .topnav-tab { font-size: 13px; font-weight: 500; color: var(--gray-3); background: none; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
-  .topnav-tab:hover { color: var(--black); background: var(--gray-bg); }
-  .topnav-tab.active { color: var(--black); background: var(--gray-bg); font-weight: 600; }
+  .topnav-tabs { display: flex; align-items: center; gap: 8px; }
+  .topnav-tab {
+    position: relative;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-3, #64748b);
+    background: transparent;
+    border: none;
+    padding: 16px 10px;
+    cursor: pointer;
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .topnav-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2.5px;
+    background: #16a34a;
+    border-radius: 9999px;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .topnav-tab:hover {
+    color: #16a34a;
+  }
+  .topnav-tab:hover::after {
+    width: 100%;
+    left: 0;
+  }
+  .topnav-tab.active {
+    color: #16a34a;
+    font-weight: 600;
+  }
+  .topnav-tab.active::after {
+    width: 100%;
+    left: 0;
+  }
   .topnav-right { display: flex; align-items: center; gap: 16px; }
   .profile-menu { position: relative; }
   .profile-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: none; border: none; padding: 4px 6px; border-radius: 8px; transition: background 0.15s; }
