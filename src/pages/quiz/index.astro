@@ -932,28 +932,39 @@ document.getElementById('btn-export-pdf')?.addEventListener('click', async () =>
       const isCorrect = ua === q.answer;
       const opts = [q.A, q.B, q.C, q.D].filter(Boolean).map(opt => {
         const letter = opt === q.A ? 'A' : opt === q.B ? 'B' : opt === q.C ? 'C' : 'D';
-        const isUserChoice = ua === opt;
+        const isUserChoice = (ua === opt) || (ua === letter);
         const isCorrectAnswer = q.answer && q.answer.includes(letter);
         let optStyle = 'padding:4px 8px;font-size:13px;border-radius:4px;margin-bottom:2px;';
-        if (isCorrectAnswer) optStyle += 'background:#fef9c3;font-weight:600;color:#854d0e;';
-        else if (isUserChoice && !isCorrect) optStyle += 'background:#fee2e2;color:#991b1b;text-decoration:line-through;';
-        else optStyle += 'color:#334155;';
-        return '<div style="' + optStyle + '">' + letter + '. ' + opt + '</div>';
+        if (isCorrectAnswer) {
+          optStyle += 'background:#fef9c3;font-weight:600;color:#854d0e;';
+        } else if (isUserChoice && !isCorrect) {
+          optStyle += 'color:#dc2626;text-decoration:line-through;';
+        } else {
+          optStyle += 'color:#334155;';
+        }
+
+        let tag = '';
+        if (isUserChoice && !isCorrect) {
+          tag = ' <span style="color:#dc2626;font-weight:700;text-decoration:none;display:inline-block;">（你的答案）</span>';
+        }
+
+        return '<div style="' + optStyle + '">' + letter + '. ' + opt + tag + '</div>';
       }).join('');
 
+      let qNumMark = isCorrect
+        ? '<span style="color:#16a34a;font-weight:700;margin-right:4px;">✓</span> ' + (idx + 1) + '. '
+        : '<span style="color:#dc2626;font-weight:700;margin-right:4px;">✗</span> <span style="color:#dc2626;text-decoration:line-through;font-weight:700;">' + (idx + 1) + '.</span> ';
+
       let ansLine = '';
-      if (!isCorrect) {
-        ansLine = '<div style="margin-top:6px;font-size:13px;color:#475569;line-height:1.5;">'
-          + '<span style="color:#dc2626;font-weight:600;">✗ 你的答案：' + (ua || '未作答') + '</span>'
-          + '　<span style="color:#16a34a;font-weight:600;">✓ 正確答案：' + q.answer + '</span>'
-          + (q.explanation ? '<div style="color:#64748b;margin-top:3px;">詳解：' + q.explanation + '</div>' : '')
-          + '</div>';
-      } else {
-        ansLine = '<div style="margin-top:4px;font-size:13px;color:#16a34a;font-weight:600;">✓ 正確</div>';
+      if (!isCorrect && !ua) {
+        ansLine += '<div style="color:#dc2626;font-size:12px;margin-top:4px;font-weight:600;">（未作答）</div>';
+      }
+      if (!isCorrect && q.explanation) {
+        ansLine += '<div style="color:#64748b;font-size:12px;margin-top:4px;">詳解：' + q.explanation + '</div>';
       }
 
       questionsHtml += '<div style="page-break-inside:avoid;margin-bottom:12px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#ffffff;">'
-        + '<p style="font-size:14px;font-weight:700;color:#0f172a;margin:0 0 6px;">' + (idx + 1) + '. ' + q.question + '</p>'
+        + '<p style="font-size:14px;font-weight:700;color:#0f172a;margin:0 0 6px;">' + qNumMark + q.question + '</p>'
         + '<div>' + opts + '</div>'
         + ansLine
         + '</div>';
