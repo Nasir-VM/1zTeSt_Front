@@ -153,6 +153,15 @@ import Footer from '../../components/Footer.astro';
     }
   }
 
+  /* ── Sticky Top Timer Bar ── */
+  #timer-bar {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 4.25rem !important;
+    z-index: 40 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
   /* ── Quiz paper — desktop looks like exam sheet ── */
   .quiz-paper {
     background: #fff;
@@ -244,6 +253,10 @@ import Footer from '../../components/Footer.astro';
       margin-top: 0 !important;
     }
     #timer-bar {
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 4rem !important;
+      z-index: 40 !important;
       padding: 0.625rem 0.875rem !important;
       flex-wrap: wrap;
       gap: 0.5rem;
