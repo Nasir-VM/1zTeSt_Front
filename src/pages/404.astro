@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout title="找不到頁面">
+  <Header />
+  <main class="relative min-h-screen pt-16 flex items-center justify-center" style="background: #faf8f5;">
+    <div class="dot-grid absolute inset-0 opacity-20 pointer-events-none"></div>
+    <div class="relative text-center px-6">
+      <p class="font-logo text-[120px] md:text-[180px] font-bold leading-none" style="color: var(--color-primary); opacity: 0.15;">404</p>
+      <h1 class="font-serif text-3xl md:text-4xl font-bold text-slate-800 -mt-16 md:-mt-24 mb-4">找不到這個頁面</h1>
+      <p class="text-slate-500 text-sm mb-4 max-w-md mx-auto">你找的頁面可能已被移除、改名，或者從來就不存在。</p>
+      <p class="text-slate-400 text-xs mb-8" id="countdown-text">將在 <span id="countdown-num">5</span> 秒後自動跳轉到首頁</p>
+      <a href="/" class="btn-primary !rounded-xl !px-8 !py-3 !text-sm">回到首頁</a>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script is:inline>
+(function() {
+  var BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+  var sec = 5;
+  var numEl = document.getElementById('countdown-num');
+  var timer = setInterval(function() {
+    sec--;
+    if (numEl) numEl.textContent = sec;
+    if (sec <= 0) {
+      clearInterval(timer);
+      window.location.href = BP + '/';
+    }
+  }, 1000);
+})();
+</script>

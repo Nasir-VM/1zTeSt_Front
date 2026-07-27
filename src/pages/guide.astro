@@ -1,0 +1,129 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout title="使用說明">
+  <Header />
+  <main class="relative min-h-screen pt-16" style="background: #faf8f5;">
+    <div class="blur-circle left-[-8%] top-[10%] h-[300px] w-[300px] bg-green-400/5"></div>
+    <div class="mx-auto max-w-3xl px-6 py-16">
+
+      <div class="mb-16 text-center">
+        <h1 class="font-serif text-4xl font-bold tracking-tight text-slate-800">如何開始使用 1zTeSt</h1>
+        <p class="mt-3 text-sm text-slate-400">跟著步驟走，馬上就能上手</p>
+      </div>
+
+      <!-- ═══ 教師 ═══ -->
+      <div class="mb-20">
+        <div class="flex items-end gap-4 mb-10">
+          <div>
+            <span class="font-serif inline-block text-6xl font-bold leading-none text-green-600/15 select-none">師</span>
+          </div>
+          <div class="pb-2">
+            <h2 class="font-serif text-xl font-bold text-slate-800">給老師</h2>
+            <p class="text-xs text-slate-400 mt-0.5">從零到考場，五步搞定</p>
+          </div>
+        </div>
+
+        <div class="border-l-2 pl-12 space-y-8" style="border-color: #d6d3d1;">
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-600 text-sm font-bold text-green-600 bg-white">壹</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">拿起你的 Google 帳號</h3>
+            <p class="text-sm leading-relaxed text-slate-500">登入就好，沒有複雜的註冊流程。點一下 Google 按鈕就進去了。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-600 text-sm font-bold text-green-600 bg-white">貳</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">填上名字</h3>
+            <p class="text-sm leading-relaxed text-slate-500">第一次進來寫一次就好，之後系統都記得你。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-600 text-sm font-bold text-green-600 bg-white">參</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">開始出題</h3>
+            <p class="text-sm leading-relaxed text-slate-500">新增章節、一道一道 key，或是把 Excel 整排貼進來——怎麼順手怎麼來。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-600 text-sm font-bold text-green-600 bg-white">肆</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">開門考試</h3>
+            <p class="text-sm leading-relaxed text-slate-500">章節說開就開、說關就關，題數也能限制——考場規則你定。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-green-600 text-sm font-bold text-green-600 bg-white">伍</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">坐著看成績</h3>
+            <p class="text-sm leading-relaxed text-slate-500">學生交卷你就收到，篩選、搜尋、匯出一條龍。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Divider ═══ -->
+      <div class="relative my-16">
+        <div class="absolute inset-0 flex items-center"><div class="w-full h-px bg-slate-200"></div></div>
+        <div class="relative flex justify-center">
+          <span class="bg-[#faf8f5] px-6 font-serif text-xs text-slate-300 tracking-[0.3em]">切換角色</span>
+        </div>
+      </div>
+
+      <!-- ═══ 學生 ═══ -->
+      <div>
+        <div class="flex items-end gap-4 mb-10">
+          <div>
+            <span class="font-serif inline-block text-6xl font-bold leading-none text-emerald-600/15 select-none">生</span>
+          </div>
+          <div class="pb-2">
+            <h2 class="font-serif text-xl font-bold text-slate-800">給學生</h2>
+            <p class="text-xs text-slate-400 mt-0.5">帳號貼上，按下開始，就這麼簡單</p>
+          </div>
+        </div>
+
+        <div class="border-l-2 pl-12 space-y-8" style="border-color: #d6d3d1;">
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-emerald-600 text-sm font-bold text-emerald-600 bg-white">壹</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">登入</h3>
+            <p class="text-sm leading-relaxed text-slate-500">Google 一鍵，搞定。不用再記一組帳號密碼。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-emerald-600 text-sm font-bold text-emerald-600 bg-white">貳</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">寫資料</h3>
+            <p class="text-sm leading-relaxed text-slate-500">學號姓名寫一次就好，之後系統都認得你。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-emerald-600 text-sm font-bold text-emerald-600 bg-white">參</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">貼上帳號</h3>
+            <p class="text-sm leading-relaxed text-slate-500">老師的 Gmail 貼進去，就能看到開放的章節。</p>
+          </div>
+          <div class="relative pl-12">
+            <span class="absolute left-[-2px] top-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-emerald-600 text-sm font-bold text-emerald-600 bg-white">肆</span>
+            <h3 class="mb-1 text-sm font-bold text-slate-700">選章節作答</h3>
+            <p class="text-sm leading-relaxed text-slate-500">挑想考的，直接開始。交卷就知道幾分，錯的有詳解。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 影片教學 ═══ -->
+      <div class="mt-16 pt-8 border-t border-slate-200">
+        <p class="text-center text-sm font-bold text-slate-500 mb-6">還是不太確定？看看影片教學</p>
+        <div class="relative w-full overflow-hidden rounded-2xl border border-slate-200 shadow-sm" style="padding-top: 56.25%;">
+          <iframe
+            src="https://www.youtube.com/embed/xZDq71EAnQo"
+            title="1zTeSt 影片教學"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            class="absolute inset-0 h-full w-full"
+          ></iframe>
+        </div>
+      </div>
+
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script is:inline>
+if (typeof gsap !== 'undefined') {
+  gsap.from('h1', { y: 30, opacity: 0, duration: 0.6, ease: 'power3.out', delay: 0.1 });
+  gsap.from('h1 + p', { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.2 });
+  gsap.from('.mb-20, .border-l-2', { y: 40, opacity: 0, duration: 0.6, stagger: 0.12, ease: 'power2.out', delay: 0.3 });
+  gsap.from('.relative.pl-12', { x: -20, opacity: 0, duration: 0.4, stagger: 0.08, ease: 'power2.out', delay: 0.5, overwrite: true });
+  gsap.from('.border-t', { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out', delay: 0.9 });
+}
+</script>

@@ -1,0 +1,72 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="個人資料設定">
+  <main class="relative flex min-h-screen items-center justify-center" style="background: #fcfcfd;">
+    <img src="/bg.gif" alt="" class="absolute inset-0 h-full w-full object-cover pointer-events-none" style="opacity:0.15;" />
+    <div class="blur-circle right-[-5%] top-[-5%] h-[350px] w-[350px] bg-green-400/10"></div>
+    <div class="blur-circle bottom-[-5%] left-[-5%] h-[300px] w-[300px] bg-emerald-400/10"></div>
+    <div class="relative w-full max-w-md px-6">
+      <div class="mb-8 text-center">
+        <a href="/" class="font-serif text-3xl font-bold" style="color: var(--color-primary);">1zTeSt</a>
+        <p class="font-script mt-1 text-lg text-slate-400">個人資料設定</p>
+      </div>
+      <div class="card card-shadow p-8">
+        <p class="mb-6 text-sm text-slate-500">請填寫您的真實姓名與學號，以便記錄成績與核對身分。</p>
+        <div class="mb-4">
+          <label class="mb-1 block text-sm text-slate-500">真實姓名</label>
+          <input id="field-name" type="text" maxlength="12" placeholder="例如：王小明" class="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100" />
+        </div>
+        <div class="mb-6">
+          <label class="mb-1 block text-sm text-slate-500">學號</label>
+          <input id="field-stunum" type="text" maxlength="20" placeholder="例如：112001 或 A123456" class="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-100" />
+        </div>
+        <p id="setup-err" class="mb-4 hidden text-center text-sm text-red-500"></p>
+        <button id="btn-save" class="btn-primary !w-full !rounded-xl !px-6 !py-3 !font-bold">儲存並開始</button>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const errEl = document.getElementById('setup-err');
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) { window.location.href = BP + '/login/student'; return; }
+  try {
+    const snap = await firebase.database().ref('1zTeStsys/Studentaccount/' + window.sanitizeEmail(user.email)).once('value');
+    const profile = snap.val();
+    if (profile) {
+      if (profile.name) document.getElementById('field-name').value = profile.name;
+      if (profile.stunum) document.getElementById('field-stunum').value = profile.stunum;
+    }
+  } catch (e) {  }
+});
+
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const user = firebase.auth().currentUser;
+  if (!user) { window.location.href = BP + '/login/student'; return; }
+
+  const name = document.getElementById('field-name').value.trim();
+  const stunum = document.getElementById('field-stunum').value.trim();
+  errEl.classList.add('hidden');
+
+  if (!name || name.length < 2) { errEl.textContent = '請輸入您的全名'; errEl.classList.remove('hidden'); return; }
+  if (!stunum || stunum.length < 1) { errEl.textContent = '請輸入學號'; errEl.classList.remove('hidden'); return; }
+
+  try {
+    const sanitized = window.sanitizeEmail(user.email);
+    await firebase.database().ref('1zTeStsys/Studentaccount/' + sanitized).set({
+      email: user.email,
+      name: name,
+      stunum: stunum
+    });
+    localStorage.setItem('fb_user', JSON.stringify({ email: user.email, name: name, role: 'student' }));
+    window.location.href = BP + '/quiz/';
+  } catch (e) {
+    errEl.textContent = '儲存失敗，請稍後再試';
+    errEl.classList.remove('hidden');
+  }
+});
+</script>

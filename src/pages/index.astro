@@ -1,0 +1,523 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout title="首頁">
+  <div id="splash" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center" style="background:#14532d;">
+    <svg class="mb-8" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+      <path d="m15 5 4 4"/>
+    </svg>
+    <div class="h-1.5 w-48 overflow-hidden rounded-full bg-white/20">
+      <div id="splash-bar" class="h-full w-0 rounded-full bg-white transition-all duration-[1200ms] ease-out"></div>
+    </div>
+  </div>
+  <Header />
+  <main class="relative min-h-screen pt-16">
+    <canvas id="cursor-canvas" class="pointer-events-none fixed inset-0 z-50" style="width:100vw;height:100vh"></canvas>
+    <!-- Floating Pencil Cursor -->
+    <div id="pencil-cursor" class="pointer-events-none fixed z-[60] transition-transform duration-75 ease-out select-none hidden md:block" style="top:0;left:0;will-change:transform;">
+      <span id="pencil-icon" style="font-size:24px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.18));display:inline-block;transform:rotate(-45deg);transition:transform 0.15s ease;">✏️</span>
+    </div>
+
+    <!-- Hero -->
+    <section class="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden">
+      <img src="/bg.gif" alt="Background" class="absolute inset-0 h-full w-full object-cover pointer-events-none" style="transform:translate3d(0,0,0); backface-visibility:hidden; will-change:transform;" />
+      <div class="absolute inset-0" style="background:rgba(255,255,255,0.6);"></div>
+      <div class="blur-circle right-[-5%] top-[-5%] h-[450px] w-[450px] bg-green-400/15"></div>
+      <div class="blur-circle bottom-[-5%] left-[-8%] h-[350px] w-[350px] bg-emerald-400/10"></div>
+      <div class="dot-grid absolute inset-0 opacity-30 pointer-events-none"></div>
+
+      <div class="relative mx-auto max-w-4xl w-full px-6 text-center md:text-right md:pr-12 md:flex md:flex-col md:items-end">
+        <div class="fade-in">
+          <h1 class="font-logo mb-3 text-6xl md:text-8xl" style="color: var(--color-primary);">1zTeSt</h1>
+          <p class="font-script mx-auto md:mr-0 md:ml-auto mb-3 text-2xl text-slate-400">輕鬆試</p>
+          <p class="mx-auto md:mr-0 md:ml-auto mb-10 max-w-lg text-base leading-relaxed" style="font-family: 'Iansui', sans-serif; color: #475569;">
+            在尋找免費的測驗系統嗎 ？ 但卻發現要$<br /><br />
+            別猶豫了 ！ <span class="font-bold" style="color: #1e293b;">1zTeSt 直接免費來吧</span>
+          </p>
+        </div>
+
+        <div id="login-section" class="mx-auto md:mr-0 md:ml-auto w-full flex flex-col items-center md:items-end">
+          <div id="hero-go-btn-area" class="hidden text-right">
+            <a id="hero-go-btn" href="/quiz/" class="btn-primary inline-flex items-center justify-center px-8 py-3 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200">前往測驗吧 →</a>
+          </div>
+
+          <div id="login-area" class="flex flex-col items-center md:items-end">
+            <p class="mb-2.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">學生登入</p>
+            <div id="login-buttons" class="flex justify-center md:justify-end">
+              <button id="btn-student" class="group inline-flex items-center justify-center gap-3 rounded-full border border-slate-200/90 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md active:scale-[0.98]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" class="h-4.5 w-4.5 shrink-0 transition-transform group-hover:scale-110">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z" />
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.15 1.45-4.92 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                  <path fill="none" d="M0 0h48v48H0z" />
+                </svg>
+                <span>以 Google 帳號登入</span>
+              </button>
+            </div>
+            <p id="login-error" class="mt-3 hidden text-center md:text-right text-xs text-red-500 font-medium"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="relative overflow-hidden py-24 bg-[#faf8f5]/40 border-t border-slate-100">
+      <div class="blur-circle right-[-10%] bottom-[-5%] h-[400px] w-[400px] bg-green-400/5"></div>
+      <div class="blur-circle left-[-10%] top-[10%] h-[350px] w-[350px] bg-emerald-400/5"></div>
+
+      <div class="mx-auto max-w-[1080px] px-6">
+        <div class="grid gap-12 lg:grid-cols-12 items-start">
+          
+          <!-- Left Column: Sticky Intro & Illustration -->
+          <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-6 text-center lg:text-left">
+            <div>
+              <p class="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-green-600">平台特色</p>
+              <h2 class="font-serif text-3xl md:text-4xl font-bold tracking-tight text-slate-800">功能一覽</h2>
+            </div>
+            <p class="text-sm leading-relaxed text-slate-500">
+              1zTeSt 專為校園測驗設計，簡化出題與作答流程，讓老師輕鬆出題、學生無痛應試。
+            </p>
+            <div class="flex justify-center lg:justify-start pt-4">
+              <img src="/student-online.png" alt="學生線上學習" class="h-44 w-auto hover:scale-105 transition duration-300 pointer-events-none" />
+            </div>
+          </div>
+
+          <!-- Right Column: Staggered Typographic Feature List -->
+          <div class="lg:col-span-8 grid gap-x-12 gap-y-12 sm:grid-cols-2">
+            
+            <!-- Item 1 -->
+            <div class="border-t-2 border-slate-900/10 pt-6">
+              <span class="font-serif text-xs font-bold tracking-wider text-green-600">01 / 輕鬆備課</span>
+              <h3 class="font-serif mt-3 mb-2 text-lg font-bold text-slate-800">自建題庫</h3>
+              <p class="text-xs leading-relaxed text-slate-500">有自己想考的題目？老師可以自己開章節、出選擇題。CSV 一次倒進去也行，從 Excel 貼上也可以。</p>
+            </div>
+            
+            <!-- Item 2 -->
+            <div class="border-t-2 border-slate-900/10 pt-6 sm:translate-y-6">
+              <span class="font-serif text-xs font-bold tracking-wider text-green-600">02 / 快速導入</span>
+              <h3 class="font-serif mt-3 mb-2 text-lg font-bold text-slate-800">CSV 批次匯入</h3>
+              <p class="text-xs leading-relaxed text-slate-500">題目一題一題 key 太慢？CSV 丟進來一次幾百題，Google Sheets 直接複製貼上也通。</p>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="border-t-2 border-slate-900/10 pt-6">
+              <span class="font-serif text-xs font-bold tracking-wider text-green-600">03 / 即時應試</span>
+              <h3 class="font-serif mt-3 mb-2 text-lg font-bold text-slate-800">即時測驗</h3>
+              <p class="text-xs leading-relaxed text-slate-500">學生輸入老師的帳號，看到開放的章節就可以進去作答。交卷立刻知道幾分，錯的題目也有詳解可以看。</p>
+            </div>
+            
+            <!-- Item 4 -->
+            <div class="border-t-2 border-slate-900/10 pt-6 sm:translate-y-6">
+              <span class="font-serif text-xs font-bold tracking-wider text-green-600">04 / 權限管理</span>
+              <h3 class="font-serif mt-3 mb-2 text-lg font-bold text-slate-800">彈性開關章節</h3>
+              <p class="text-xs leading-relaxed text-slate-500">哪個章節要開放、哪個先關掉，老師自己決定。還可以限制每次測驗出幾題，不怕一次考太多。</p>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="border-t-2 border-slate-900/10 pt-6">
+              <span class="font-serif text-xs font-bold tracking-wider text-green-600">05 / 安全登入</span>
+              <h3 class="font-serif mt-3 mb-2 text-lg font-bold text-slate-800">Google 快速登入</h3>
+              <p class="text-xs leading-relaxed text-slate-500">不用再記一組帳號密碼。點一下 Google 按鈕就登入了，省事、安全加密也有做好。</p>
+            </div>
+            
+            <!-- Item 6 -->
+            <div class="border-t-2 border-slate-900/10 pt-6 sm:translate-y-6">
+              <span class="font-serif text-xs font-bold tracking-wider text-green-600">06 / 數據追蹤</span>
+              <h3 class="font-serif mt-3 mb-2 text-lg font-bold text-slate-800">成績管理</h3>
+              <p class="text-xs leading-relaxed text-slate-500">老師可以看全班成績、各章節統計，學生自己也能回頭翻之前錯過哪些題目。</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Use -->
+    <section class="reveal relative overflow-hidden py-24 bg-white border-t border-slate-100">
+      <div class="blur-circle left-[-8%] top-[10%] h-[300px] w-[300px] bg-green-400/5"></div>
+      <div class="mx-auto max-w-[1080px] px-6">
+
+        <!-- Section Header — brushstroke feel -->
+        <div class="mb-20 text-center">
+          <h2 class="font-serif text-4xl font-bold tracking-tight text-slate-800">如何開始</h2>
+        </div>
+
+        <!-- ═══ Teacher ═══ -->
+        <div class="mb-20">
+          <div class="flex items-end gap-4 mb-10">
+            <div>
+              <span class="font-serif inline-block text-6xl font-bold leading-none text-green-600/15 select-none">師</span>
+            </div>
+            <div class="pb-2">
+              <h3 class="font-serif text-xl font-bold text-slate-800">給老師</h3>
+              <p class="text-xs text-slate-400 mt-0.5">從零到考場，五步搞定</p>
+            </div>
+          </div>
+
+          <div class="grid gap-8 md:grid-cols-2 items-start">
+            <!-- Left: image + quote -->
+            <div class="flex flex-col items-center">
+              <img src="/images/teacher_flow.jpg" alt="教師端示意圖" class="w-full max-w-sm rounded-2xl" loading="lazy" />
+              <p class="mt-6 font-serif text-sm italic text-slate-400 text-center max-w-xs leading-relaxed">「題庫建好那一刻，<br/>考場就已經準備好了。」</p>
+            </div>
+
+            <!-- Right: storytelling steps -->
+            <div class="relative">
+              <!-- Vertical brush line -->
+              <div class="absolute left-[11px] top-2 bottom-2 w-[2px] rounded-full" style="background:linear-gradient(to bottom, rgba(22,163,74,0.3), rgba(22,163,74,0.08));"></div>
+
+              <div class="space-y-8">
+                <div class="relative pl-10">
+                  <span class="absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-green-600 text-[10px] font-bold text-green-600 bg-white">壹</span>
+                  <h4 class="text-sm font-bold text-slate-800 mb-1">拿起你的 Google 帳號</h4>
+                  <p class="text-xs leading-relaxed text-slate-500">登入就好，沒有複雜的註冊流程。</p>
+                </div>
+                <div class="relative pl-10">
+                  <span class="absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-green-600 text-[10px] font-bold text-green-600 bg-white">貳</span>
+                  <h4 class="text-sm font-bold text-slate-800 mb-1">填上名字</h4>
+                  <p class="text-xs leading-relaxed text-slate-500">第一次進來寫一次就好，之後系統都記得你。</p>
+                </div>
+                <div class="relative pl-10">
+                  <span class="absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-green-600 text-[10px] font-bold text-green-600 bg-white">參</span>
+                  <h4 class="text-sm font-bold text-slate-800 mb-1">開始出題</h4>
+                  <p class="text-xs leading-relaxed text-slate-500">新增章節、一道一道key，或是把 Excel 整排貼進來——怎麼順手怎麼來。</p>
+                </div>
+                <div class="relative pl-10">
+                  <span class="absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-green-600 text-[10px] font-bold text-green-600 bg-white">肆</span>
+                  <h4 class="text-sm font-bold text-slate-800 mb-1">開門考試</h4>
+                  <p class="text-xs leading-relaxed text-slate-500">章節說開就開、說關就關，題數也能限制——考場規則你定。</p>
+                </div>
+                <div class="relative pl-10">
+                  <span class="absolute left-0 top-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-green-600 text-[10px] font-bold text-green-600 bg-white">伍</span>
+                  <h4 class="text-sm font-bold text-slate-800 mb-1">坐著看成績</h4>
+                  <p class="text-xs leading-relaxed text-slate-500">學生交卷你就收到，篩選、搜尋、匯出一條龍。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ Divider — brush divider ═══ -->
+        <div class="relative my-16">
+          <div class="absolute inset-0 flex items-center"><div class="w-full h-px bg-slate-100"></div></div>
+          <div class="relative flex justify-center">
+            <span class="bg-white px-6 font-serif text-xs text-slate-300 tracking-[0.3em]">切換角色</span>
+          </div>
+        </div>
+
+        <!-- ═══ Student ═══ -->
+        <div>
+          <div class="flex items-end gap-4 mb-10">
+            <div>
+              <span class="font-serif inline-block text-6xl font-bold leading-none text-emerald-600/15 select-none">生</span>
+            </div>
+            <div class="pb-2">
+              <h3 class="font-serif text-xl font-bold text-slate-800">給學生</h3>
+              <p class="text-xs text-slate-400 mt-0.5">帳號貼上，按下開始，就這麼簡單</p>
+            </div>
+          </div>
+
+          <!-- Horizontal story cards — staggered heights for organic feel -->
+          <div class="grid gap-5 sm:grid-cols-5">
+            <div class="sm:col-span-1 flex flex-col justify-center text-center sm:text-left sm:pr-4">
+              <span class="font-serif text-5xl font-bold leading-none text-emerald-500/10 select-none">壹</span>
+              <h4 class="text-sm font-bold text-slate-800 mt-2">登入</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500 mt-1">Google 一鍵，搞定。</p>
+            </div>
+            <div class="sm:col-span-1 bg-slate-50 rounded-2xl p-5 text-center border border-slate-100" style="transform:translateY(12px);">
+              <span class="font-serif text-2xl font-bold text-emerald-500/30 block mb-2">貳</span>
+              <h4 class="text-xs font-bold text-slate-800 mb-1">寫資料</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500">學號姓名寫一次就好</p>
+            </div>
+            <div class="sm:col-span-1 bg-emerald-50/50 rounded-2xl p-5 text-center border border-emerald-100/60" style="transform:translateY(-4px);">
+              <span class="font-serif text-2xl font-bold text-emerald-500/30 block mb-2">參</span>
+              <h4 class="text-xs font-bold text-slate-800 mb-1">貼上帳號</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500">老師的 Gmail 貼進去</p>
+            </div>
+            <div class="sm:col-span-1 bg-slate-50 rounded-2xl p-5 text-center border border-slate-100" style="transform:translateY(8px);">
+              <span class="font-serif text-2xl font-bold text-emerald-500/30 block mb-2">肆</span>
+              <h4 class="text-xs font-bold text-slate-800 mb-1">選章節作答</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500">挑想考的，直接開始</p>
+            </div>
+            <div class="sm:col-span-1 flex flex-col justify-center text-center sm:text-left sm:pl-4">
+              <span class="font-serif text-5xl font-bold leading-none text-emerald-500/10 select-none">伍</span>
+              <h4 class="text-sm font-bold text-slate-800 mt-2">看結果</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500">交卷就知道幾分，<br/>錯的有詳解。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Button -->
+        <div class="reveal-child mt-20 text-center">
+          <a href="https://www.youtube.com/watch?v=xZDq71EAnQo" target="_blank" rel="noopener" class="btn-outline !inline-flex !gap-2.5 !px-6 !py-3 !rounded-xl text-xs font-medium border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 transition">
+            <svg class="h-4 w-4 text-red-500 fill-current" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 4-8 4z"/></svg>
+            <span>觀看影片教學</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Marquee -->
+    <section class="reveal relative overflow-hidden border-y border-green-100 py-14" style="background:#f8faf6;">
+      <div class="marquee-mask overflow-hidden">
+        <div class="flex animate-marquee-loop gap-12 whitespace-nowrap">
+          <span class="text-base text-slate-500">教師可自建題庫、管理章節</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">學生即時作答、查看成績</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">支援選擇題</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">Google 帳號快速登入</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">CSV 批次匯入題目</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">教師可開放或關閉章節</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">成績管理與統計</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">一鍵 Google 登入</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">教師可自建題庫、管理章節</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">學生即時作答、查看成績</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">支援選擇題</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">Google 帳號快速登入</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">CSV 批次匯入題目</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">教師可開放或關閉章節</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">成績管理與統計</span>
+          <span class="text-base text-slate-300">/</span>
+          <span class="text-base text-slate-500">一鍵 Google 登入</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .marquee-mask {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+  @keyframes marqueeLoop {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee-loop {
+    animation: marqueeLoop 50s linear infinite;
+  }
+  .fade-in {
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script is:inline>
+  const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+
+  function hideEl(id) { const e = document.getElementById(id); if (e) e.classList.add('hidden'); }
+  function showEl(id) { const e = document.getElementById(id); if (e) e.classList.remove('hidden'); }
+  function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
+  function showErr(msg) { setText('login-error', msg); showEl('login-error'); }
+  function hideErr() { hideEl('login-error'); }
+
+  document.getElementById('btn-student').addEventListener('click', async () => {
+    hideErr();
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+      await firebase.auth().signInWithPopup(provider);
+      
+    } catch (e) {
+      if (e.code === 'auth/popup-closed-by-user') return;
+      if (e.code === 'auth/cancelled-popup-request') return;
+      showErr('登入失敗：' + (e.message || e));
+    }
+  });
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      showEl('login-area');
+      return;
+    }
+
+    const email = user.email;
+    const san = window.sanitizeEmail(email);
+
+    // Returning visit — fb_user already set with same email → hide login area, Header handles the rest
+    const existingUser = JSON.parse(localStorage.getItem('fb_user') || 'null');
+    if (existingUser && existingUser.email === email) {
+      hideEl('login-area');
+      return;
+    }
+
+    // Fresh login — determine role and redirect once
+    try {
+      
+      if (window.isAdminEmail(email)) {
+        const userData = { email: email, name: user.displayName || email, role: 'admin' };
+        localStorage.setItem('fb_user', JSON.stringify(userData));
+        window.smoothRedirect(BP + '/admin/home', '管理員登入成功，正在跳轉...');
+        return;
+      }
+
+      const [teacherSnap, studentSnap] = await Promise.all([
+        firebase.database().ref('1zTeStsys/Teacheraccount/' + san).once('value'),
+        firebase.database().ref('1zTeStsys/Studentaccount/' + san).once('value')
+      ]);
+
+      const isTeacher = teacherSnap.exists();
+      const role = isTeacher ? 'teacher' : 'student';
+
+      if (studentSnap.exists()) {
+        const profile = studentSnap.val();
+        const userData = { email: email, name: profile.name || user.displayName || email, role: role };
+        localStorage.setItem('fb_user', JSON.stringify(userData));
+
+        if (!profile.stunum || !profile.name) {
+          window.smoothRedirect(BP + '/login/setup', '首次登入，正在引導至資料設定頁面...');
+          return;
+        }
+        window.smoothRedirect(BP + '/quiz/', '登入成功，正在引導至測驗...');
+        return;
+      }
+
+      const userData = { email: email, name: user.displayName || email, role: role };
+      localStorage.setItem('fb_user', JSON.stringify(userData));
+      window.smoothRedirect(BP + '/login/setup', '首次登入，正在引導至資料設定頁面...');
+
+    } catch (e) {
+      console.error('Role detection error:', e);
+      
+      const userData = { email: email, name: user.displayName || email, role: 'student' };
+      localStorage.setItem('fb_user', JSON.stringify(userData));
+      hideEl('login-area');
+    }
+  });
+
+  /* If already logged in via localStorage, hide login area and show hero go button */
+  (function() {
+    const u = JSON.parse(localStorage.getItem('fb_user') || 'null');
+    if (u && u.email) {
+      hideEl('login-area');
+      const goArea = document.getElementById('hero-go-btn-area');
+      const goBtn = document.getElementById('hero-go-btn');
+      if (goArea) goArea.classList.remove('hidden');
+      if (goBtn) {
+        goBtn.href = BP + '/quiz/';
+        goBtn.textContent = '前往測驗吧';
+      }
+    }
+  })();
+
+  (function() {
+    const shown = sessionStorage.getItem('splash_shown');
+    if (shown) { document.getElementById('splash').style.display = 'none'; return; }
+    const bar = document.getElementById('splash-bar');
+    const splash = document.getElementById('splash');
+    requestAnimationFrame(() => { bar.style.width = '100%'; });
+    setTimeout(() => {
+      splash.style.transition = 'opacity 0.4s ease';
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 400);
+    }, 1300);
+    sessionStorage.setItem('splash_shown', '1');
+  })();
+</script>
+
+<script is:inline>
+  (function() {
+    const pencil = document.getElementById('pencil-cursor');
+    const pencilIcon = document.getElementById('pencil-icon');
+    const canvas = document.getElementById('cursor-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles = [];
+    const MAX = 45;
+
+    window.addEventListener('mousemove', (e) => {
+      const mx = e.clientX;
+      const my = e.clientY;
+
+      if (pencil) {
+        pencil.style.transform = `translate3d(${mx - 6}px, ${my - 22}px, 0)`;
+      }
+
+      for (let i = 0; i < 2; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.4 + Math.random() * 1.2;
+        particles.push({
+          x: mx, y: my,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 0.4,
+          life: 1,
+          size: 2 + Math.random() * 3,
+          hue: 135 + Math.random() * 35,
+        });
+      }
+      if (particles.length > MAX) particles.splice(0, particles.length - MAX);
+    });
+
+    document.addEventListener('mouseover', (e) => {
+      if (e.target && e.target.closest && e.target.closest('a, button, input, select, textarea, .btn-primary, [role="button"]')) {
+        if (pencilIcon) pencilIcon.style.transform = 'rotate(-15deg) scale(1.3)';
+      } else {
+        if (pencilIcon) pencilIcon.style.transform = 'rotate(-45deg) scale(1)';
+      }
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.02;
+        p.life -= 0.02;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 70%, 48%, ${p.life * 0.7})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  (function() {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('revealed');
+        if (entry.target.classList.contains('reveal-stagger')) {
+          var children = entry.target.querySelectorAll(':scope > .reveal-child');
+          children.forEach(function(child, i) {
+            setTimeout(function() { child.classList.add('revealed'); }, i * 120);
+          });
+        }
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(function(el) { observer.observe(el); });
+  })();
+</script>

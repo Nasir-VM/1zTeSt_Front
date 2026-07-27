@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout title="隱私權政策">
+  <Header />
+  <main class="relative min-h-screen pt-16">
+    <div class="blur-circle right-[-5%] top-[10%] h-[250px] w-[250px] bg-green-400/10"></div>
+    <div class="mx-auto max-w-3xl px-6 py-16">
+      <h1 class="font-serif mb-8 text-3xl font-bold text-slate-800">隱私權政策</h1>
+      <div class="space-y-6 text-sm leading-relaxed text-slate-500">
+        <p>最後更新：2025 年 7 月</p>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">1. 資料收集</h2>
+        <p>1zTeSt 輕鬆試（以下簡稱「本平台」）會透過 Google OAuth 收集您的 Google 帳號基本資訊，包括：</p>
+        <ul class="list-inside list-disc space-y-1 pl-4">
+          <li>電子郵件地址</li>
+          <li>姓名</li>
+          <li>Google 帳號頭像</li>
+        </ul>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">2. 資料使用</h2>
+        <p>我們收集的資料僅用於以下目的：</p>
+        <ul class="list-inside list-disc space-y-1 pl-4">
+          <li>身分驗證與帳號管理</li>
+          <li>提供測驗服務功能</li>
+          <li>記錄測驗成績與統計</li>
+          <li>系統安全與濫用防護</li>
+        </ul>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">3. 資料儲存與安全</h2>
+        <p>所有資料儲存在加密的資料庫中，並採取合理的安全措施保護您的資料。我們不會將您的資料出售或分享給第三方，除非法律要求。</p>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">4. Cookie</h2>
+        <p>本平台使用 Cloudflare Turnstile 進行人機驗證，可能涉及 Cookie 的使用。這些 Cookie 僅用於安全驗證，不會用於追蹤或廣告。</p>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">5. 第三方服務</h2>
+        <p>本平台使用以下第三方服務：</p>
+        <ul class="list-inside list-disc space-y-1 pl-4">
+          <li>Google OAuth（身分驗證）</li>
+          <li>Cloudflare（網站安全與加速）</li>
+        </ul>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">6. 資料刪除</h2>
+        <p>您可以隨時聯繫我們要求刪除您的帳號與相關資料。</p>
+
+        <h2 class="font-serif text-lg font-bold text-slate-700">7. 聯絡方式</h2>
+        <p>如有任何隱私權相關問題，請聯繫：<a href="https://nasirlin.net" target="_blank" rel="noopener" class="font-medium transition hover:underline" style="color: var(--color-primary);">Nasir</a></p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>
