@@ -1,0 +1,542 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="管理後台">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+
+  <!-- Top Navbar -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <div class="topnav-left">
+        <a href="/" class="topnav-logo">1zTeSt</a>
+        <span class="topnav-divider"></span>
+        <span class="topnav-subtitle">管理後台</span>
+      </div>
+      <div class="topnav-tabs">
+        <button data-tab="dashboard" class="topnav-tab active">總覽</button>
+        <a href="/ttvs/admin" class="topnav-tab">TTVS</a>
+        <a href="/" class="topnav-tab">回首頁</a>
+      </div>
+      <div class="topnav-right">
+        <div class="profile-menu">
+          <button id="profile-trigger" class="profile-btn">
+            <div id="avatar-circle" class="avatar"></div>
+            <svg class="chevron" id="profile-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+          </button>
+          <div id="profile-dropdown" class="dropdown">
+            <div class="dropdown-head">
+              <p class="dropdown-label">管理員</p>
+              <p id="dropdown-email" class="dropdown-email"></p>
+            </div>
+            <button id="dropdown-logout" class="dropdown-item danger">登出</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="main-content w-full flex-1">
+    <!-- User List -->
+    <section id="tab-dashboard" class="tab-content">
+      <div id="stats-grid" class="stats-grid"></div>
+
+      <!-- PVQC Whitelist -->
+      <div class="panel p-5 mb-5 !rounded-none border border-slate-200" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-radius:0px;">
+        <span style="font-size:13px;font-weight:600;color:var(--black);white-space:nowrap;">PVQC 權限教師</span>
+        <input id="pvqc-email-input" type="email" placeholder="teacher@example.com" style="flex:1;min-width:200px;border:1px solid var(--border);border-radius:0px;padding:8px 12px;font-size:13px;outline:none;" />
+        <button id="btn-pvqc-add" class="btn-green" style="white-space:nowrap;border-radius:0px;">指派為 PVQC 教師</button>
+      </div>
+
+      <div class="section-bar">
+        <h2 class="section-title">用戶列表</h2>
+        <span id="user-count" class="section-count"></span>
+      </div>
+      <div class="panel !rounded-none border border-slate-200 shadow-none overflow-hidden" style="border-radius:0px;">
+        <div class="panel-search border-b border-slate-200 p-3 bg-slate-50/50">
+          <div class="relative w-full max-w-md">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input id="user-search" type="text" placeholder="搜尋 Email、姓名或學號..." class="w-full border border-slate-200 bg-white py-2 pl-9 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800 transition-colors" style="border-radius:0px;" />
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm font-sans border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                <th class="py-3.5 px-4 w-12 text-center">#</th>
+                <th class="py-3.5 px-4">Email / 帳號</th>
+                <th class="py-3.5 px-4">姓名</th>
+                <th class="py-3.5 px-4">學號</th>
+                <th class="py-3.5 px-4 text-center">身份權限</th>
+                <th class="py-3.5 px-4 text-center w-24">操作</th>
+              </tr>
+            </thead>
+            <tbody id="users-list" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+        <div id="load-more-wrap" class="hidden border-t border-slate-200 text-center py-4 bg-slate-50">
+          <button id="btn-load-more" style="padding:8px 24px;font-size:12px;font-weight:600;color:var(--gray-2);background:#fff;border:1px solid var(--border);border-radius:0px;cursor:pointer;transition:all 0.2s;">載入更多用戶</button>
+        </div>
+        <p id="users-empty" class="empty-msg hidden py-10 text-center text-sm text-slate-400">尚無用戶資料</p>
+      </div>
+    </section>
+
+    <!-- Whitelist — removed -->
+    <section id="tab-whitelist" class="tab-content hidden"></section>
+  </main>
+
+  <div id="toast" class="toast-wrap"></div>
+</Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+  /* ── Reset & Base ── */
+  :root { --black: #111; --gray-1: #333; --gray-2: #666; --gray-3: #999; --gray-4: #ccc; --gray-bg: #f5f5f5; --white: #fff; --border: #e5e5e5; --radius: 12px; }
+  body { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+
+  /* ── Top Nav ── */
+  .topnav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  .topnav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; }
+  .topnav-left { display: flex; align-items: center; gap: 12px; }
+  .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
+  .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
+  .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
+  .topnav-tabs { display: flex; align-items: center; gap: 4px; }
+  .topnav-tab { font-size: 13px; font-weight: 500; color: var(--gray-3); background: none; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .topnav-tab:hover { color: var(--black); background: var(--gray-bg); }
+  .topnav-tab.active { color: var(--black); background: var(--gray-bg); font-weight: 600; }
+  .topnav-right { display: flex; align-items: center; gap: 16px; }
+  .load-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-3); }
+  .load-dot span { width: 6px; height: 6px; border-radius: 50%; background: var(--black); animation: pulse 1.2s ease infinite; }
+  .profile-menu { position: relative; }
+  .profile-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 8px; transition: background 0.15s; }
+  .profile-btn:hover { background: var(--gray-bg); }
+  .avatar { width: 30px; height: 30px; border-radius: 8px; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-email { font-size: 13px; color: var(--gray-2); font-weight: 500; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chevron { width: 14px; height: 14px; color: var(--gray-4); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 240px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+  .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .dropdown-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .dropdown-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-3); }
+  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gray-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dropdown-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 13px; color: var(--gray-2); background: none; border: none; cursor: pointer; transition: background 0.15s; }
+  .dropdown-item:hover { background: var(--gray-bg); }
+  .dropdown-item.danger { color: #e53e3e; }
+  .dropdown-item.danger:hover { background: #fff5f5; }
+
+  /* ── Main Content ── */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .tab-content { animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Stats Grid — illustration cards ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  :global(.stat-card) {
+    background: #fff; border: 1px solid var(--border); border-radius: 16px;
+    padding: 0; overflow: hidden; opacity: 0; transform: translateY(12px);
+    animation: statIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  :global(.stat-card:hover) { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.05); border-color: #d5d5d5; }
+  :global(.stat-illust) {
+    width: 100%; height: 120px; object-fit: contain; padding: 16px 20px 8px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04));
+    transition: transform 0.3s;
+  }
+  :global(.stat-card:hover .stat-illust) { transform: scale(1.05); }
+  :global(.stat-info) { padding: 4px 16px 18px; text-align: center; width: 100%; }
+  :global(.stat-label) { font-size: 12px; font-weight: 500; color: var(--gray-3); margin-bottom: 4px; }
+  :global(.stat-value) { font-size: 30px; font-weight: 700; color: var(--black); letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  :global(.stat-sub) { font-size: 11px; color: var(--gray-4); margin-top: 6px; }
+  @keyframes statIn { to { opacity: 1; transform: translateY(0); } }
+  .stats-grid :global(.stat-skeleton) { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: pulse 1.5s ease infinite; }
+
+  /* ── Section Bar ── */
+  .section-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--black); }
+  .section-count { font-size: 12px; color: var(--gray-3); }
+  .section-desc { font-size: 14px; color: var(--gray-2); line-height: 1.6; margin-bottom: 20px; }
+
+  /* ── Panel ── */
+  .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s; }
+  .panel:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .panel.p-5 { padding: 20px; }
+  .panel-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--gray-4); }
+  .input-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); margin-bottom: 6px; }
+
+  /* ── Search Input ── */
+  .search-input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px 10px 36px; font-size: 13px; color: var(--gray-1); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+  .search-input:focus { border-color: var(--black); box-shadow: 0 0 0 2px rgba(0,0,0,0.06); }
+  .search-input::placeholder { color: var(--gray-4); }
+
+  /* ── Table ── */
+  .data-table { width: 100%; text-align: left; font-size: 13px; }
+  .data-table th { padding: 12px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 14px 20px; border-bottom: 1px solid #f5f5f5; color: var(--gray-1); }
+  .data-table tr:last-child td { border-bottom: none; }
+  :global(#users-tbody tr), :global(#wl-tbody tr) { transition: background 0.15s; }
+  :global(#users-tbody tr:hover), :global(#wl-tbody tr:hover) { background: #fafafa; }
+  .empty-msg { padding: 40px; text-align: center; font-size: 13px; color: var(--gray-3); }
+
+  /* ── Users Card List ── */
+  :global(.users-list) { display: flex; flex-direction: column; }
+  :global(.user-card) {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid #f5f5f5;
+    transition: background 0.15s;
+  }
+  :global(.user-card:last-child) { border-bottom: none; }
+  :global(.user-card:hover) { background: #fafafa; }
+  :global(.user-card-info) { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  :global(.user-card-email) {
+    font-size: 13px; font-weight: 600; color: var(--gray-1);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  :global(.user-card-meta) { font-size: 12px; color: var(--gray-3); }
+  :global(.user-card-actions) { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 12px; }
+
+  /* ── Buttons ── */
+  .btn-dark { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: var(--black); border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-dark:hover { background: #333; transform: translateY(-1px); }
+  .btn-dark:active { transform: scale(0.97); }
+  .btn-green { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #22c55e; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-green:hover { background: #16a34a; transform: translateY(-1px); }
+  .btn-green:active { transform: scale(0.97); }
+  :global(.btn-danger) { display: inline-flex; align-items: center; padding: 6px 12px; font-size: 12px; font-weight: 500; color: #e53e3e; border: 1px solid #fed7d7; background: #fff; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+  :global(.btn-danger:hover) { background: #fff5f5; border-color: #feb2b2; }
+  :global(.btn-ghost) { font-size: 12px; color: var(--gray-4); background: none; border: none; cursor: default; }
+
+  /* ── Badges ── */
+  :global(.role-badge) { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
+  :global(.role-admin) { background: #faf5ff; color: #6d28d9; border: 1px solid #ede9fe; }
+  :global(.role-teacher) { background: #f0f7ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+  :global(.role-student) { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+
+  /* ── Toast ── */
+  .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 50; display: flex; flex-direction: column; gap: 8px; }
+  :global(.toast-item) { padding: 12px 20px; border-radius: 10px; background: var(--black); color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.12); animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+  :global(.toast-item.out) { animation: toastOut 0.2s forwards; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(8px); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .topnav-inner { padding: 0 16px; height: 50px; }
+    .topnav-subtitle { display: none; }
+    .topnav-divider { display: none; }
+    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+    .topnav-tabs::-webkit-scrollbar { display: none; }
+    .topnav-tab { white-space: nowrap; padding: 6px 10px; font-size: 12px; }
+    .topnav-right { gap: 8px; }
+    .profile-email { display: none; }
+    .main-content { padding: 20px 16px; }
+    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 24px; }
+    :global(.stat-value) { font-size: 22px; }
+    .section-bar { margin-bottom: 10px; }
+    .data-table th, .data-table td { padding: 10px 12px; font-size: 12px; }
+    :global(.user-card) { padding: 12px 14px; }
+    :global(.user-card-email) { font-size: 12px; }
+    :global(.user-card-meta) { font-size: 11px; }
+    :global(.user-card-actions) { margin-left: 8px; }
+    .btn-dark { padding: 8px 14px; font-size: 12px; }
+    .panel-search { padding: 10px 12px; }
+    .search-input { padding: 8px 12px 8px 32px; font-size: 12px; }
+  }
+  @media (max-width: 480px) {
+    .topnav-inner { padding: 0 12px; }
+    .topnav-logo { font-size: 16px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email || !window.isAdminEmail(user.email)) {
+  window.location.href = BP + '/admin/login';
+} else {
+  document.getElementById('auth-guard')?.remove();
+}
+
+/* ── Cache ── */
+const CACHE_TTL = 60000;
+const _cache = {};
+function cacheGet(k) { const e = _cache[k]; return e && Date.now() - e.ts < CACHE_TTL ? e.data : null; }
+function cacheSet(k, d) { _cache[k] = { data: d, ts: Date.now() }; }
+function cacheInvalidate(p) { Object.keys(_cache).forEach(k => { if (k.startsWith(p)) delete _cache[k]; }); }
+
+/* ── Profile ── */
+const avatarEl = document.getElementById('avatar-circle');
+const dropdownEmail = document.getElementById('dropdown-email');
+if (user?.email) {
+  if (user.photoURL) {
+    avatarEl.innerHTML = '<img src="' + user.photoURL + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />';
+  } else {
+    avatarEl.textContent = user.email[0].toUpperCase();
+  }
+  dropdownEmail.textContent = user.email;
+}
+let ddOpen = false;
+const dd = document.getElementById('profile-dropdown');
+const chev = document.getElementById('profile-chevron');
+document.getElementById('profile-trigger')?.addEventListener('click', e => { e.stopPropagation(); ddOpen = !ddOpen; dd.classList.toggle('open', ddOpen); chev.classList.toggle('open', ddOpen); });
+document.addEventListener('click', () => { if (ddOpen) { ddOpen = false; dd.classList.remove('open'); chev.classList.remove('open'); } });
+dd?.addEventListener('click', e => e.stopPropagation());
+
+/* ── Loading ── */
+function showLoading() {}
+function hideLoading() {}
+
+/* ── Toast ── */
+function showToast(msg) {
+  const w = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item'; el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+}
+
+/* ── Helpers ── */
+function mkEl(tag, attrs) {
+  const e = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => { if (k === 'className') e.className = v; else if (k === 'textContent') e.textContent = v; else e.setAttribute(k, v); });
+  for (let i = 2; i < arguments.length; i++) { const c = arguments[i]; if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
+  return e;
+}
+
+/* ── Tabs ── */
+let currentTab = 'dashboard';
+document.querySelectorAll('.topnav-tab[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    if (tab === currentTab) return;
+    document.querySelectorAll('.topnav-tab[data-tab]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+    const t = document.getElementById('tab-' + tab);
+    t.classList.remove('hidden');
+    t.style.animation = 'none'; t.offsetHeight; t.style.animation = '';
+    currentTab = tab;
+    if (tab === 'whitelist') loadWhitelist();
+  });
+});
+
+/* ── Dashboard ── */
+async function loadDashboard() {
+  showLoading();
+  try {
+    const cached = cacheGet('dashboard');
+    if (cached) { renderStats(cached.stats); renderUsers(cached.users); hideLoading(); return; }
+    const [sSnap, tSnap, qSnap, aSnap] = await Promise.all([
+      firebase.database().ref('1zTeStsys/Studentaccount').once('value'),
+      firebase.database().ref('1zTeStsys/Teacheraccount').once('value'),
+      firebase.database().ref('Teacherquestion').once('value'),
+      firebase.database().ref('config/admins').once('value'),
+    ]);
+    let tS = 0, tT = 0, tCh = 0, tQ = 0, tSc = 0;
+    if (sSnap.exists()) tS = Object.keys(sSnap.val()).length;
+    if (tSnap.exists()) { const d = tSnap.val(); tT = Object.keys(d).length; Object.keys(d).forEach(k => { const t = d[k]; if (t.Teacherscores) tSc += Object.keys(t.Teacherscores).length; }); }
+    if (qSnap.exists()) { const d = qSnap.val(); Object.keys(d).forEach(tk => { if (d[tk].chapters) Object.keys(d[tk].chapters).forEach(ck => { tCh++; if (d[tk].chapters[ck].questions) tQ += Object.keys(d[tk].chapters[ck].questions).length; }); }); }
+    const stats = { totalMembers: tS + tT, totalStudents: tS, totalTeachers: tT, totalChapters: tCh, totalQuestions: tQ, totalScores: tSc };
+    const allU = [];
+    if (aSnap.exists()) { const a = aSnap.val(); Object.keys(a).forEach(k => allU.push({ email: a[k].email || k, role: 'admin', name: '', stunum: '' })); }
+    if (tSnap.exists()) { const d = tSnap.val(); Object.keys(d).forEach(k => { const em = k.replace(/,/g, '.'); if (!allU.find(u => u.email === em)) allU.push({ email: em, role: 'teacher', name: '', stunum: '' }); }); }
+    if (sSnap.exists()) { const d = sSnap.val(); Object.keys(d).forEach(k => allU.push({ email: d[k].email || k.replace(/,/g, '.'), role: 'student', name: d[k].name || '', stunum: d[k].stunum || '' })); }
+    cacheSet('dashboard', { stats, users: allU });
+    renderStats(stats); renderUsers(allU);
+  } catch (e) { console.error(e); showToast('載入失敗'); }
+  hideLoading();
+}
+
+function renderStats(s) {
+  const illustMap = {
+    '會員數': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj72XC7BDxBcvN8ukOQFdnubPQxgEdxg7BYJAcHpIIXKQJahBhuJFzY3-gWOEWr7RLJsqHifHNKKyDMT6tFw1Jw1TLcJ8a4ZGXCwbAqHBHQq_91QLGT-DAgZtabix0cztyJGJngTSQiLlJD/s800/cat_study.png',
+    '章節': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjDuKsQjh9yiTox7xuwyEsO81xO7qSIPz9LmFfyXU58DYGIiFlUNkoeAkVFAt8u3QVmfif-jve_qSIf54fIyez1fuo9xAxonbCKS4RXFr24hGbACkanDNTXy_8kJLa99q-8ZAh3FNLUT6CH/s800/test_print_mondaiyoushi.png',
+    '題目': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhxdrlsTW_fS0mA8lWrpvkt03gX4l3r9KhPOoyurCoU-ipXuYRJfc9DtvjqDVj1HNGhE3Qy53U8-A94sqNkEGVt2TYfwD65r-MPavcs5dbBaQQw5N3KJScwPf-rX1RS47sM4hi63_AvwXtN/s800/test_touan_100ten.png',
+    '測驗紀錄': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjrCuctKWY_-p3O9FQ0JtJO1zirAhjZweaoDDbAR6j8YoAwTg9eoOC3_B6wZuJuXRLyJOB-X2cTRFmfVflSD0SOwPYqzB4zV6Ave8DKynvfjh2RPZ-sozPe1Doj32wFc3zwmR7fQUsBf4e1/s800/test_touan.png'
+  };
+  const cards = [
+    { l: '會員數', v: s.totalMembers, sub: '學生 ' + s.totalStudents + '　教師 ' + s.totalTeachers },
+    { l: '章節', v: s.totalChapters },
+    { l: '題目', v: s.totalQuestions },
+    { l: '測驗紀錄', v: s.totalScores }
+  ];
+  const g = document.getElementById('stats-grid'); g.replaceChildren();
+  cards.forEach((c, i) => {
+    const img = mkEl('img', { className: 'stat-illust', src: illustMap[c.l] || '', alt: c.l, loading: 'lazy' });
+    const info = mkEl('div', { className: 'stat-info' },
+      mkEl('p', { className: 'stat-label' }, c.l),
+      mkEl('p', { className: 'stat-value' }, String(c.v))
+    );
+    if (c.sub) info.appendChild(mkEl('p', { className: 'stat-sub' }, c.sub));
+    const card = mkEl('div', { className: 'stat-card' }, img, info);
+    card.style.animationDelay = (i * 0.06) + 's';
+    g.appendChild(card);
+  });
+}
+
+let allUsers = [];
+let displayedCount = 0;
+const PAGE_SIZE = 10;
+function renderUsers(users, append) {
+  if (!append) {
+    allUsers = users;
+    displayedCount = 0;
+    document.getElementById('user-count').textContent = '共 ' + users.length + ' 位';
+  }
+  const rm = { admin: '管理員', teacher: '教師', student: '學生' };
+  const cm = { admin: 'role-admin', teacher: 'role-teacher', student: 'role-student' };
+  const tb = document.getElementById('users-list');
+  const emp = document.getElementById('users-empty');
+  const loadWrap = document.getElementById('load-more-wrap');
+
+  if (!append) tb.replaceChildren();
+
+  if (!allUsers.length && !append) { emp?.classList.remove('hidden'); loadWrap?.classList.add('hidden'); return; }
+  emp?.classList.add('hidden');
+
+  const start = append ? displayedCount : 0;
+  const end = Math.min(start + PAGE_SIZE, allUsers.length);
+  const slice = allUsers.slice(start, end);
+
+  slice.forEach((u, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-200';
+
+    const idxTd = `<td class="py-3.5 px-4 text-xs font-medium text-slate-400 text-center">${start + i + 1}</td>`;
+    const emailTd = `<td class="py-3.5 px-4 text-xs font-semibold text-slate-800 tracking-tight">${u.email}</td>`;
+    const nameTd = `<td class="py-3.5 px-4 text-xs font-normal text-slate-600">${u.name || '-'}</td>`;
+    const stunumTd = `<td class="py-3.5 px-4 text-xs font-normal text-slate-500">${u.stunum || '-'}</td>`;
+    const roleBadge = `<span class="role-badge !rounded-none ${cm[u.role] || ''}">${rm[u.role] || u.role}</span>`;
+    const roleTd = `<td class="py-3 px-4 text-center">${roleBadge}</td>`;
+
+    let actionBtn = `<span class="text-xs text-slate-300">-</span>`;
+    if (u.role !== 'admin') {
+      actionBtn = `<button class="btn-danger-square del-user-btn" style="padding:4px 10px;font-size:11px;font-weight:500;color:#dc2626;border:1px solid #fca5a5;background:#fff;border-radius:0px;cursor:pointer;transition:all 0.15s;">刪除</button>`;
+    }
+    const actionTd = `<td class="py-3 px-4 text-center">${actionBtn}</td>`;
+
+    tr.innerHTML = idxTd + emailTd + nameTd + stunumTd + roleTd + actionTd;
+
+    const delBtn = tr.querySelector('.del-user-btn');
+    if (delBtn) {
+      delBtn.addEventListener('click', async () => {
+        if (!confirm('確定刪除 ' + u.email + '？此操作無法復原！')) return;
+        const san = window.sanitizeEmail(u.email);
+        try {
+          if (u.role === 'teacher') {
+            await firebase.database().ref('1zTeStsys/Teacheraccount/' + san).remove();
+            await firebase.database().ref('Teacherquestion/' + san).remove();
+            const w = await firebase.database().ref('config/teacherWhitelist/' + san).once('value');
+            if (w.exists()) await firebase.database().ref('config/teacherWhitelist/' + san).remove();
+          } else if (u.role === 'student') {
+            await firebase.database().ref('1zTeStsys/Studentaccount/' + san).remove();
+          }
+          showToast('已刪除 ' + u.email);
+          cacheInvalidate('dashboard');
+          loadDashboard();
+        } catch (e) {
+          showToast('刪除失敗');
+        }
+      });
+    }
+
+    tb.appendChild(tr);
+  });
+
+  displayedCount = end;
+  if (displayedCount < allUsers.length) {
+    loadWrap?.classList.remove('hidden');
+  } else {
+    loadWrap?.classList.add('hidden');
+  }
+}
+
+document.getElementById('btn-load-more')?.addEventListener('click', () => {
+  renderUsers(allUsers, true);
+});
+
+/* ── PVQC Whitelist ── */
+document.getElementById('pvqc-email-input')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('btn-pvqc-add')?.click();
+  }
+});
+
+document.getElementById('btn-pvqc-add')?.addEventListener('click', async () => {
+  const em = document.getElementById('pvqc-email-input').value.trim();
+  if (!em) { showToast('請輸入 email'); return; }
+  const san = window.sanitizeEmail(em);
+  try {
+    await firebase.database().ref('config/teacherWhitelist/' + san).set({
+      email: em,
+      addedBy: user.email,
+      createdAt: new Date().toISOString()
+    });
+    showToast('已將 ' + em + ' 指派為 PVQC 教師');
+    document.getElementById('pvqc-email-input').value = '';
+    cacheInvalidate('dashboard');
+  } catch (e) { showToast('設定失敗'); }
+});
+
+let sTimer = null;
+document.getElementById('user-search')?.addEventListener('input', function() {
+  clearTimeout(sTimer);
+  const q = this.value.toLowerCase().trim();
+  sTimer = setTimeout(() => { renderUsers(q ? allUsers.filter(u => (u.email||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q) || (u.stunum||'').toLowerCase().includes(q)) : allUsers); }, 150);
+});
+
+/* ── Auto-register admin ── */
+async function ensureAdmin() {
+  if (!user?.email) return;
+  const san = user.email.replace(/\./g, ',').replace(/#/g, ',').replace(/\$/g, ',').replace(/\//g, ',');
+  const snap = await firebase.database().ref('config/admins/' + san).once('value');
+  if (!snap.exists()) { await firebase.database().ref('config/admins/' + san).set({ email: user.email, createdAt: new Date().toISOString() }); cacheInvalidate('dashboard'); }
+}
+
+/* ── Whitelist ── */
+async function loadWhitelist() {
+  showLoading();
+  const cached = cacheGet('whitelist');
+  if (cached) { renderWL(cached); hideLoading(); return; }
+  const snap = await firebase.database().ref('config/teacherWhitelist').once('value');
+  const data = snap.exists() ? snap.val() : null;
+  if (data) cacheSet('whitelist', data);
+  renderWL(data); hideLoading();
+}
+function renderWL(data) {
+  const tb = document.getElementById('wl-tbody'); tb.replaceChildren();
+  const emp = document.getElementById('wl-empty');
+  if (!data) { emp?.classList.remove('hidden'); return; }
+  emp?.classList.add('hidden');
+  Object.keys(data).forEach(k => {
+    const d = data[k]; const em = d.email || k.replace(/,/g, '.');
+    const db = mkEl('button', { className: 'btn-danger' }, '移除');
+    db.addEventListener('click', async () => { if (!confirm('確定移除？')) return; await firebase.database().ref('config/teacherWhitelist/' + k).remove(); showToast('已移除'); cacheInvalidate('whitelist'); cacheInvalidate('dashboard'); loadWhitelist(); });
+    const row = mkEl('tr', null, mkEl('td', { className: 'font-medium' }, em), mkEl('td', { className: 'text-gray-500' }, d.addedBy || '—'), mkEl('td', { className: 'text-gray-500' }, d.createdAt || '—'), mkEl('td', { className: 'text-right' }, db));
+    row.style.animation = 'fadeUp 0.25s cubic-bezier(0.16,1,0.3,1) forwards';
+    tb.appendChild(row);
+  });
+}
+document.getElementById('btn-wl-add')?.addEventListener('click', async () => {
+  const em = document.getElementById('wl-email').value.trim();
+  if (!em) { showToast('請輸入 email'); return; }
+  const san = window.sanitizeEmail(em);
+  await firebase.database().ref('config/teacherWhitelist/' + san).set({ email: em, addedBy: user.email, createdAt: new Date().toISOString() });
+  showToast('已加入 ' + em); document.getElementById('wl-email').value = '';
+  cacheInvalidate('whitelist'); cacheInvalidate('dashboard'); loadWhitelist();
+});
+
+/* ── Logout ── */
+async function doLogout() { try { await firebase.auth().signOut(); } catch(e) {} localStorage.removeItem('fb_user'); window.location.href = BP + '/admin/login'; }
+document.getElementById('logout-btn')?.addEventListener('click', doLogout);
+document.getElementById('dropdown-logout')?.addEventListener('click', doLogout);
+
+ensureAdmin().then(loadDashboard);
+</script>
