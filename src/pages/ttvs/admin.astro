@@ -55,21 +55,7 @@ import Layout from '../../layouts/Layout.astro';
           </div>
         </div>
 
-        <!-- Stat cards -->
-        <div class="mb-6 grid gap-3 sm:grid-cols-3">
-          <div class="stat-card">
-            <p class="stat-label">總測驗次數</p>
-            <p id="total-count" class="stat-value">0</p>
-          </div>
-          <div class="stat-card">
-            <p class="stat-label">學生人數</p>
-            <p id="student-count" class="stat-value">0</p>
-          </div>
-          <div class="stat-card">
-            <p class="stat-label">平均分數</p>
-            <p id="avg-score" class="stat-value">—</p>
-          </div>
-        </div>
+
 
         <!-- Control & Filter Bar -->
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm">
@@ -515,9 +501,9 @@ async function loadScores() {
   try {
     const snap = await firebase.database().ref('PVQCSCORES').once('value');
     if (!snap.exists()) {
-      document.getElementById('total-count').textContent = '0';
-      document.getElementById('student-count').textContent = '0';
-      document.getElementById('avg-score').textContent = '—';
+      if (document.getElementById('total-count')) document.getElementById('total-count').textContent = '0';
+      if (document.getElementById('student-count')) document.getElementById('student-count').textContent = '0';
+      if (document.getElementById('avg-score')) document.getElementById('avg-score').textContent = '—';
       allScores = [];
       renderCurrentPage(false);
       return;
@@ -560,12 +546,12 @@ async function loadScores() {
     allScores = entries;
 
     /* Stats */
-    document.getElementById('total-count').textContent = String(entries.length);
+    if (document.getElementById('total-count')) document.getElementById('total-count').textContent = String(entries.length);
     const uniqueStudents = new Set(entries.map(s => (s.email || s.name).toLowerCase()));
-    document.getElementById('student-count').textContent = String(uniqueStudents.size);
+    if (document.getElementById('student-count')) document.getElementById('student-count').textContent = String(uniqueStudents.size);
     const validScores = entries.map(s => s.total ? Math.round((s.score / s.total) * 100) : s.score);
     const avg = validScores.length ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length) : 0;
-    document.getElementById('avg-score').textContent = validScores.length ? (avg + '%') : '—';
+    if (document.getElementById('avg-score')) document.getElementById('avg-score').textContent = validScores.length ? (avg + '%') : '—';
 
     renderCurrentPage(false);
   } catch (e) {
