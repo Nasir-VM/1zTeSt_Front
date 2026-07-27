@@ -1,0 +1,467 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+---
+<Layout title="題庫管理">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+
+  <!-- Top Navbar -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <div class="topnav-left">
+        <a href="/" class="topnav-logo">1zTeSt</a>
+        <span class="topnav-divider"></span>
+        <span class="topnav-subtitle">教師後台</span>
+      </div>
+      <div class="topnav-tabs">
+        <a href="/teacher/" class="topnav-tab active">題庫管理</a>
+        <a href="/teacher/scores" class="topnav-tab">成績管理</a>
+        <a href="/quiz/" class="topnav-tab">學生頁面</a>
+      </div>
+      <div class="topnav-right">
+        <div class="profile-menu">
+          <button id="profile-trigger" class="profile-btn">
+            <div id="avatar-circle" class="avatar"></div>
+            <svg class="chevron" id="profile-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+          </button>
+          <div id="profile-dropdown" class="dropdown">
+            <div class="dropdown-head">
+              <p class="dropdown-label">教師帳號</p>
+              <p id="dropdown-email" class="dropdown-email"></p>
+            </div>
+            <button id="dropdown-logout" class="dropdown-item danger">登出</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="main-content w-full flex-1">
+    <!-- Add Chapter -->
+    <div class="panel p-5 mb-5">
+      <h2 class="section-title mb-4"><span class="title-mark"></span>新增章節</h2>
+      <div class="flex flex-wrap items-end gap-3">
+        <div class="flex-1 min-w-[160px]">
+          <label class="input-label">科目</label>
+          <input id="chapter-subject" type="text" placeholder="例：英文、數學" class="input-field" />
+        </div>
+        <div class="flex-[2] min-w-[200px]">
+          <label class="input-label">章節名稱</label>
+          <input id="chapter-name" type="text" placeholder="例：第一章" class="input-field" />
+        </div>
+        <button id="btn-add-chapter" class="btn-green">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          新增章節
+        </button>
+      </div>
+    </div>
+
+    <!-- Chapter List -->
+    <div class="panel p-5 mb-5">
+      <h2 class="section-title mb-4"><span class="title-mark"></span>章節列表</h2>
+      <div id="chapter-list" class="space-y-3"><p class="text-sm text-gray-400">載入中...</p></div>
+    </div>
+
+    <!-- Question Section -->
+    <div id="question-section" class="hidden">
+      <div class="panel p-5 mb-5">
+        <div class="mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="section-title">題目列表 — <span id="current-chapter-name" class="text-gray-600"></span></h2>
+            <p id="q-section-sub" class="mt-0.5 text-xs text-gray-400"></p>
+          </div>
+          <div class="flex gap-2">
+            <button id="btn-import-csv" class="btn-blue">匯入 CSV</button>
+            <button id="btn-add-question" class="btn-green">新增題目</button>
+            <button id="btn-back" class="btn-outline">← 返回</button>
+          </div>
+        </div>
+
+        <!-- Question Form -->
+        <div id="question-form" class="mb-6 hidden form-slide">
+          <div class="grid gap-3 md:grid-cols-2">
+            <div class="md:col-span-2"><label class="input-label">題目</label><textarea id="q-text" rows="2" class="input-field w-full"></textarea></div>
+            <div id="container-q-a"><label class="input-label">選項 A</label><input id="q-a" type="text" class="input-field w-full" /></div>
+            <div id="container-q-b"><label class="input-label">選項 B</label><input id="q-b" type="text" class="input-field w-full" /></div>
+            <div id="container-q-c"><label class="input-label">選項 C</label><input id="q-c" type="text" class="input-field w-full" /></div>
+            <div id="container-q-d"><label class="input-label">選項 D</label><input id="q-d" type="text" class="input-field w-full" /></div>
+            <div><label class="input-label">正確答案</label><input id="q-answer" type="text" placeholder="A 或 A,B" class="input-field w-full" /></div>
+            <div><label class="input-label">詳解</label><input id="q-explanation" type="text" class="input-field w-full" /></div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button id="btn-save-question" class="btn-green">儲存</button>
+            <button id="btn-cancel-question" class="btn-outline">取消</button>
+          </div>
+        </div>
+
+        <!-- CSV Import -->
+        <div id="csv-modal" class="mb-6 hidden form-slide">
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-700">批次匯入</h3>
+            <button id="btn-close-csv" class="text-sm text-gray-400 hover:text-red-500">✕</button>
+          </div>
+          <div class="mb-4">
+            <p class="mb-2 text-sm text-gray-500">從 Excel 或 Google Sheets 複製貼上（Tab 分隔），或上傳 CSV</p>
+            <textarea id="csv-paste" rows="4" class="input-field w-full font-mono text-xs" placeholder="貼上 Excel/Sheets 的資料格（Tab 分隔）&#10;格式：題目&#09;A&#09;B&#09;C&#09;D&#09;答案&#09;詳解"></textarea>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <button id="btn-preview-import" class="btn-blue !py-1.5 !text-xs">預覽並匯入</button>
+              <button id="btn-csv-file" class="btn-outline !py-1.5 !text-xs">上傳 CSV</button>
+              <button id="btn-download-template" class="btn-outline !py-1.5 !text-xs">下載範本</button>
+              <a href="https://gemini.google.com/gem/1sHejM2PGAUPeuntnH6QQQofxXKSvDTSa?usp=sharing" target="_blank" rel="noopener" class="btn-outline !py-1.5 !text-xs !border-purple-200 !text-purple-600 hover:!bg-purple-50">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                Gemini 題目產出器
+              </a>
+            </div>
+            <input id="csv-file" type="file" accept=".csv" class="hidden" />
+          </div>
+          <div id="csv-preview" class="hidden">
+            <p class="mb-2 text-xs text-gray-500">預覽（<span id="csv-preview-count">0</span> 題）：</p>
+            <div class="max-h-48 overflow-auto" style="border:1px solid var(--border);border-radius:8px;">
+              <table class="w-full text-left text-xs">
+                <thead class="sticky top-0" style="background:#fafafa;"><tr>
+                  <th class="table-th">題目</th><th class="table-th">A</th><th class="table-th">B</th><th class="table-th">C</th><th class="table-th">D</th><th class="table-th">答案</th><th class="table-th">詳解</th>
+                </tr></thead>
+                <tbody id="csv-preview-body" class="divide-y" style="border-color:#f0f0f0;"></tbody>
+              </table>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <button id="btn-do-import" class="btn-green !py-1.5 !text-xs">確認匯入 <span id="csv-import-count">0</span> 題</button>
+              <button id="btn-cancel-preview" class="btn-outline !py-1.5 !text-xs">取消</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question List -->
+        <div id="question-list" class="space-y-2"></div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  :root { --black: #111; --gray-1: #333; --gray-2: #666; --gray-3: #999; --gray-4: #ccc; --gray-bg: #f5f5f5; --white: #fff; --border: #e5e5e5; --radius: 12px; }
+  body { font-family: "LXGW WenKai Lite", "Klee One", "JhengHei", "圓體", sans-serif; }
+  .topnav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  .topnav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; }
+  .topnav-left { display: flex; align-items: center; gap: 12px; }
+  .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
+  .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
+  .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
+  .topnav-tabs { display: flex; align-items: center; gap: 4px; }
+  .topnav-tab { font-size: 13px; font-weight: 500; color: var(--gray-3); background: none; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .topnav-tab:hover { color: var(--black); background: var(--gray-bg); }
+  .topnav-tab.active { color: var(--black); background: var(--gray-bg); font-weight: 600; }
+  .topnav-right { display: flex; align-items: center; gap: 16px; }
+  /* Profile menu */
+  .profile-menu { position: relative; }
+  .profile-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: none; border: none; padding: 4px 6px; border-radius: 8px; transition: background 0.15s; }
+  .profile-btn:hover { background: var(--gray-bg); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .chevron { width: 14px; height: 14px; color: var(--gray-4); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 240px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all 0.2s cubic-bezier(0.16,1,0.3,1); z-index: 50; }
+  .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .dropdown-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .dropdown-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-3); }
+  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gray-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dropdown-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 13px; color: var(--gray-2); background: none; border: none; cursor: pointer; transition: background 0.15s; }
+  .dropdown-item:hover { background: var(--gray-bg); }
+  .dropdown-item.danger { color: #e53e3e; }
+  .dropdown-item.danger:hover { background: #fff5f5; }
+  /* Main */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); transition: box-shadow 0.2s; }
+  .panel:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .panel.p-5 { padding: 20px; }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--black); display: flex; align-items: center; gap: 8px; }
+  .title-mark { width: 3px; height: 14px; background: var(--black); border-radius: 2px; flex-shrink: 0; }
+  .input-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); margin-bottom: 6px; }
+  .input-field { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--gray-1); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+  .input-field:focus { border-color: var(--black); box-shadow: 0 0 0 2px rgba(0,0,0,0.06); }
+  .input-field::placeholder { color: var(--gray-4); }
+
+  /* ── Colorful buttons ── */
+  .btn-green { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #16a34a; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-green:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+  .btn-green:active { transform: scale(0.97); }
+  .btn-blue { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #1e3a5f; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-blue:hover { background: #163049; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,58,95,0.3); }
+  .btn-blue:active { transform: scale(0.97); }
+  .btn-amber { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #d97706; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-amber:hover { background: #b45309; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(217,119,6,0.3); }
+  .btn-amber:active { transform: scale(0.97); }
+  .btn-red { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; color: #e53e3e; background: #fff; border: 1px solid #fed7d7; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+  .btn-red:hover { background: #fff5f5; transform: translateY(-1px); }
+  .btn-outline { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--gray-2); background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-outline:hover { border-color: var(--gray-3); background: var(--gray-bg); }
+
+  .table-th { padding: 10px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); }
+  .form-slide { background: #fafafa; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; animation: formSlide 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes formSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  :global(.chapter-row) { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; transition: background 0.15s, transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s; }
+  :global(.chapter-row:hover) { background: #fafafa; transform: translateX(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  :global(.limit-input) { width: 64px; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; text-align: center; font-size: 12px; outline: none; }
+  :global(.limit-input:focus) { border-color: var(--black); }
+  :global(.toggle-track) { position: relative; width: 36px; height: 20px; border-radius: 10px; background: var(--gray-4); transition: background 0.25s cubic-bezier(0.16,1,0.3,1); cursor: pointer; }
+  :global(.toggle-track.on) { background: #16a34a; }
+  :global(.toggle-dot) { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  :global(.toggle-track.on .toggle-dot) { transform: translateX(16px); }
+  :global(.manage-btn) { padding: 6px 14px; font-size: 12px; font-weight: 500; color: #fff; background: #1e3a5f; border: 1px solid #1e3a5f; border-radius: 6px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+  :global(.manage-btn:hover) { background: #163049; transform: translateY(-1px); }
+  :global(.delete-btn) { padding: 6px 12px; font-size: 12px; font-weight: 500; color: #e53e3e; background: #fff; border: 1px solid #fed7d7; border-radius: 6px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+  :global(.delete-btn:hover) { background: #fff5f5; transform: translateY(-1px); }
+  :global(.empty-state) { text-align: center; padding: 40px 20px; }
+  :global(.empty-state-icon) { font-size: 32px; margin-bottom: 8px; opacity: 0.3; }
+  :global(.empty-state-text) { font-size: 13px; color: var(--gray-3); }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .topnav-inner { padding: 0 16px; height: 50px; }
+    .topnav-subtitle { display: none; }
+    .topnav-divider { display: none; }
+    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+    .topnav-tabs::-webkit-scrollbar { display: none; }
+    .topnav-tab { white-space: nowrap; padding: 6px 10px; font-size: 12px; }
+    .topnav-right { gap: 8px; }
+    .main-content { padding: 20px 16px; }
+    .section-title { font-size: 14px; }
+    .panel.p-5 { padding: 14px; }
+    .btn-green, .btn-blue, .btn-amber, .btn-outline { padding: 8px 14px; font-size: 12px; }
+    :global(.chapter-row) { padding: 12px; flex-wrap: wrap; gap: 8px; }
+    :global(.chapter-row .manage-btn),
+    :global(.chapter-row .delete-btn) { font-size: 11px; padding: 5px 10px; }
+  }
+  @media (max-width: 480px) {
+    .topnav-inner { padding: 0 12px; }
+    .topnav-logo { font-size: 16px; }
+    .form-slide { padding: 14px; }
+    .grid.gap-3 { gap: 8px !important; }
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email) window.location.href = BP + '/';
+else document.getElementById('auth-guard')?.remove();
+
+/* ── Profile + Google Avatar ── */
+const avatarEl = document.getElementById('avatar-circle');
+const dropdownEmail = document.getElementById('dropdown-email');
+if (user?.email) {
+  dropdownEmail.textContent = user.email;
+  if (user.photoURL) {
+    avatarEl.innerHTML = '<img src="' + user.photoURL + '" alt="avatar" />';
+  } else {
+    avatarEl.textContent = user.email[0].toUpperCase();
+  }
+}
+let ddOpen = false;
+const dd = document.getElementById('profile-dropdown');
+const chev = document.getElementById('profile-chevron');
+document.getElementById('profile-trigger')?.addEventListener('click', e => { e.stopPropagation(); ddOpen = !ddOpen; dd.classList.toggle('open', ddOpen); chev.classList.toggle('open', ddOpen); });
+document.addEventListener('click', () => { if (ddOpen) { ddOpen = false; dd.classList.remove('open'); chev.classList.remove('open'); } });
+dd?.addEventListener('click', e => e.stopPropagation());
+
+function showToast(msg) {
+  Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: msg, showConfirmButton: false, timer: 2200, timerProgressBar: true, customClass: { popup: 'swal2-popup-custom' } });
+}
+
+function mkEl(tag, attrs) {
+  const e = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => { if (k === 'className') e.className = v; else if (k === 'textContent') e.textContent = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), v); else e.setAttribute(k, v); });
+  for (let i = 2; i < arguments.length; i++) { const c = arguments[i]; if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
+  return e;
+}
+
+const teacherSan = window.sanitizeEmail(user.email);
+let chapters = [];
+let currentChapterKey = null;
+let editingQuestionKey = null;
+
+async function loadChapters() {
+  chapters = [];
+  const qSnap = await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters').once('value');
+  if (qSnap.exists()) {
+    const d = qSnap.val();
+    Object.keys(d).forEach(k => {
+      const ch = d[k];
+      chapters.push({ key: k, name: ch.name || k, subject: ch.subject || '', question_count: ch.question_count != null ? ch.question_count : (ch.questions ? Object.keys(ch.questions).length : 0), is_open: ch.open === true || ch.open === 'true', is_antiChe: ch.antiChe === true, question_limit: ch.limit || 0, dbPath: 'Teacherquestion/' + teacherSan + '/chapters/' + k });
+    });
+  }
+  renderChapters();
+}
+
+function renderChapters() {
+  const el = document.getElementById('chapter-list'); el.replaceChildren();
+  const totalQs = chapters.reduce((s, c) => s + (c.question_count || 0), 0);
+  if (!chapters.length) {
+    var empty = mkEl('div', { className: 'empty-state' });
+    empty.appendChild(mkEl('div', { className: 'empty-state-icon' }, '📂'));
+    empty.appendChild(mkEl('p', { className: 'empty-state-text' }, '目前還沒有任何章節喔～趕快從上面新增一個吧！'));
+    el.appendChild(empty);
+    return;
+  }
+  chapters.forEach((ch, idx) => {
+    const left = mkEl('div', { className: 'flex items-center gap-3' }, mkEl('span', { className: 'font-medium text-gray-700', style: 'font-family: "Iansui", "LXGW WenKai Lite", serif; font-size: 15px;' }, ch.name), ch.subject ? mkEl('span', { className: 'text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full font-medium' }, ch.subject) : null, mkEl('span', { className: 'text-xs text-gray-400' }, ch.question_count + ' 題'));
+    const toggle = mkEl('div', { className: 'toggle-track' + (ch.is_open ? ' on' : '') });
+    toggle.appendChild(mkEl('div', { className: 'toggle-dot' }));
+    toggle.addEventListener('click', async () => { const on = toggle.classList.toggle('on'); await firebase.database().ref(ch.dbPath + '/open').set(on); showToast(on ? '已開放此章節' : '已關閉此章節'); });
+    const limitIn = mkEl('input', { type: 'number', value: String(ch.question_limit), className: 'limit-input', title: '題數上限（0=不限）' });
+    limitIn.addEventListener('change', async () => { await firebase.database().ref(ch.dbPath + '/limit').set(parseInt(limitIn.value) || 0); showToast('已更新上限'); });
+    const manageBtn = mkEl('button', { className: 'manage-btn' }, '管理題目');
+    manageBtn.addEventListener('click', () => openChapter(ch));
+    const delBtn = mkEl('button', { className: 'delete-btn' }, '刪除');
+    delBtn.addEventListener('click', async () => {
+      Swal.fire({ title: '確定刪除此章節？', text: '此操作無法復原', icon: 'warning', showCancelButton: true, confirmButtonText: '確定刪除', cancelButtonText: '取消', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref(ch.dbPath).remove(); showToast('已刪除章節'); loadChapters(); } });
+    });
+    const rightItems = [toggle];
+    const acTrack = mkEl('div', { className: 'toggle-track' + (ch.is_antiChe ? ' on' : '') });
+    acTrack.appendChild(mkEl('div', { className: 'toggle-dot' }));
+    acTrack.addEventListener('click', async () => { const on = acTrack.classList.toggle('on'); await firebase.database().ref(ch.dbPath + '/antiChe').set(on); showToast(on ? '防作弊已開啟' : '防作弊已關閉'); });
+    rightItems.push(mkEl('span', { className: 'text-xs text-gray-400' }, '🔒'), acTrack);
+    rightItems.push(limitIn, manageBtn, delBtn);
+    const row = mkEl('div', { className: 'chapter-row' }, left, mkEl('div', { className: 'flex items-center gap-2 flex-wrap justify-end' }, ...rightItems));
+    row.style.opacity = '0'; row.style.transform = 'translateY(8px)';
+    el.appendChild(row);
+    setTimeout(function() { row.style.transition = 'opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.15s, box-shadow 0.2s'; row.style.opacity = '1'; row.style.transform = 'translateY(0)'; }, idx * 40);
+  });
+}
+
+['chapter-name', 'chapter-subject'].forEach(id => {
+  document.getElementById(id)?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('btn-add-chapter')?.click();
+    }
+  });
+});
+
+document.getElementById('btn-add-chapter').addEventListener('click', async () => {
+  const name = document.getElementById('chapter-name').value.trim();
+  const subject = document.getElementById('chapter-subject').value.trim();
+  if (!name) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '請輸入章節名稱', showConfirmButton: false, timer: 1800 }); return; }
+  await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters').push({ name, subject: subject || '', open: false, antiChe: false, limit: 0 });
+  document.getElementById('chapter-name').value = ''; document.getElementById('chapter-subject').value = ''; showToast('章節已建立'); loadChapters();
+});
+
+async function openChapter(ch) {
+  const qSection = document.getElementById('question-section');
+  if (currentChapterKey === ch.key && !qSection.classList.contains('hidden')) {
+    qSection.classList.add('hidden');
+    document.getElementById('question-form').classList.add('hidden');
+    document.getElementById('csv-modal').classList.add('hidden');
+    currentChapterKey = null;
+    return;
+  }
+  currentChapterKey = ch.key;
+  document.getElementById('current-chapter-name').textContent = ch.name;
+  qSection.classList.remove('hidden');
+  document.getElementById('question-form').classList.add('hidden');
+  document.getElementById('csv-modal').classList.add('hidden');
+  await loadQuestions();
+}
+
+document.getElementById('btn-back').addEventListener('click', () => { document.getElementById('question-section').classList.add('hidden'); currentChapterKey = null; loadChapters(); });
+
+/* ── Question Pagination ── */
+const PAGE_SIZE = 20;
+let allQuestionKeys = [];
+let questionPage = 0;
+
+async function loadQuestions() {
+  const el = document.getElementById('question-list'); el.replaceChildren();
+  const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+  const snap = await firebase.database().ref(dbPath).once('value');
+  if (!snap.exists()) {
+    var empty = mkEl('div', { className: 'empty-state' });
+    empty.appendChild(mkEl('div', { className: 'empty-state-icon' }, '✏️'));
+    empty.appendChild(mkEl('p', { className: 'empty-state-text' }, '目前沒有題目喔～快來出第一題吧！'));
+    el.appendChild(empty);
+    document.getElementById('q-section-sub').textContent = '0 題';
+    return;
+  }
+  const data = snap.val();
+  allQuestionKeys = Object.keys(data).map(k => ({ _key: k, ...data[k] }));
+  questionPage = 0;
+  document.getElementById('q-section-sub').textContent = allQuestionKeys.length + ' 題';
+  renderQuestionPage();
+}
+
+function renderQuestionPage() {
+  const el = document.getElementById('question-list');
+  /* Keep only empty state or remove old items */
+  el.querySelectorAll('.q-row, .load-more-btn').forEach(n => n.remove());
+  const start = questionPage * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, allQuestionKeys.length);
+  const pageItems = allQuestionKeys.slice(start, end);
+
+  pageItems.forEach((q) => {
+    const left = mkEl('div', { className: 'flex-1' }, mkEl('p', { className: 'font-medium text-gray-700' }, q.question || ''), mkEl('p', { className: 'mt-1 text-xs text-gray-400' }, 'A: ' + (q.A||'-') + ' | B: ' + (q.B||'-') + ' | C: ' + (q.C||'-') + ' | D: ' + (q.D||'-')), mkEl('p', { className: 'mt-0.5 text-xs text-gray-600' }, '答案: ' + q.answer + (q.explanation ? ' | 詳解: ' + q.explanation : '')));
+    const editBtn = mkEl('button', { className: 'manage-btn' }, '編輯');
+    editBtn.addEventListener('click', () => { editingQuestionKey = q._key; document.getElementById('q-text').value = q.question || ''; document.getElementById('q-a').value = q.A || ''; document.getElementById('q-b').value = q.B || ''; document.getElementById('q-c').value = q.C || ''; document.getElementById('q-d').value = q.D || ''; document.getElementById('q-answer').value = q.answer || ''; document.getElementById('q-explanation').value = q.explanation || ''; document.getElementById('question-form').classList.remove('hidden'); document.getElementById('question-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    const delBtn = mkEl('button', { className: 'delete-btn' }, '刪除');
+    delBtn.addEventListener('click', async () => { Swal.fire({ title: '確定刪除此題目？', icon: 'warning', showCancelButton: true, confirmButtonText: '刪除', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions/' + q._key).remove(); /* Update question_count */ const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap2 = await chRef.once('value'); await chRef.set(Math.max(0, (snap2.val() || 0) - 1)); /* Also update local chapter list */ const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = Math.max(0, ch.question_count - 1); document.getElementById('stat-questions').textContent = String(chapters.reduce((s,c) => s + (c.question_count||0), 0)); showToast('已刪除題目'); renderChapters(); loadQuestions(); } }); });
+    const row = mkEl('div', { className: 'q-row flex items-start justify-between p-3', style: 'border:1px solid var(--border);border-radius:8px;transition:transform 0.2s cubic-bezier(0.16,1,0.3,1),box-shadow 0.2s;' }, left, mkEl('div', { className: 'flex gap-1' }, editBtn, delBtn));
+    row.addEventListener('mouseenter', function() { row.style.transform = 'translateX(2px)'; row.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'; });
+    row.addEventListener('mouseleave', function() { row.style.transform = ''; row.style.boxShadow = ''; });
+    el.appendChild(row);
+  });
+
+  /* Load more button */
+  if (end < allQuestionKeys.length) {
+    const moreBtn = mkEl('button', { className: 'load-more-btn btn-outline' }, '載入更多（' + end + ' / ' + allQuestionKeys.length + '）');
+    moreBtn.style.cssText = 'width:100%;margin-top:12px;';
+    moreBtn.addEventListener('click', () => { questionPage++; renderQuestionPage(); });
+    el.appendChild(moreBtn);
+  }
+}
+
+document.getElementById('btn-add-question').addEventListener('click', () => { editingQuestionKey = null; ['q-text','q-a','q-b','q-c','q-d','q-answer','q-explanation'].forEach(id => document.getElementById(id).value = ''); document.getElementById('question-form').classList.remove('hidden'); document.getElementById('question-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+document.getElementById('btn-cancel-question').addEventListener('click', () => { document.getElementById('question-form').classList.add('hidden'); editingQuestionKey = null; });
+document.getElementById('btn-save-question').addEventListener('click', async () => {
+  const q = document.getElementById('q-text').value.trim(); const A = document.getElementById('q-a').value.trim() || null; const B = document.getElementById('q-b').value.trim() || null; const C = document.getElementById('q-c').value.trim() || null; const D = document.getElementById('q-d').value.trim() || null; const ans = document.getElementById('q-answer').value.trim(); const ex = document.getElementById('q-explanation').value.trim() || null;
+  if (!q || !ans) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '題目和答案不可為空', showConfirmButton: false, timer: 1800 }); return; }
+  const body = { question: q, A, B, C, D, answer: ans, explanation: ex }; const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+  if (editingQuestionKey) {
+    await firebase.database().ref(dbPath + '/' + editingQuestionKey).update(body);
+  } else {
+    await firebase.database().ref(dbPath).push(body);
+    /* Increment question_count */
+    const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count');
+    const snap = await chRef.once('value');
+    await chRef.set((snap.val() || 0) + 1);
+    const ch = chapters.find(c => c.key === currentChapterKey);
+    if (ch) ch.question_count = (ch.question_count || 0) + 1;
+    document.getElementById('stat-questions').textContent = String(chapters.reduce((s,c) => s + (c.question_count||0), 0));
+  }
+  showToast(editingQuestionKey ? '已更新題目' : '已新增題目');
+  document.getElementById('question-form').classList.add('hidden'); editingQuestionKey = null; renderChapters(); loadQuestions();
+});
+
+/* ── CSV ── */
+document.getElementById('btn-import-csv').addEventListener('click', () => document.getElementById('csv-modal').classList.toggle('hidden'));
+document.getElementById('btn-close-csv').addEventListener('click', () => { document.getElementById('csv-modal').classList.add('hidden'); document.getElementById('csv-preview').classList.add('hidden'); });
+document.getElementById('btn-cancel-preview').addEventListener('click', () => document.getElementById('csv-preview').classList.add('hidden'));
+document.getElementById('btn-csv-file').addEventListener('click', () => document.getElementById('csv-file').click());
+document.getElementById('btn-download-template').addEventListener('click', () => { const csv = 'FEFF題目,A,B,C,D,答案,詳解範例題目,選項A,選項B,選項C,選項D,A,範例詳解'; const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = '題目匯入範本.csv'; link.click(); });
+let parsedRows = [];
+function parseTabData(text) { return text.split(/\r?\n/).filter(r => r.trim()).map(r => { let c = r.split('\t'); if (c.length === 1) c = r.split(','); return c; }); }
+function renderPreview(rows) { const tb = document.getElementById('csv-preview-body'); tb.replaceChildren(); rows.forEach(r => { const tr = document.createElement('tr'); for (let i = 0; i < Math.min(7, r.length); i++) { const td = document.createElement('td'); td.className = 'max-w-[120px] truncate px-3 py-1.5'; td.textContent = r[i] || ''; tr.appendChild(td); } tb.appendChild(tr); }); document.getElementById('csv-preview-count').textContent = rows.length; document.getElementById('csv-import-count').textContent = rows.length; document.getElementById('csv-preview').classList.remove('hidden'); }
+document.getElementById('btn-preview-import').addEventListener('click', () => { const text = document.getElementById('csv-paste').value.trim(); if (!text) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '請先貼上資料', showConfirmButton: false, timer: 1800 }); return; } parsedRows = parseTabData(text); if (!parsedRows.length || parsedRows[0].length < 2) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無法解析', showConfirmButton: false, timer: 1800 }); return; } if (parsedRows[0][0].includes('題目') || parsedRows[0][0].includes('Question')) parsedRows.shift(); if (!parsedRows.length) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無有效資料', showConfirmButton: false, timer: 1800 }); return; } renderPreview(parsedRows); });
+document.getElementById('csv-file').addEventListener('change', function(e) { const file = this.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(ev) { parsedRows = parseTabData(ev.target.result); if (parsedRows.length && (parsedRows[0][0].includes('題目') || parsedRows[0][0].includes('Question'))) parsedRows.shift(); renderPreview(parsedRows); }; reader.readAsText(file, 'utf-8'); });
+document.getElementById('btn-do-import').addEventListener('click', async () => { if (!parsedRows.length) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無資料可匯入', showConfirmButton: false, timer: 1800 }); return; } const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions'; const batch = {}; let imported = 0; for (const row of parsedRows) { if (row.length < 6) continue; const q = row[0]||''; const A = row[1]||null; const B = row[2]||null; const C = row[3]||null; const D = row[4]||null; const ans = row[5]||''; const ex = row[6]||null; if (q && ans) { const key = firebase.database().ref(dbPath).push().key; batch[key] = { question: q, A, B, C, D, answer: ans, explanation: ex }; imported++; } } if (imported > 0) { await firebase.database().ref(dbPath).set(batch); const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap = await chRef.once('value'); await chRef.set((snap.val() || 0) + imported); const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = (ch.question_count || 0) + imported; document.getElementById('stat-questions').textContent = String(chapters.reduce((s,c) => s + (c.question_count||0), 0)); } showToast('已匯入 ' + imported + ' 題'); document.getElementById('csv-modal').classList.add('hidden'); document.getElementById('csv-preview').classList.add('hidden'); document.getElementById('csv-paste').value = ''; parsedRows = []; loadQuestions(); });
+
+document.getElementById('dropdown-logout')?.addEventListener('click', async () => { try { await firebase.auth().signOut(); } catch(e) {} localStorage.removeItem('fb_user'); localStorage.removeItem('last_activity'); window.location.href = BP + '/'; });
+loadChapters();
+
+/* ── GSAP Entrance Animations ── */
+if (typeof gsap !== 'undefined') {
+  gsap.from('.topnav', { y: -60, opacity: 0, duration: 0.6, ease: 'power3.out' });
+  gsap.from('.main-content .panel', { y: 30, opacity: 0, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2 });
+}
+</script>

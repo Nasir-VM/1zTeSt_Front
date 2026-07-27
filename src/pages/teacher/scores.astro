@@ -1,0 +1,463 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+---
+<Layout title="成績管理">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+
+  <!-- Top Navbar -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <div class="topnav-left">
+        <a href="/" class="topnav-logo">1zTeSt</a>
+        <span class="topnav-divider"></span>
+        <span class="topnav-subtitle">教師後台</span>
+      </div>
+      <div class="topnav-tabs">
+        <a href="/teacher/" class="topnav-tab">題庫管理</a>
+        <a href="/teacher/scores" class="topnav-tab active">成績管理</a>
+        <a href="/quiz/" class="topnav-tab">學生頁面</a>
+      </div>
+      <div class="topnav-right">
+        <div class="profile-menu">
+          <button id="profile-trigger" class="profile-btn">
+            <div id="avatar-circle" class="avatar"></div>
+            <svg class="chevron" id="profile-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+          </button>
+          <div id="profile-dropdown" class="dropdown">
+            <div class="dropdown-head">
+              <p class="dropdown-label">教師帳號</p>
+              <p id="dropdown-email" class="dropdown-email"></p>
+            </div>
+            <button id="dropdown-logout" class="dropdown-item danger">登出</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="main-content w-full flex-1">
+    <!-- Date Filter -->
+    <div class="panel p-5 mb-5">
+      <div class="flex flex-wrap items-end gap-3">
+        <div>
+          <label class="input-label">開始日期</label>
+          <input id="filter-date-start" type="date" class="input-field" style="width:180px" />
+        </div>
+        <div>
+          <label class="input-label">結束日期</label>
+          <input id="filter-date-end" type="date" class="input-field" style="width:180px" />
+        </div>
+        <div class="flex-1">
+          <label class="input-label">搜尋學生</label>
+          <input id="filter-search" type="text" placeholder="輸入學生名稱..." class="input-field" />
+        </div>
+        <button id="btn-apply-filter" class="btn-blue">篩選</button>
+        <button id="btn-clear-filter" class="btn-outline">清除</button>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="panel p-5 mb-5">
+      <div class="flex items-center justify-between">
+        <h2 class="section-title"><span class="title-mark"></span>成績列表</h2>
+        <div class="flex gap-2">
+          <button id="btn-refresh-scores" class="btn-outline" title="重新載入成績">重新整理</button>
+          <button id="btn-select-all" class="btn-outline">全選</button>
+          <button id="btn-delete-selected" class="btn-red">刪除選取</button>
+          <button id="btn-export-csv" class="btn-green">匯出 CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score Table -->
+    <div class="panel p-5 mb-5">
+      <div id="score-date-label" class="mb-3 text-xs text-gray-400"></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr>
+              <th class="table-th" style="width:40px"><input id="select-all-check" type="checkbox" class="cursor-pointer" /></th>
+              <th class="table-th">學生</th>
+              <th class="table-th">日期</th>
+              <th class="table-th">章節</th>
+              <th class="table-th">分數</th>
+              <th class="table-th">時間</th>
+              <th class="table-th">操作</th>
+            </tr>
+          </thead>
+          <tbody id="score-table-body" class="divide-y" style="border-color:var(--border);">
+            <tr><td colspan="7" class="py-8 text-center text-gray-400">載入中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="hidden py-8 text-center">
+        <div class="empty-state-icon">📋</div>
+        <p class="empty-state-text">這幾天還沒有任何成績記錄喔～</p>
+        <p class="empty-state-sub">等學生開始測驗就會在這裡看到囉！</p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  :root { --black: #111; --gray-1: #333; --gray-2: #666; --gray-3: #999; --gray-4: #ccc; --gray-bg: #f5f5f5; --white: #fff; --border: #e5e5e5; --radius: 12px; }
+  body { font-family: "LXGW WenKai Lite", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  .topnav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  .topnav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; }
+  .topnav-left { display: flex; align-items: center; gap: 12px; }
+  .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
+  .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
+  .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
+  .topnav-tabs { display: flex; align-items: center; gap: 4px; }
+  .topnav-tab { font-size: 13px; font-weight: 500; color: var(--gray-3); background: none; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .topnav-tab:hover { color: var(--black); background: var(--gray-bg); }
+  .topnav-tab.active { color: var(--black); background: var(--gray-bg); font-weight: 600; }
+  .topnav-right { display: flex; align-items: center; gap: 16px; }
+  .profile-menu { position: relative; }
+  .profile-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: none; border: none; padding: 4px 6px; border-radius: 8px; transition: background 0.15s; }
+  .profile-btn:hover { background: var(--gray-bg); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .chevron { width: 14px; height: 14px; color: var(--gray-4); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 240px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all 0.2s cubic-bezier(0.16,1,0.3,1); z-index: 50; }
+  .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .dropdown-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .dropdown-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-3); }
+  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gray-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dropdown-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 13px; color: var(--gray-2); background: none; border: none; cursor: pointer; transition: background 0.15s; }
+  .dropdown-item:hover { background: var(--gray-bg); }
+  .dropdown-item.danger { color: #e53e3e; }
+  .dropdown-item.danger:hover { background: #fff5f5; }
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); transition: box-shadow 0.2s; }
+  .panel:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .panel.p-5 { padding: 20px; }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--black); display: flex; align-items: center; gap: 8px; }
+  .title-mark { width: 3px; height: 14px; background: var(--black); border-radius: 2px; flex-shrink: 0; }
+  .input-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); margin-bottom: 6px; }
+  .input-field { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--gray-1); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+  .input-field:focus { border-color: var(--black); box-shadow: 0 0 0 2px rgba(0,0,0,0.06); }
+  .input-field::placeholder { color: var(--gray-4); }
+  .btn-green { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #22c55e; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-green:hover { background: #16a34a; transform: translateY(-1px); }
+  .btn-green:active { transform: scale(0.97); }
+  .btn-blue { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #3b82f6; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-blue:hover { background: #2563eb; transform: translateY(-1px); }
+  .btn-blue:active { transform: scale(0.97); }
+  .btn-red { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #ef4444; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-red:hover { background: #dc2626; transform: translateY(-1px); }
+  .btn-red:active { transform: scale(0.97); }
+  .btn-outline { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--gray-2); background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .btn-outline:hover { border-color: var(--gray-3); background: var(--gray-bg); }
+  .table-th { padding: 10px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); }
+  .empty-state-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.3; }
+  .empty-state-text { font-size: 13px; color: var(--gray-3); }
+  .empty-state-sub { font-size: 12px; color: var(--gray-4); margin-top: 4px; }
+
+  @media (max-width: 768px) {
+    .topnav-inner { padding: 0 16px; height: 50px; }
+    .topnav-subtitle, .topnav-divider { display: none; }
+    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+    .topnav-tabs::-webkit-scrollbar { display: none; }
+    .topnav-tab { white-space: nowrap; padding: 6px 10px; font-size: 12px; }
+    .topnav-right { gap: 8px; }
+    .main-content { padding: 20px 16px; }
+    .panel.p-5 { padding: 14px; }
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email) window.location.href = BP + '/';
+else document.getElementById('auth-guard')?.remove();
+
+/* ── Profile + Google Avatar ── */
+const avatarEl = document.getElementById('avatar-circle');
+const dropdownEmail = document.getElementById('dropdown-email');
+if (user?.email) {
+  dropdownEmail.textContent = user.email;
+  if (user.photoURL) {
+    avatarEl.innerHTML = '<img src="' + user.photoURL + '" alt="avatar" />';
+  } else {
+    avatarEl.textContent = user.email[0].toUpperCase();
+  }
+}
+let ddOpen = false;
+const dd = document.getElementById('profile-dropdown');
+const chev = document.getElementById('profile-chevron');
+document.getElementById('profile-trigger')?.addEventListener('click', e => { e.stopPropagation(); ddOpen = !ddOpen; dd.classList.toggle('open', ddOpen); chev.classList.toggle('open', ddOpen); });
+document.addEventListener('click', () => { if (ddOpen) { ddOpen = false; dd.classList.remove('open'); chev.classList.remove('open'); } });
+dd?.addEventListener('click', e => e.stopPropagation());
+
+function showToast(msg) {
+  Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: msg, showConfirmButton: false, timer: 2200, timerProgressBar: true });
+}
+
+function sanitizeEmail(email) {
+  return email.replace(/\./g, ',').replace(/#/g, ',').replace(/\$/g, ',').replace(/\//g, ',');
+}
+
+/* ── Date Helpers ── */
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function dateRange(start, end) {
+  const dates = [];
+  const s = new Date(start + 'T00:00:00');
+  const e = new Date(end + 'T00:00:00');
+  while (s <= e) {
+    dates.push(s.getFullYear() + '-' + String(s.getMonth()+1).padStart(2,'0') + '-' + String(s.getDate()).padStart(2,'0'));
+    s.setDate(s.getDate() + 1);
+  }
+  return dates;
+}
+
+/* ── Init date fields ── */
+const today = todayStr();
+document.getElementById('filter-date-start').value = today;
+document.getElementById('filter-date-end').value = today;
+
+const teacherSan = sanitizeEmail(user.email);
+let allScores = [];
+let selectedKeys = new Set();
+let chapterNameMap = {};
+
+async function loadChapterNames() {
+  try {
+    const snap = await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters').once('value');
+    if (snap.exists()) {
+      const chs = snap.val();
+      Object.entries(chs).forEach(([key, ch]) => {
+        if (ch && ch.name) chapterNameMap[key] = ch.name;
+      });
+    }
+  } catch (e) { console.warn('loadChapterNames error', e); }
+}
+
+async function loadScores() {
+  allScores = [];
+  const startDate = document.getElementById('filter-date-start').value;
+  const endDate = document.getElementById('filter-date-end').value;
+
+  if (!startDate || !endDate) { renderTable(); return; }
+
+  /* Ensure chapter name map is loaded */
+  if (!Object.keys(chapterNameMap).length) await loadChapterNames();
+
+  const dates = dateRange(startDate, endDate);
+  const dateLabel = document.getElementById('score-date-label');
+  if (startDate === endDate) {
+    dateLabel.textContent = '📅 顯示 ' + startDate + ' 的成績';
+  } else {
+    dateLabel.textContent = '📅 顯示 ' + startDate + ' ~ ' + endDate + ' 的成績（共 ' + dates.length + ' 天）';
+  }
+
+  /* Read each date bucket — only reads the dates we need! */
+  for (const dateKey of dates) {
+    try {
+      const dateSnap = await firebase.database().ref('QUIZSCORES/' + teacherSan + '/' + dateKey).once('value');
+      if (!dateSnap.exists()) continue;
+      const dateData = dateSnap.val();
+      Object.entries(dateData).forEach(([studentKey, chapters]) => {
+        if (!chapters || typeof chapters !== 'object') return;
+        Object.entries(chapters).forEach(([chapterKey, records]) => {
+          if (!records || typeof records !== 'object') return;
+          if (chapterKey === '_meta') return;
+          Object.entries(records).forEach(([recKey, rec]) => {
+            if (!rec || typeof rec !== 'object') return;
+            const dbPath = 'QUIZSCORES/' + teacherSan + '/' + dateKey + '/' + studentKey + '/' + chapterKey + '/' + recKey;
+            allScores.push({
+              student: rec.student || rec.name || studentKey,
+              studentKey,
+              date: rec.date || dateKey,
+              chapter: chapterNameMap[chapterKey] || chapterKey,
+              chapterKey: chapterKey,
+              type: rec.type || 'quiz',
+              score: rec.score || 0,
+              total: rec.total || 0,
+              time: rec.time || '',
+              key: recKey,
+              dbDate: dateKey,
+              dbPath
+            });
+          });
+        });
+      });
+    } catch (e) { console.warn('Error loading date', dateKey, e); }
+  }
+
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('score-table-body');
+  tbody.replaceChildren();
+  const uniqueStudents = new Set(allScores.map(s => s.student));
+
+  let filtered = allScores.filter(s => {
+    const searchVal = document.getElementById('filter-search').value.trim().toLowerCase();
+    if (searchVal && !s.student.toLowerCase().includes(searchVal)) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    document.getElementById('empty-state').classList.remove('hidden');
+    tbody.innerHTML = '';
+    return;
+  }
+  document.getElementById('empty-state').classList.add('hidden');
+
+  filtered.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.style.transition = 'background 0.15s';
+    tr.onmouseenter = function() { this.style.background = '#fafafa'; };
+    tr.onmouseleave = function() { this.style.background = ''; };
+
+    const tdCheck = document.createElement('td');
+    tdCheck.className = 'py-2 px-3';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'score-checkbox';
+    cb.dataset.dbpath = s.dbPath;
+    cb.checked = selectedKeys.has(s.dbPath);
+    cb.addEventListener('change', () => { if (cb.checked) selectedKeys.add(s.dbPath); else selectedKeys.delete(s.dbPath); });
+    tdCheck.appendChild(cb);
+    tr.appendChild(tdCheck);
+
+    const tdStudent = document.createElement('td');
+    tdStudent.className = 'py-2 px-3 font-medium text-gray-700';
+    tdStudent.textContent = s.student;
+    tr.appendChild(tdStudent);
+
+    const tdDate = document.createElement('td');
+    tdDate.className = 'py-2 px-3 text-gray-500 text-xs';
+    tdDate.textContent = s.date || s.dbDate;
+    tr.appendChild(tdDate);
+
+    const tdChapter = document.createElement('td');
+    tdChapter.className = 'py-2 px-3 text-gray-600';
+    tdChapter.textContent = s.chapter;
+    tr.appendChild(tdChapter);
+
+    const tdScore = document.createElement('td');
+    tdScore.className = 'py-2 px-3 font-semibold text-gray-700';
+    tdScore.textContent = s.score + ' / 100';
+    tr.appendChild(tdScore);
+
+    const tdTime = document.createElement('td');
+    tdTime.className = 'py-2 px-3 text-gray-400 text-xs';
+    tdTime.textContent = s.time || '-';
+    tr.appendChild(tdTime);
+
+    const tdActions = document.createElement('td');
+    tdActions.className = 'py-2 px-3';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-outline';
+    delBtn.style.cssText = 'padding:4px 12px;font-size:12px;';
+    delBtn.textContent = '刪除';
+    delBtn.addEventListener('click', async () => {
+      Swal.fire({ title: '確定刪除此記錄？', icon: 'warning', showCancelButton: true, confirmButtonText: '刪除', confirmButtonColor: '#e53e3e' }).then(async (r) => {
+        if (r.isConfirmed) {
+          await firebase.database().ref(s.dbPath).remove();
+          showToast('已刪除記錄');
+          selectedKeys.delete(s.dbPath);
+          loadScores();
+        }
+      });
+    });
+    tdActions.appendChild(delBtn);
+    tr.appendChild(tdActions);
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('btn-apply-filter').addEventListener('click', () => loadScores());
+document.getElementById('btn-refresh-scores')?.addEventListener('click', () => { showToast('重新載入中...'); loadScores(); });
+document.getElementById('btn-clear-filter').addEventListener('click', () => {
+  document.getElementById('filter-date-start').value = today;
+  document.getElementById('filter-date-end').value = today;
+  document.getElementById('filter-search').value = '';
+  loadScores();
+});
+
+document.getElementById('select-all-check')?.addEventListener('change', function() {
+  const checked = this.checked;
+  document.querySelectorAll('#score-table-body input[type="checkbox"]').forEach(cb => {
+    cb.checked = checked;
+    const path = cb.dataset.dbpath;
+    if (path) {
+      if (checked) selectedKeys.add(path);
+      else selectedKeys.delete(path);
+    }
+  });
+});
+document.getElementById('btn-select-all')?.addEventListener('click', () => {
+  document.querySelectorAll('#score-table-body input[type="checkbox"]').forEach(cb => {
+    cb.checked = true;
+    const path = cb.dataset.dbpath;
+    if (path) selectedKeys.add(path);
+  });
+  const allCheck = document.getElementById('select-all-check');
+  if (allCheck) allCheck.checked = true;
+});
+document.getElementById('btn-delete-selected')?.addEventListener('click', async () => {
+  const paths = Array.from(selectedKeys);
+  if (paths.length === 0) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '請先選取記錄', showConfirmButton: false, timer: 1800 }); return; }
+  Swal.fire({
+    title: '確定刪除選取的 ' + paths.length + ' 筆記錄？',
+    text: '此操作無法復原！',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '確定刪除',
+    confirmButtonColor: '#e53e3e',
+    cancelButtonText: '取消'
+  }).then(async (r) => {
+    if (r.isConfirmed) {
+      Swal.fire({ title: '正在刪除選取記錄...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      try {
+        const updates = {};
+        paths.forEach(p => { updates[p] = null; });
+        await firebase.database().ref().update(updates);
+        showToast('已成功刪除 ' + paths.length + ' 筆記錄');
+        selectedKeys.clear();
+        const allCheck = document.getElementById('select-all-check');
+        if (allCheck) allCheck.checked = false;
+        await loadScores();
+        Swal.close();
+      } catch (err) {
+        console.error('Batch delete error:', err);
+        Swal.fire({ icon: 'error', title: '刪除失敗', text: err.message || '權限不足或網路發生異常' });
+      }
+    }
+  });
+});
+
+document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+  if (allScores.length === 0) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無資料可匯出', showConfirmButton: false, timer: 1800 }); return; }
+  const rows = [['學生', '日期', '章節', '分數', '總題數', '時間']];
+  allScores.forEach(s => { rows.push([s.student, s.date || s.dbDate, s.chapter, s.score, s.total, s.time || '']); });
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '成績匯出_' + today + '.csv';
+  link.click();
+  showToast('已匯出成績');
+});
+
+document.getElementById('dropdown-logout')?.addEventListener('click', async () => { try { await firebase.auth().signOut(); } catch(e) {} localStorage.removeItem('fb_user'); localStorage.removeItem('last_activity'); window.location.href = BP + '/'; });
+loadScores();
+
+/* ── GSAP Entrance Animations ── */
+if (typeof gsap !== 'undefined') {
+  gsap.from('.topnav', { y: -60, opacity: 0, duration: 0.6, ease: 'power3.out' });
+  gsap.from('.main-content .panel', { y: 30, opacity: 0, duration: 0.5, stagger: 0.1, ease: 'power2.out', delay: 0.2 });
+}
+</script>
