@@ -1,0 +1,657 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="TTVS 成績管理">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+  <div class="admin-wrap flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col">
+      <div class="sidebar-brand flex h-16 items-center px-6">
+        <span class="text-[15px] font-semibold tracking-tight text-white/90">1zTeSt</span>
+        <span class="ml-2 text-[10px] font-medium text-white/30 tracking-wide">TTVS 成績</span>
+      </div>
+      <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-5">
+        <a href="/ttvs/admin" class="sidebar-btn active">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>成績總覽</span>
+        </a>
+        <a href="/ttvs/" class="sidebar-btn">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <span>測驗頁面</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer border-t border-white/10 px-3 py-3 space-y-0.5">
+        <a id="nav-super-admin-link" href="/admin/home" class="sidebar-link hidden">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>回到最高主控台</span>
+        </a>
+        <button id="logout-btn" class="sidebar-link sidebar-link-danger">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>登出</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main relative ml-[260px] flex-1 bg-[#fafafa]">
+      <header class="admin-header sticky top-0 z-30 flex h-16 items-center justify-between px-8">
+        <h1 class="text-[15px] font-semibold text-slate-800" style="letter-spacing:-0.01em">TTVS 成績總覽</h1>
+        <div class="flex items-center gap-4">
+          <div id="load-indicator" class="hidden flex items-center gap-1.5 text-xs text-slate-400">
+            <div class="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></div>
+            載入中...
+          </div>
+          <span id="admin-email" class="text-[13px] font-medium text-slate-600"></span>
+        </div>
+      </header>
+
+      <div class="p-8">
+        <!-- Hero -->
+        <div class="mb-6 flex items-center gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+          <img src="/computer-study.png" alt="TTVS 學習" class="h-28 w-auto shrink-0" loading="lazy" />
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">TTVS PVQC 成績管理</h2>
+            <p class="mt-1 text-sm text-slate-500">查看學生的 TTVS 英文單字測驗成績與作答紀錄。</p>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="mb-6 grid gap-3 sm:grid-cols-3">
+          <div class="stat-card">
+            <p class="stat-label">總測驗次數</p>
+            <p id="total-count" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">學生人數</p>
+            <p id="student-count" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">平均分數</p>
+            <p id="avg-score" class="stat-value">—</p>
+          </div>
+        </div>
+
+        <!-- Control & Filter Bar -->
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm">
+          <div class="flex flex-wrap items-center gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">開始日期</label>
+              <input id="filter-date-start" type="date" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700 focus:border-green-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">結束日期</label>
+              <input id="filter-date-end" type="date" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700 focus:border-green-500 focus:outline-none" />
+            </div>
+            <div class="pt-4 flex gap-1.5">
+              <button id="btn-today-only" class="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">只看今日</button>
+              <button id="btn-all-dates" class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 transition">顯示全部</button>
+            </div>
+          </div>
+
+          <div class="w-full md:w-auto">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">搜尋學生</label>
+            <input id="search-input" type="text" placeholder="搜尋姓名或帳號..." class="w-full md:w-64 rounded-lg border border-slate-200 px-3.5 py-1.5 text-xs focus:border-green-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <!-- Category Sub-Tabs -->
+        <div class="mb-4 flex flex-wrap gap-1.5 border-b border-slate-200 pb-2">
+          <button data-cat="all" class="cat-tab active">全部測驗</button>
+          <button data-cat="p1" class="cat-tab">第一部分 · 看英文選中文</button>
+          <button data-cat="p2" class="cat-tab">第二部分 · 聽發音選中文</button>
+          <button data-cat="p3" class="cat-tab">第三部分 · 聽發音選英文</button>
+          <button data-cat="p4" class="cat-tab">第四部分 · 看中文選發音</button>
+          <button data-cat="p5" class="cat-tab">第五部分 · 看英文選發音</button>
+          <button data-cat="total" class="cat-tab">全區綜合 (500題)</button>
+        </div>
+
+        <!-- Scores table -->
+        <div class="panel-card overflow-hidden">
+          <div class="flex items-center justify-between border-b border-slate-50 px-5 py-3.5 bg-slate-50/50">
+            <div class="flex items-center gap-3">
+              <h3 id="current-tab-label" class="text-[13px] font-bold text-slate-700">全部測驗紀錄</h3>
+              <button id="btn-batch-delete" class="hidden rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-700 transition-all flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                <span>批次刪除 (<span id="selected-count">0</span>)</span>
+              </button>
+            </div>
+            <span id="score-count-label" class="text-[11px] font-medium text-slate-400"></span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm font-sans border-collapse">
+              <thead>
+                <tr class="bg-slate-100/70 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <th class="py-3 px-4 w-10 text-center">
+                    <input type="checkbox" id="select-all-scores" class="h-4 w-4 rounded border-slate-300 text-green-600 focus:ring-green-500 cursor-pointer" />
+                  </th>
+                  <th class="py-3 px-4 w-12 text-center">#</th>
+                  <th class="py-3 px-4">學生</th>
+                  <th class="py-3 px-4">帳號 / Email</th>
+                  <th class="py-3 px-4">分數</th>
+                  <th class="py-3 px-4">測驗類型</th>
+                  <th class="py-3 px-4">時間</th>
+                </tr>
+              </thead>
+              <tbody id="scores-tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div id="load-more-wrap" class="hidden border-t border-slate-100 py-3 text-center bg-slate-50">
+            <button id="btn-load-more" class="rounded-lg border border-slate-200 bg-white px-5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">載入更多紀錄</button>
+          </div>
+          <div id="scores-empty" class="hidden px-6 py-12 text-center text-sm text-slate-400">尚無相關測驗紀錄</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast-wrap"></div>
+</Layout>
+
+<style>
+  .cat-tab {
+    padding: 0.375rem 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cat-tab:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+  }
+  .cat-tab.active {
+    color: #15803d;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    font-weight: 600;
+  }
+  /* ── Sidebar ── */
+  .admin-sidebar {
+    background: linear-gradient(175deg, #14532d 0%, #166534 50%, #14532d 100%);
+  }
+  .sidebar-brand { border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-btn {
+    display: flex; align-items: center; gap: 0.75rem; width: 100%;
+    padding: 0.55rem 0.875rem; border-radius: 0.5rem;
+    font-size: 0.8125rem; font-weight: 500; letter-spacing: -0.005em;
+    color: rgba(255,255,255,0.50);
+    transition: all 0.15s ease;
+    position: relative;
+  }
+  .sidebar-btn .nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.5; transition: opacity 0.15s; }
+  .sidebar-btn:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.07); }
+  .sidebar-btn:hover .nav-icon { opacity: 0.8; }
+  .sidebar-btn.active { color: rgba(255,255,255,0.95); background: rgba(255,255,255,0.10); }
+  .sidebar-btn.active::before {
+    content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 50%; border-radius: 0 2px 2px 0; background: rgba(255,255,255,0.5);
+  }
+  .sidebar-btn.active .nav-icon { opacity: 1; }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 0.75rem; width: 100%;
+    padding: 0.5rem 0.875rem; border-radius: 0.5rem;
+    font-size: 0.8125rem; font-weight: 500; letter-spacing: -0.005em;
+    color: rgba(255,255,255,0.40);
+    transition: all 0.15s ease;
+  }
+  .sidebar-link .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+  .sidebar-link:hover { color: rgba(255,255,255,0.80); background: rgba(255,255,255,0.05); }
+  .sidebar-link-danger:hover { color: #fca5a5; background: rgba(239,68,68,0.1); }
+
+  /* ── Header ── */
+  .admin-header {
+    background: rgba(250,250,250,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  /* ── Cards & Panels ── */
+  .panel-card {
+    background: #fff; border: 1px solid #f0f0f0;
+    border-radius: 0.875rem; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s;
+  }
+  .panel-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+  /* ── Stat Cards ── */
+  .stat-card {
+    background: #fff; border: 1px solid #f0f0f0;
+    border-radius: 0.875rem; padding: 1.25rem 1.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .stat-label {
+    font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.04em;
+    color: #94a3b8; margin-bottom: 0.375rem;
+  }
+  .stat-value {
+    font-family: 'SF Mono', 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+    font-size: 1.75rem; font-weight: 600; color: #0f172a;
+    letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Table ── */
+  .table-th {
+    padding: 0.75rem 1.5rem; font-size: 0.6875rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;
+  }
+  :global(#scores-tbody tr) { transition: background 0.15s; }
+  :global(#scores-tbody tr:hover) { background: #f8fafc; }
+  :global(#scores-tbody td) {
+    padding: 0.875rem 1.5rem; border-bottom: 1px solid #f5f5f5;
+    font-size: 0.8125rem; color: #475569;
+  }
+  :global(#scores-tbody tr:last-child td) { border-bottom: none; }
+
+  /* ── Toast ── */
+  .toast-wrap {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  :global(.toast-item) {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1.125rem; border-radius: 0.75rem;
+    background: #1e293b; color: #f8fafc;
+    font-size: 0.8125rem; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    animation: toastIn 0.25s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  :global(.toast-item.out) { animation: toastOut 0.2s cubic-bezier(0.4,0,1,1) forwards; }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(24px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to { opacity: 0; transform: translateX(24px) scale(0.95); }
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email || !window.isAdminEmail(user.email)) window.location.href = BP + '/admin/login';
+
+// PVQC 權限檢查：沒被指派的人不能進
+(function checkPVQCPermission() {
+  const guard = document.getElementById('auth-guard');
+  if (!user || !user.email) { window.location.href = BP + '/admin/login'; return; }
+  const san = user.email.replace(/\./g,',').replace(/#/g,',').replace(/\$/g,',').replace(/\//g,',');
+  const db = window.firebase.database();
+  db.ref('config/teacherWhitelist/' + san).once('value', snap => {
+    if (!snap.exists()) {
+      // 403 — 沒有 PVQC 權限
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;background:#fafafa;">' +
+        '<div style="text-align:center;padding:40px;">' +
+        '<div style="font-size:64px;font-weight:700;color:#e2e8f0;letter-spacing:-0.04em;line-height:1;">403</div>' +
+        '<h1 style="margin:16px 0 8px;font-size:18px;font-weight:600;color:#1e293b;">沒有存取權限</h1>' +
+        '<p style="font-size:14px;color:#64748b;margin-bottom:24px;">你的帳號尚未被指派 PVQC 權限，無法使用此頁面。</p>' +
+        '<a href="' + BP + '/admin/home" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#1e293b;color:#fff;font-size:14px;font-weight:500;text-decoration:none;">返回主控台</a>' +
+        '</div></div>';
+      return;
+    }
+    guard?.remove();
+  });
+})();
+
+const adminEmailEl = document.getElementById('admin-email');
+if (adminEmailEl && user) adminEmailEl.textContent = user.email;
+
+if (window.isAdminEmail && user && window.isAdminEmail(user.email)) {
+  document.getElementById('nav-super-admin-link')?.classList.remove('hidden');
+}
+
+function showToast(msg) {
+  const wrap = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+}
+
+let allScores = [];
+let chapterMap = {};
+
+/* Load all teacher chapters to map chapter keys to names */
+async function loadChapterNames() {
+  try {
+    const snap = await firebase.database().ref('Teacherquestion').once('value');
+    if (!snap.exists()) return;
+    const data = snap.val();
+    Object.keys(data).forEach(teacherKey => {
+      const teacherData = data[teacherKey];
+      if (!teacherData || typeof teacherData !== 'object') return;
+      const chapters = teacherData.chapters || teacherData;
+      if (typeof chapters !== 'object') return;
+      Object.keys(chapters).forEach(chKey => {
+        const ch = chapters[chKey];
+        if (ch && ch.name) chapterMap[chKey] = ch.name;
+        else if (ch && ch.subject) chapterMap[chKey] = ch.subject;
+      });
+    });
+  } catch(e) { console.warn('Failed to load chapter names:', e); }
+}
+
+function parseModeName(key, rec) {
+  const modeStr = String(rec.mode || rec.type || rec.chapter || key || '').toLowerCase();
+  if (modeStr.includes('scores1') || modeStr === '0') return '第一部分 · 看英文選中文';
+  if (modeStr.includes('scores2') || modeStr === '1') return '第二部分 · 聽英文發音選中文';
+  if (modeStr.includes('scores3') || modeStr === '2') return '第三部分 · 聽英文發音選英文';
+  if (modeStr === '3') return '第四部分 · 看中文選英文發音';
+  if (modeStr === '4') return '第五部分 · 看英文選英文發音';
+  if (modeStr.includes('totalscores') || modeStr === 'all') return '全區綜合測驗 (500題)';
+  if (rec.chapter) return rec.chapter;
+  return 'PVQC 測驗';
+}
+
+function formatTimeStr(rec) {
+  if (rec.time) return rec.time;
+  if (rec.timestamp) {
+    try {
+      const d = new Date(rec.timestamp);
+      if (!isNaN(d.getTime())) return d.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+    } catch(e) {}
+    return String(rec.timestamp);
+  }
+  if (rec.date) return rec.date;
+  return '-';
+}
+
+let currentCat = 'all';
+let displayedCount = 0;
+const PAGE_SIZE = 20;
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+const today = todayStr();
+
+/* Init default date inputs to today */
+const startInput = document.getElementById('filter-date-start');
+const endInput = document.getElementById('filter-date-end');
+if (startInput) startInput.value = today;
+if (endInput) endInput.value = today;
+
+function getCatKey(key, rec) {
+  const modeStr = String(rec.mode || rec.type || rec.chapter || key || '').toLowerCase();
+  if (modeStr.includes('scores1') || modeStr === '0') return 'p1';
+  if (modeStr.includes('scores2') || modeStr === '1') return 'p2';
+  if (modeStr.includes('scores3') || modeStr === '2') return 'p3';
+  if (modeStr === '3') return 'p4';
+  if (modeStr === '4') return 'p5';
+  if (modeStr.includes('totalscores') || modeStr === 'all') return 'total';
+  return 'other';
+}
+
+function parseDateKey(rec) {
+  if (rec.date) return rec.date;
+  const timeStr = rec.time || rec.timestamp;
+  if (!timeStr) return '';
+  try {
+    const cleanStr = String(timeStr).replace(/下午|上午/g, ' ').replace(/\//g, '-');
+    const d = new Date(cleanStr);
+    if (!isNaN(d.getTime())) {
+      return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+    }
+  } catch (e) {}
+  return '';
+}
+
+function getFilteredScores() {
+  const q = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
+  const startDate = document.getElementById('filter-date-start')?.value || '';
+  const endDate = document.getElementById('filter-date-end')?.value || '';
+
+  return allScores.filter(s => {
+    // Category tab
+    if (currentCat !== 'all' && s._cat !== currentCat) return false;
+
+    // Search query
+    if (q) {
+      const matchName = (s.name || '').toLowerCase().includes(q);
+      const matchEmail = (s.email || '').toLowerCase().includes(q);
+      if (!matchName && !matchEmail) return false;
+    }
+
+    // Date range
+    if (startDate || endDate) {
+      const dateKey = s.dateKey;
+      if (dateKey) {
+        if (startDate && dateKey < startDate) return false;
+        if (endDate && dateKey > endDate) return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+function updateBatchDeleteUI() {
+  const checked = document.querySelectorAll('.score-checkbox:checked');
+  const count = checked.length;
+  const btn = document.getElementById('btn-batch-delete');
+  const countSpan = document.getElementById('selected-count');
+
+  if (countSpan) countSpan.textContent = String(count);
+  if (btn) {
+    if (count > 0) btn.classList.remove('hidden');
+    else btn.classList.add('hidden');
+  }
+
+  const allBox = document.getElementById('select-all-scores');
+  const totalBoxes = document.querySelectorAll('.score-checkbox');
+  if (allBox) {
+    allBox.checked = (totalBoxes.length > 0 && count === totalBoxes.length);
+  }
+}
+
+function renderCurrentPage(append) {
+  const filtered = getFilteredScores();
+  const tbody = document.getElementById('scores-tbody');
+  const empty = document.getElementById('scores-empty');
+  const loadWrap = document.getElementById('load-more-wrap');
+
+  if (!append) {
+    tbody.replaceChildren();
+    displayedCount = 0;
+  }
+
+  const allBox = document.getElementById('select-all-scores');
+  if (allBox) allBox.checked = false;
+  updateBatchDeleteUI();
+
+  if (!filtered.length) {
+    document.getElementById('score-count-label').textContent = '0 筆紀錄';
+    empty.classList.remove('hidden');
+    loadWrap?.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  const start = append ? displayedCount : 0;
+  const end = Math.min(start + PAGE_SIZE, filtered.length);
+  const slice = filtered.slice(start, end);
+
+  document.getElementById('score-count-label').textContent = `顯示 ${end} / 共 ${filtered.length} 筆紀錄`;
+
+  slice.forEach((s, i) => {
+    const row = document.createElement('tr');
+    row.className = 'hover:bg-slate-50 transition-colors border-b border-slate-100';
+    const displayScore = s.total ? `${s.score} / ${s.total}` : `${s.score} 分`;
+    const pct = s.total ? Math.round((s.score / s.total) * 100) : s.score;
+    const scoreColor = pct >= 80 ? 'text-green-600' : pct >= 60 ? 'text-amber-600' : 'text-red-500';
+
+    row.innerHTML =
+      '<td class="py-3 px-4 text-center"><input type="checkbox" class="score-checkbox h-4 w-4 rounded border-slate-300 text-green-600 focus:ring-green-500 cursor-pointer" data-dbpath="' + s._dbPath + '" /></td>' +
+      '<td class="py-3 px-4 text-slate-400 text-xs text-center font-mono">' + (start + i + 1) + '</td>' +
+      '<td class="py-3 px-4 font-medium text-slate-800">' + (s.name || '未命名') + '</td>' +
+      '<td class="py-3 px-4 text-slate-500 text-xs font-mono">' + (s.email || '-') + '</td>' +
+      '<td class="py-3 px-4 font-bold ' + scoreColor + '">' + displayScore + '</td>' +
+      '<td class="py-3 px-4"><span class="inline-block rounded bg-slate-50 border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600">' + (s.mode || 'PVQC 測驗') + '</span></td>' +
+      '<td class="py-3 px-4 text-slate-400 text-xs font-mono">' + (s.time || '-') + '</td>';
+
+    row.querySelector('.score-checkbox').addEventListener('change', updateBatchDeleteUI);
+
+    tbody.appendChild(row);
+  });
+
+  displayedCount = end;
+  if (displayedCount < filtered.length) {
+    loadWrap?.classList.remove('hidden');
+  } else {
+    loadWrap?.classList.add('hidden');
+  }
+}
+
+async function loadScores() {
+  const indicator = document.getElementById('load-indicator');
+  indicator?.classList.remove('hidden');
+  try {
+    const snap = await firebase.database().ref('PVQCSCORES').once('value');
+    if (!snap.exists()) {
+      document.getElementById('total-count').textContent = '0';
+      document.getElementById('student-count').textContent = '0';
+      document.getElementById('avg-score').textContent = '—';
+      allScores = [];
+      renderCurrentPage(false);
+      return;
+    }
+
+    const data = snap.val();
+    const entries = [];
+
+    function traverse(obj, pathParts) {
+      if (!obj || typeof obj !== 'object') return;
+      if ('score' in obj || 'stuscore' in obj) {
+        const scoreVal = parseInt(obj.score != null ? obj.score : obj.stuscore) || 0;
+        const totalVal = parseInt(obj.total != null ? obj.total : obj.totalQuestions) || null;
+        const studentName = obj.studentName || obj.name || obj.studentId || obj.student || '未命名';
+        const studentEmail = obj.student || obj.studentId || obj.Studentaccount || '';
+        const categoryKey = pathParts[1] || '';
+
+        entries.push({
+          name: studentName,
+          email: studentEmail,
+          score: scoreVal,
+          total: totalVal,
+          mode: parseModeName(categoryKey, obj),
+          _cat: getCatKey(categoryKey, obj),
+          time: formatTimeStr(obj),
+          dateKey: parseDateKey(obj),
+          _dbPath: pathParts.join('/')
+        });
+        return;
+      }
+      for (const [k, v] of Object.entries(obj)) {
+        traverse(v, [...pathParts, k]);
+      }
+    }
+
+    traverse(data, ['PVQCSCORES']);
+
+    entries.sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+
+    allScores = entries;
+
+    /* Stats */
+    document.getElementById('total-count').textContent = String(entries.length);
+    const uniqueStudents = new Set(entries.map(s => (s.email || s.name).toLowerCase()));
+    document.getElementById('student-count').textContent = String(uniqueStudents.size);
+    const validScores = entries.map(s => s.total ? Math.round((s.score / s.total) * 100) : s.score);
+    const avg = validScores.length ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length) : 0;
+    document.getElementById('avg-score').textContent = validScores.length ? (avg + '%') : '—';
+
+    renderCurrentPage(false);
+  } catch (e) {
+    console.error(e);
+    showToast('載入失敗');
+  } finally {
+    indicator?.classList.add('hidden');
+  }
+}
+
+// Sub-Tab Click Handlers
+document.querySelectorAll('.cat-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    document.getElementById('current-tab-label').textContent = btn.textContent + ' 紀錄';
+    renderCurrentPage(false);
+  });
+});
+
+// Date Quick Filter Handlers
+document.getElementById('btn-today-only')?.addEventListener('click', () => {
+  document.getElementById('filter-date-start').value = today;
+  document.getElementById('filter-date-end').value = today;
+  renderCurrentPage(false);
+});
+
+document.getElementById('btn-all-dates')?.addEventListener('click', () => {
+  document.getElementById('filter-date-start').value = '';
+  document.getElementById('filter-date-end').value = '';
+  renderCurrentPage(false);
+});
+
+document.getElementById('filter-date-start')?.addEventListener('change', () => renderCurrentPage(false));
+document.getElementById('filter-date-end')?.addEventListener('change', () => renderCurrentPage(false));
+
+document.getElementById('search-input')?.addEventListener('input', () => renderCurrentPage(false));
+
+document.getElementById('btn-load-more')?.addEventListener('click', () => renderCurrentPage(true));
+
+// Select All & Batch Delete Handlers
+document.getElementById('select-all-scores')?.addEventListener('change', function() {
+  const isChecked = this.checked;
+  document.querySelectorAll('.score-checkbox').forEach(cb => {
+    cb.checked = isChecked;
+  });
+  updateBatchDeleteUI();
+});
+
+document.getElementById('btn-batch-delete')?.addEventListener('click', async () => {
+  const checked = document.querySelectorAll('.score-checkbox:checked');
+  if (!checked.length) return;
+
+  const confirm = await Swal.fire({
+    title: `確定刪除選取的 ${checked.length} 筆紀錄？`,
+    text: '此操作無法復原！',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '確定刪除',
+    confirmButtonColor: '#e53e3e',
+    cancelButtonText: '取消'
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const updates = {};
+    checked.forEach(cb => {
+      const dbPath = cb.dataset.dbpath;
+      if (dbPath) updates[dbPath] = null;
+    });
+    await firebase.database().ref().update(updates);
+    showToast(`已成功刪除 ${checked.length} 筆紀錄`);
+    loadScores();
+  } catch (e) {
+    console.error(e);
+    showToast('批次刪除失敗');
+  }
+});
+
+document.getElementById('logout-btn')?.addEventListener('click', async () => {
+  try { await firebase.auth().signOut(); } catch(e) {}
+  localStorage.removeItem('fb_user');
+  window.location.href = BP + '/admin/login';
+});
+
+loadScores();
+</script>

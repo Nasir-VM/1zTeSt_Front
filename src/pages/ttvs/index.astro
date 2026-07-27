@@ -1,0 +1,707 @@
+---
+import Layout from '../../layouts/Layout.astro';
+const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID || '';
+const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
+---
+<Layout title="TTVS PVQC 英文單字測驗">
+  <script is:inline set:html={`
+    window.ENV_GOOGLE_CLIENT_ID = "${GOOGLE_CLIENT_ID}";
+    window.ENV_TURNSTILE_SITE_KEY = "${TURNSTILE_SITE_KEY}";
+  `}></script>
+
+  <style is:inline>
+    .option-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 14px 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background-color: #ffffff;
+      font-size: 0.95rem;
+      color: #334155;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: #22c55e;
+      background-color: #f0fdf4;
+    }
+    .option-btn.correct {
+      background-color: #22c55e !important;
+      border-color: #22c55e !important;
+      color: #ffffff !important;
+      font-weight: bold;
+    }
+    .option-btn.incorrect {
+      background-color: #ef4444 !important;
+      border-color: #ef4444 !important;
+      color: #ffffff !important;
+      font-weight: bold;
+    }
+    .speaker-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background-color: #f0fdf4;
+      border: 2px solid #bbf7d0;
+      color: #15803d;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .speaker-btn:hover {
+      transform: scale(1.08);
+      background-color: #dcfce7;
+    }
+    .btn-menu-option {
+      transition: all 0.2s;
+    }
+    .btn-menu-option:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+
+  <header class="fixed left-0 right-0 top-0 z-50 border-b border-green-100/80 bg-white/90 backdrop-blur-md">
+    <div class="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
+      <a href="/ttvs/" class="font-serif text-lg font-bold transition hover:opacity-80" style="color: var(--color-primary);">TTVS PVQC</a>
+      <nav class="flex items-center gap-3">
+        <span id="user-name" class="text-sm text-slate-500"></span>
+        <button id="logout-btn" class="btn-outline !rounded-lg !border-slate-200 !px-3 !py-1.5 !text-xs !text-slate-500 hover:!border-red-200 hover:!bg-red-50 hover:!text-red-500 hidden">登出</button>
+        <a id="login-nav-btn" href="/login/student" class="btn-primary !rounded-lg !px-4 !py-1.5 !text-xs !font-medium hidden">登入</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="relative min-h-screen pt-16">
+    <div class="blur-circle right-[-5%] top-[5%] h-[300px] w-[300px] bg-green-400/10"></div>
+    <div class="blur-circle left-[-5%] bottom-[10%] h-[250px] w-[250px] bg-emerald-400/10"></div>
+    <div class="mx-auto max-w-3xl px-4 py-12">
+      
+      <!-- STEP 1: SETUP SCREEN -->
+      <section id="step-setup">
+        <div class="card card-shadow p-8">
+          <div class="flex flex-col items-center gap-8 md:flex-row md:items-start md:text-left">
+            <img src="/computer-study.png" alt="電腦學習" class="h-44 w-auto shrink-0" loading="lazy" />
+            <div class="min-w-0 flex-1 text-center md:text-left">
+              <h1 class="font-serif mb-3 text-3xl font-bold text-slate-800">TTVS PVQC 英文單字測驗</h1>
+              <p class="mb-1 text-slate-500">一題一題慢慢作答，精熟單字考取證照！</p>
+              <p class="mb-6 font-bold" style="color: var(--color-primary);">一定可以考取證照！加油！💪</p>
+              
+              <!-- Logged In View: Select Quiz Mode -->
+              <div id="setup-logged-in-area" class="w-full max-w-md mx-auto md:mx-0 hidden space-y-3">
+                <p class="text-sm font-semibold text-slate-600 mb-2 text-left">請選擇測驗模式（每部分 100 題）：</p>
+                <button class="btn-menu-option btn-primary !w-full !rounded-xl !px-6 !py-3.5 !font-bold text-left flex justify-between items-center" data-mode="all">
+                  <span>全部測驗 (5大題共 500 題)</span>
+                  <span class="text-xs opacity-75">⏱️ 約 50 分鐘</span>
+                </button>
+                <div class="grid grid-cols-1 gap-2">
+                  <button class="btn-menu-option btn-outline !w-full !rounded-xl !px-4 !py-2.5 text-left text-sm" data-mode="0">第一部分：看英文選中文</button>
+                  <button class="btn-menu-option btn-outline !w-full !rounded-xl !px-4 !py-2.5 text-left text-sm" data-mode="1">第二部分：聽英文發音選中文</button>
+                  <button class="btn-menu-option btn-outline !w-full !rounded-xl !px-4 !py-2.5 text-left text-sm" data-mode="2">第三部分：聽英文發音選英文</button>
+                  <button class="btn-menu-option btn-outline !w-full !rounded-xl !px-4 !py-2.5 text-left text-sm" data-mode="3">第四部分：看中文選英文發音</button>
+                  <button class="btn-menu-option btn-outline !w-full !rounded-xl !px-4 !py-2.5 text-left text-sm" data-mode="4">第五部分：看英文選英文發音</button>
+                </div>
+              </div>
+
+              <!-- Logged Out View -->
+              <div id="setup-login-area" class="max-w-xs mx-auto md:mx-0 hidden">
+                <p class="mb-4 text-sm text-slate-400">此測驗需要登入後方可開始，分數將會記錄於您的帳號中。</p>
+                <button id="btn-google" class="btn-primary !w-full !rounded-xl !px-6 !py-3 !font-bold flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" class="shrink-0">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z" />
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    <path fill="none" d="M0 0h48v48H0z" />
+                  </svg>
+                  使用 Google 帳號登入並開始
+                </button>
+              </div>
+
+              <p id="setup-msg" class="mt-4 hidden text-sm text-red-500 text-center md:text-left"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2: QUIZ SCREEN -->
+      <section id="step-quiz" class="hidden">
+        <div class="card mb-6 flex flex-col gap-3 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div id="quiz-part-title" class="text-sm font-bold text-slate-700">第一部分 · 看英文選中文</div>
+            <div class="text-sm text-slate-500 font-medium">⏱ <span id="timer" class="font-mono font-bold" style="color: var(--color-primary);">00:00</span></div>
+          </div>
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span id="quiz-part-progress">第 1 題，共 100 題</span>
+            <span id="quiz-total-progress">總進度: 1 / 100</span>
+          </div>
+          <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div id="progress-bar" class="h-full rounded-full bg-green-500 transition-all duration-300" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="card card-shadow p-8 mb-6">
+          <div id="quiz-question-area" class="text-center mb-8 flex flex-col items-center justify-center min-h-[120px]">
+            <!-- Question content injected here -->
+          </div>
+          <div id="quiz-options-area" class="space-y-3 max-w-md mx-auto">
+            <!-- Choice buttons injected here -->
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <button id="btn-end-quiz" class="btn-outline !border-red-200 !text-red-500 hover:!bg-red-50 !rounded-xl !px-6 !py-2.5 !text-sm">提前結束測驗</button>
+          <button id="btn-next" class="btn-primary !rounded-xl !px-8 !py-2.5 !font-bold" disabled>下一題</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: RESULT SCREEN -->
+      <section id="step-result" class="hidden">
+        <div class="card card-shadow p-8 text-center flex flex-col items-center">
+          <img src="/teacher-student.png" alt="測驗完成" class="h-44 w-auto mb-6" loading="lazy" />
+          <h2 class="mb-2 text-xl font-bold text-slate-800">測驗結果</h2>
+          <p id="result-score" class="mb-2 text-5xl font-bold" style="color: var(--color-primary);"></p>
+          <p id="result-pct" class="mb-6 text-lg text-slate-500"></p>
+          
+          <div class="w-full max-w-lg mb-8 text-left">
+            <p class="text-sm font-semibold text-slate-700 mb-3">題目檢視與複習 (點擊喇叭發音)：</p>
+            <div id="result-review" class="max-h-96 overflow-y-auto space-y-2.5 border border-slate-100 rounded-xl p-3 bg-slate-50/50">
+              <!-- Review cards injected here -->
+            </div>
+          </div>
+
+          <div class="flex justify-center gap-3">
+            <button id="btn-retry" class="btn-primary !rounded-xl !px-6 !py-2.5 !font-bold">再次測驗</button>
+            <a href="/" class="btn-outline !rounded-xl !px-6 !py-2.5">回首頁</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="border-t border-green-800 bg-green-900 py-12 text-white" style="background: #14532d;">
+    <div class="mx-auto max-w-[1080px] px-6">
+      <div class="flex items-center justify-between text-sm">
+        <p class="text-green-200/60">&copy; 2025 TTVS PVQC</p>
+        <div class="flex items-center gap-4">
+          <a href="/" class="text-green-200/60 transition hover:text-green-300">回到 1zTeSt</a>
+          <a href="https://nasirlin.net" target="_blank" rel="noopener" class="text-green-200/60 transition hover:text-green-300">Nasir</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</Layout>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+let allWords = [];
+let quizQuestions = [];
+let questionIndex = 0;
+let selectMode = 'all';
+let timerInterval = null;
+let seconds = 0;
+
+const PARTS = [
+  { name: "看英文選中文", num: 100 },
+  { name: "聽英文發音選中文", num: 100 },
+  { name: "聽英文發音選英文", num: 100 },
+  { name: "看中文選英文發音", num: 100 },
+  { name: "看英文選英文發音", num: 100 }
+];
+
+function el(tag, attrs) {
+  const e = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => {
+    if (k === 'className') e.className = v;
+    else if (k === 'textContent') e.textContent = v;
+    else e.setAttribute(k, v);
+  });
+  for (let i = 2; i < arguments.length; i++) {
+    const c = arguments[i];
+    if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  window.speechSynthesis.speak(utter);
+}
+
+function showMsg(msg) {
+  const e = document.getElementById('setup-msg');
+  if (e) { e.textContent = msg; e.classList.remove('hidden'); }
+}
+
+function showLoader(msg) {
+  const overlay = document.getElementById('page-transition');
+  const text = document.getElementById('page-transition-text');
+  if (overlay) { if (text && msg) text.textContent = msg; overlay.classList.add('active'); }
+}
+
+function hideLoader() {
+  const overlay = document.getElementById('page-transition');
+  if (overlay) overlay.classList.remove('active');
+}
+
+async function loadWordsDatabase() {
+  try {
+    const res = await fetch(BP + '/ttvs/words.json');
+    if (res.ok) {
+      const rawWords = await res.json();
+      allWords = rawWords.map(w => ({ en: w.en || w.english, zh: w.zh || w.chinese }));
+    } else {
+      showMsg('單字庫載入失敗');
+    }
+  } catch (e) {
+    showMsg('無法讀取單字庫');
+  }
+}
+
+function checkSession() {
+  const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+  const nameEl = document.getElementById('user-name');
+  const logoutBtn = document.getElementById('logout-btn');
+  const loginNavBtn = document.getElementById('login-nav-btn');
+  const loggedInArea = document.getElementById('setup-logged-in-area');
+  const loginArea = document.getElementById('setup-login-area');
+
+  if (user && user.email) {
+    if (nameEl) nameEl.textContent = user.name || user.email;
+    if (logoutBtn) logoutBtn.classList.remove('hidden');
+    if (loginNavBtn) loginNavBtn.classList.add('hidden');
+    if (loggedInArea) loggedInArea.classList.remove('hidden');
+    if (loginArea) loginArea.classList.add('hidden');
+  } else {
+    if (nameEl) nameEl.textContent = '';
+    if (logoutBtn) logoutBtn.classList.add('hidden');
+    if (loginNavBtn) loginNavBtn.classList.remove('hidden');
+    if (loggedInArea) loggedInArea.classList.add('hidden');
+    if (loginArea) loginArea.classList.remove('hidden');
+  }
+}
+
+function initGoogle() {
+  const btnGoogle = document.getElementById('btn-google');
+  if (btnGoogle) {
+    btnGoogle.addEventListener('click', async () => {
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await firebase.auth().signInWithPopup(provider);
+        const u = result.user;
+        const userData = { email: u.email, name: u.displayName, photo: u.photoURL };
+        localStorage.setItem('fb_user', JSON.stringify(userData));
+
+        const san = window.sanitizeEmail(u.email);
+        const snap = await firebase.database().ref('1zTeStsys/Studentaccount/' + san).once('value');
+        if (!snap.exists() || !snap.val().stunum || !snap.val().name) {
+          window.smoothRedirect(BP + '/login/setup', '首次登入，正在導向個人設定頁面...');
+          return;
+        }
+
+        userData.name = snap.val().name;
+        userData.stunum = snap.val().stunum;
+        localStorage.setItem('fb_user', JSON.stringify(userData));
+        hideLoader();
+        checkSession();
+      } catch (e) {
+        hideLoader();
+        console.error(e);
+        if (e.code !== 'auth/popup-closed-by-user') {
+          showMsg('登入失敗：' + (e.message || e));
+        }
+      }
+    });
+  }
+}
+
+function getRandomOptions(correct, allOptions, key, count = 4) {
+  const others = shuffle(allOptions.filter(opt => opt[key] !== correct[key]));
+  const seen = new Set();
+  seen.add(correct[key]);
+  const uniqueOthers = [];
+  for (const opt of others) {
+    if (!seen.has(opt[key])) {
+      seen.add(opt[key]);
+      uniqueOthers.push(opt);
+    }
+    if (uniqueOthers.length >= count - 1) break;
+  }
+  const options = shuffle([correct, ...uniqueOthers]);
+  return options;
+}
+
+function buildQuizQuestions() {
+  let questions = [];
+  if (selectMode === "all") {
+    for (let p = 0; p < PARTS.length; p++) {
+      const part = PARTS[p];
+      const chosenWords = shuffle([...allWords]).slice(0, part.num);
+      for (let i = 0; i < chosenWords.length; i++) {
+        questions.push({
+          part: p,
+          word: chosenWords[i],
+          isCorrect: null,
+          selected: null
+        });
+      }
+    }
+  } else {
+    const part = PARTS[selectMode];
+    const chosenWords = shuffle([...allWords]).slice(0, part.num);
+    for (let i = 0; i < chosenWords.length; i++) {
+      questions.push({
+        part: selectMode,
+        word: chosenWords[i],
+        isCorrect: null,
+        selected: null
+      });
+    }
+  }
+  return questions;
+}
+
+function renderQuestion() {
+  if (questionIndex >= quizQuestions.length) {
+    showResult();
+    return;
+  }
+  
+  const q = quizQuestions[questionIndex];
+  const partName = PARTS[q.part].name;
+  
+  let partStart = 0;
+  if (selectMode === "all") {
+    for (let i = 0; i < q.part; i++) partStart += PARTS[i].num;
+  }
+  const partQuestionNo = questionIndex - partStart + 1;
+  const partTotal = PARTS[q.part].num;
+  
+  document.getElementById('quiz-part-title').textContent = `第 ${q.part + 1} 部分 · ${partName}`;
+  document.getElementById('quiz-part-progress').textContent = `第 ${partQuestionNo} 題，共 ${partTotal} 題`;
+  document.getElementById('quiz-total-progress').textContent = `總進度: ${questionIndex + 1} / ${quizQuestions.length}`;
+  
+  const pct = (questionIndex / quizQuestions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  
+  const questionArea = document.getElementById('quiz-question-area');
+  const optionsArea = document.getElementById('quiz-options-area');
+  questionArea.replaceChildren();
+  optionsArea.replaceChildren();
+  
+  document.getElementById('btn-next').disabled = true;
+  
+  let options = [];
+  
+  if (q.part === 0) {
+    
+    const wordText = el('h2', { className: 'text-3xl md:text-4xl font-bold text-slate-800 tracking-wide mb-2' }, q.word.en);
+    const label = el('p', { className: 'text-sm text-slate-400' }, '請選出正確的中文翻譯');
+    questionArea.appendChild(wordText);
+    questionArea.appendChild(label);
+    
+    options = getRandomOptions(q.word, allWords, 'zh');
+    renderOptionsList(options, 'zh', q.word.zh);
+    
+  } else if (q.part === 1) {
+    
+    const speakBtn = el('button', { className: 'speaker-btn animate-pulse', title: '播放發音' }, '🔊');
+    speakBtn.addEventListener('click', () => speak(q.word.en));
+    const label = el('p', { className: 'text-sm text-slate-400 mt-4' }, '點擊播放發音，並選出正確的中文翻譯');
+    questionArea.appendChild(speakBtn);
+    questionArea.appendChild(label);
+    
+    options = getRandomOptions(q.word, allWords, 'zh');
+    renderOptionsList(options, 'zh', q.word.zh);
+    speak(q.word.en);
+    
+  } else if (q.part === 2) {
+    
+    const speakBtn = el('button', { className: 'speaker-btn animate-pulse', title: '播放發音' }, '🔊');
+    speakBtn.addEventListener('click', () => speak(q.word.en));
+    const label = el('p', { className: 'text-sm text-slate-400 mt-4' }, '點擊播放發音，並選出正確的英文單字');
+    questionArea.appendChild(speakBtn);
+    questionArea.appendChild(label);
+    
+    options = getRandomOptions(q.word, allWords, 'en');
+    renderOptionsList(options, 'en', q.word.en);
+    speak(q.word.en);
+    
+  } else if (q.part === 3) {
+    
+    const wordText = el('h2', { className: 'text-3xl md:text-4xl font-bold text-slate-800 mb-2' }, q.word.zh);
+    const label = el('p', { className: 'text-sm text-slate-400' }, '請聆聽下列發音選項，並選出對應的正確答案');
+    questionArea.appendChild(wordText);
+    questionArea.appendChild(label);
+    
+    options = getRandomOptions(q.word, allWords, 'en');
+    renderPronounceOptionsList(options, q.word.en);
+    
+  } else if (q.part === 4) {
+    
+    const wordText = el('h2', { className: 'text-3xl md:text-4xl font-bold text-slate-800 tracking-wide mb-2' }, q.word.en);
+    const label = el('p', { className: 'text-sm text-slate-400' }, '下列哪個選項的發音與此單字相同？');
+    questionArea.appendChild(wordText);
+    questionArea.appendChild(label);
+    
+    options = getRandomOptions(q.word, allWords, 'en');
+    renderPronounceOptionsList(options, q.word.en);
+  }
+}
+
+function renderOptionsList(options, keyField, correctValue) {
+  const optionsArea = document.getElementById('quiz-options-area');
+  options.forEach(opt => {
+    const btn = el('button', { className: 'option-btn' }, opt[keyField]);
+    btn.addEventListener('click', () => {
+      optionsArea.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      
+      const q = quizQuestions[questionIndex];
+      q.selected = opt[keyField];
+      
+      if (opt[keyField] === correctValue) {
+        btn.classList.add('correct');
+        q.isCorrect = true;
+      } else {
+        btn.classList.add('incorrect');
+        q.isCorrect = false;
+        optionsArea.querySelectorAll('.option-btn').forEach(b => {
+          if (b.textContent === correctValue) {
+            b.classList.add('correct');
+          }
+        });
+      }
+      document.getElementById('btn-next').disabled = false;
+      document.getElementById('btn-next').focus();
+    });
+    optionsArea.appendChild(btn);
+  });
+}
+
+function renderPronounceOptionsList(options, correctValue) {
+  const optionsArea = document.getElementById('quiz-options-area');
+
+  const speakSection = el('div', { className: 'grid grid-cols-2 gap-3 mb-4' });
+  options.forEach((opt, idx) => {
+    const sBtn = el('button', { className: 'option-btn !py-3 flex justify-center items-center gap-2 border-green-100 bg-green-50/30' }, 
+      el('span', { className: 'text-base text-green-600' }, '🔊'), 
+      '發音 #' + (idx + 1)
+    );
+    sBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      speak(opt.en);
+    });
+    speakSection.appendChild(sBtn);
+  });
+  optionsArea.appendChild(speakSection);
+  
+  optionsArea.appendChild(el('hr', { className: 'border-slate-100 my-4' }));
+
+  const ansSection = el('div', { className: 'grid grid-cols-2 gap-3' });
+  options.forEach((opt, idx) => {
+    const aBtn = el('button', { className: 'option-btn !py-3 text-center justify-center font-medium hover:border-green-300' }, '答案 #' + (idx + 1));
+    aBtn.addEventListener('click', () => {
+      ansSection.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      speak(opt.en);
+      
+      const q = quizQuestions[questionIndex];
+      q.selected = opt.en;
+      
+      if (opt.en === correctValue) {
+        aBtn.classList.add('correct');
+        q.isCorrect = true;
+      } else {
+        aBtn.classList.add('incorrect');
+        q.isCorrect = false;
+        options.forEach((o, oIdx) => {
+          if (o.en === correctValue) {
+            ansSection.querySelectorAll('.option-btn')[oIdx].classList.add('correct');
+          }
+        });
+      }
+      document.getElementById('btn-next').disabled = false;
+      document.getElementById('btn-next').focus();
+    });
+    ansSection.appendChild(aBtn);
+  });
+  optionsArea.appendChild(ansSection);
+}
+
+async function showResult(forceEnd = false) {
+  clearInterval(timerInterval);
+  
+  const totalAnswered = forceEnd ? questionIndex : quizQuestions.length;
+  if (totalAnswered === 0) {
+    document.getElementById('step-quiz').classList.add('hidden');
+    document.getElementById('step-setup').classList.remove('hidden');
+    return;
+  }
+
+  let correctCount = 0;
+  for (let i = 0; i < totalAnswered; i++) {
+    if (quizQuestions[i] && quizQuestions[i].isCorrect) correctCount++;
+  }
+  
+  let maxScore = 100;
+  let totalScore = 0;
+  
+  if (selectMode === "all") {
+    maxScore = 500;
+    totalScore = correctCount; 
+  } else {
+    maxScore = 100;
+    totalScore = correctCount; 
+  }
+  
+  const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+
+  const fbUser = JSON.parse(localStorage.getItem('fb_user') || 'null');
+  if (fbUser && fbUser.email) {
+    const san = window.sanitizeEmail(fbUser.email);
+    const now = new Date().toLocaleString('zh-TW');
+    try {
+      await firebase.database().ref('ttvs/scores/' + san).push({
+        score: totalScore,
+        total: maxScore,
+        percentage: percentage,
+        mode: selectMode === 'all' ? 'all' : String(selectMode),
+        time: now
+      });
+    } catch (err) {
+      console.error('Failed to submit TTVS score:', err);
+    }
+    /* Dual-write to PVQCSCORES for teacher scores page */
+    try {
+      await firebase.database().ref('PVQCSCORES/_ttvs/' + san + '/ttvs').push({
+        student: fbUser.email,
+        name: fbUser.name || fbUser.email,
+        score: totalScore,
+        total: maxScore,
+        type: 'ttvs',
+        time: now
+      });
+    } catch (err) {
+      console.error('Failed to write PVQCSCORES:', err);
+    }
+  }
+  
+  document.getElementById('step-quiz').classList.add('hidden');
+  document.getElementById('step-result').classList.remove('hidden');
+  document.getElementById('result-score').textContent = totalScore + ' / ' + maxScore;
+  document.getElementById('result-pct').textContent = '正確率 ' + percentage + '%';
+  
+  const reviewEl = document.getElementById('result-review');
+  reviewEl.replaceChildren();
+  
+  for (let i = 0; i < totalAnswered; i++) {
+    const q = quizQuestions[i];
+    const cls = q.isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50';
+    const card = el('div', { className: 'flex items-start justify-between gap-3 rounded-lg border px-4 py-3 ' + cls });
+    
+    const left = el('div', { className: 'flex items-start gap-2' });
+    left.appendChild(el('span', { className: 'mt-0.5 text-lg shrink-0' }, q.isCorrect ? '✅' : '❌'));
+    
+    const textDiv = el('div');
+    textDiv.appendChild(el('p', { className: 'font-medium text-slate-800' }, q.word.en));
+    textDiv.appendChild(el('p', { className: 'text-xs text-slate-500' }, '中文翻譯：' + q.word.zh));
+    
+    if (!q.isCorrect) {
+      textDiv.appendChild(el('p', { className: 'text-xs text-red-600 font-medium mt-1' }, '你的回答：' + (q.selected || '(未答)')));
+    }
+    left.appendChild(textDiv);
+    
+    const speakBtn = el('button', { className: 'btn-outline !rounded-full !p-2 !w-9 !h-9 flex items-center justify-center border-slate-200 hover:bg-slate-50' }, '🔊');
+    speakBtn.addEventListener('click', () => speak(q.word.en));
+    
+    card.appendChild(left);
+    card.appendChild(speakBtn);
+    reviewEl.appendChild(card);
+  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.btn-menu-option').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.getAttribute('data-mode');
+    if (mode === 'all') {
+      selectMode = 'all';
+    } else {
+      selectMode = parseInt(mode, 10);
+    }
+    
+    quizQuestions = buildQuizQuestions();
+    if (quizQuestions.length === 0) {
+      Swal.fire('錯誤', '題庫載入異常，請重整頁面後再試。', 'error');
+      return;
+    }
+    
+    questionIndex = 0;
+    seconds = 0;
+    
+    document.getElementById('step-setup').classList.add('hidden');
+    document.getElementById('step-quiz').classList.remove('hidden');
+    
+    renderQuestion();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${m}:${s}`;
+    }, 1000);
+  });
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  questionIndex++;
+  renderQuestion();
+});
+
+document.getElementById('btn-end-quiz').addEventListener('click', async () => {
+  const confirmResult = await Swal.fire({
+    title: '確定要提前結束測驗嗎？',
+    text: '將會以目前的答題進度進行計分與結算！',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '確定結束',
+    cancelButtonText: '繼續作答',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6'
+  });
+  if (confirmResult.isConfirmed) {
+    showResult(true);
+  }
+});
+
+document.getElementById('btn-retry').addEventListener('click', () => {
+  document.getElementById('step-result').classList.add('hidden');
+  document.getElementById('step-setup').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  try { await firebase.auth().signOut(); } catch(e) {}
+  localStorage.removeItem('fb_user');
+  location.reload();
+});
+
+checkSession();
+loadWordsDatabase().then(initGoogle);
+</script>
