@@ -33,12 +33,6 @@ import Layout from '../../layouts/Layout.astro';
 <script is:inline>
 const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
 
-/* ── Fast path: already logged in as teacher → redirect immediately ── */
-const _u = JSON.parse(localStorage.getItem('fb_user') || 'null');
-if (_u && _u.email && _u.role === 'teacher') {
-  window.location.href = BP + '/teacher/';
-} else {
-
 function hideEl(id) { const e = document.getElementById(id); if (e) e.classList.add('hidden'); }
 function showEl(id) { const e = document.getElementById(id); if (e) e.classList.remove('hidden'); }
 function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
@@ -54,27 +48,29 @@ firebase.auth().onAuthStateChanged(async (user) => {
       firebase.database().ref('1zTeStsys/Teacheraccount/' + sanitized).once('value')
     ]);
 
-    if (!wlSnap.exists()) {
+    const isSuperAdmin = window.isAdminEmail ? window.isAdminEmail(email) : false;
+    const isWhitelisted = wlSnap.exists();
+    const isTeacherAcc = teacherSnap.exists();
+
+    if (!isSuperAdmin && !isWhitelisted && !isTeacherAcc) {
       hideEl('login-area');
       showEl('logged-in-info');
       setText('user-display-name', email);
-      document.getElementById('login-error') && (document.getElementById('login-error').textContent = '此帳號未被授權為教師');
+      document.getElementById('login-error') && (document.getElementById('login-error').textContent = '此帳號尚未被授權為教師');
       document.getElementById('login-error') && document.getElementById('login-error').classList.remove('hidden');
       return;
     }
 
-    if (!teacherSnap.exists()) {
-      await firebase.database().ref('1zTeStsys/Teacheraccount/' + sanitized).set({ email: email });
+    if (!isTeacherAcc) {
+      await firebase.database().ref('1zTeStsys/Teacheraccount/' + sanitized).set({ email: email, createdAt: new Date().toISOString() });
     }
 
-    localStorage.setItem('fb_user', JSON.stringify({ email, name: user.displayName, role: 'teacher' }));
+    localStorage.setItem('fb_user', JSON.stringify({ email, name: user.displayName || email, role: 'teacher' }));
     window.location.href = BP + '/teacher/';
   }
 });
 
-} /* end else - not already logged in */
-
-document.getElementById('btn-google').addEventListener('click', async () => {
+document.getElementById('btn-google')?.addEventListener('click', async () => {
   hideEl('login-error');
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
