@@ -257,43 +257,61 @@ import Layout from '../../layouts/Layout.astro';
 
 <script is:inline>
 const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
-const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
 
-if (!user || !user.email) {
-  window.location.href = BP + '/login/teacher';
-} else {
-  const isSuperAdmin = window.isAdminEmail ? window.isAdminEmail(user.email) : false;
-  if (isSuperAdmin) {
-    document.getElementById('auth-guard')?.remove();
-  } else {
-    const san = window.sanitizeEmail(user.email);
-    const db = window.firebase.database();
-    Promise.all([
-      db.ref('config/teacherWhitelist/' + san).once('value'),
-      db.ref('1zTeStsys/Teacheraccount/' + san).once('value')
-    ]).then(([wlSnap, taSnap]) => {
-      if (wlSnap.exists() || taSnap.exists()) {
-        document.getElementById('auth-guard')?.remove();
-      } else {
-        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;background:#fafafa;">' +
-          '<div style="text-align:center;padding:40px;">' +
-          '<div style="font-size:64px;font-weight:700;color:#e2e8f0;letter-spacing:-0.04em;line-height:1;">403</div>' +
-          '<h1 style="margin:16px 0 8px;font-size:18px;font-weight:600;color:#1e293b;">尚未獲得存取權限</h1>' +
-          '<p style="font-size:14px;color:#64748b;margin-bottom:24px;">您的帳號尚未被指派 TTVS PVQC 管理權限，請聯絡最高管理員開放權限。</p>' +
-          '<a href="' + BP + '/teacher/" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#16a34a;color:#fff;font-size:14px;font-weight:500;text-decoration:none;">返回教師頁面</a>' +
-          '</div></div>';
-      }
-    }).catch(() => {
-      document.getElementById('auth-guard')?.remove();
-    });
+function checkTTVSAuth(currentUser) {
+  if (!currentUser || !currentUser.email) {
+    window.location.href = BP + '/login/teacher';
+    return;
   }
+  const email = currentUser.email;
+  const adminEmailEl = document.getElementById('admin-email');
+  if (adminEmailEl) adminEmailEl.textContent = email;
+
+  const isSuperAdmin = window.isAdminEmail ? window.isAdminEmail(email) : false;
+  if (isSuperAdmin) {
+    document.getElementById('nav-super-admin-link')?.classList.remove('hidden');
+    document.getElementById('auth-guard')?.remove();
+    return;
+  }
+
+  const san = window.sanitizeEmail(email);
+  const db = window.firebase.database();
+  Promise.all([
+    db.ref('config/teacherWhitelist/' + san).once('value'),
+    db.ref('1zTeStsys/Teacheraccount/' + san).once('value')
+  ]).then(([wlSnap, taSnap]) => {
+    if (wlSnap.exists() || taSnap.exists()) {
+      document.getElementById('auth-guard')?.remove();
+    } else {
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;background:#fafafa;">' +
+        '<div style="text-align:center;padding:40px;max-width:460px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">' +
+        '<div style="font-size:56px;font-weight:800;color:#cbd5e1;line-height:1;">403</div>' +
+        '<h1 style="margin:16px 0 8px;font-size:18px;font-weight:700;color:#0f172a;">尚未獲得 TTVS PVQC 管理權限</h1>' +
+        '<p style="font-size:13px;color:#64748b;margin-bottom:6px;">目前登入帳號：<strong style="color:#0f172a;">' + email + '</strong></p>' +
+        '<p style="font-size:13px;color:#64748b;margin-bottom:24px;line-height:1.6;">您的帳號尚未授權存取 TTVS PVQC 管理頁面。若您是指導老師，請聯絡平台最高管理員為您開啟權限。</p>' +
+        '<div style="display:flex;gap:10px;justify-content:center;">' +
+        '<a href="' + BP + '/teacher/" style="display:inline-block;padding:9px 18px;border-radius:8px;background:#16a34a;color:#fff;font-size:13px;font-weight:600;text-decoration:none;">前往教師頁面</a>' +
+        '<a href="' + BP + '/login/teacher" style="display:inline-block;padding:9px 18px;border-radius:8px;background:#f1f5f9;color:#334155;font-size:13px;font-weight:600;text-decoration:none;">切換教師帳號</a>' +
+        '</div></div></div>';
+    }
+  }).catch(() => {
+    document.getElementById('auth-guard')?.remove();
+  });
 }
 
-const adminEmailEl = document.getElementById('admin-email');
-if (adminEmailEl && user) adminEmailEl.textContent = user.email;
-
-if (window.isAdminEmail && user && window.isAdminEmail(user.email)) {
-  document.getElementById('nav-super-admin-link')?.classList.remove('hidden');
+const localUser = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (localUser && localUser.email) {
+  checkTTVSAuth(localUser);
+} else if (typeof firebase !== 'undefined' && firebase.auth) {
+  firebase.auth().onAuthStateChanged(user => {
+    if (user && user.email) {
+      const uObj = { email: user.email, name: user.displayName || user.email };
+      localStorage.setItem('fb_user', JSON.stringify(uObj));
+      checkTTVSAuth(uObj);
+    } else {
+      window.location.href = BP + '/login/teacher';
+    }
+  });
 }
 
 function showToast(msg) {
@@ -643,7 +661,7 @@ document.getElementById('btn-batch-delete')?.addEventListener('click', async () 
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   try { await firebase.auth().signOut(); } catch(e) {}
   localStorage.removeItem('fb_user');
-  window.location.href = BP + '/admin/login';
+  window.location.href = BP + '/login/teacher';
 });
 
 loadScores();
