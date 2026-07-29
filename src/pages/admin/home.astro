@@ -41,11 +41,33 @@ import Layout from '../../layouts/Layout.astro';
     <section id="tab-dashboard" class="tab-content">
       <div id="stats-grid" class="stats-grid"></div>
 
-      <!-- PVQC Whitelist -->
-      <div class="panel p-5 mb-5 !rounded-none border border-slate-200" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-radius:0px;">
-        <span style="font-size:13px;font-weight:600;color:var(--black);white-space:nowrap;">PVQC 權限教師</span>
-        <input id="pvqc-email-input" type="email" placeholder="teacher@example.com" style="flex:1;min-width:200px;border:1px solid var(--border);border-radius:0px;padding:8px 12px;font-size:13px;outline:none;" />
-        <button id="btn-pvqc-add" class="btn-green" style="white-space:nowrap;border-radius:0px;">指派為 PVQC 教師</button>
+      <!-- Teacher Whitelist Management (指派 & 解除權限) -->
+      <div class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white" style="border-radius:0px;">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
+          <div>
+            <h2 class="text-sm font-bold text-slate-800">指派權限教師管理</h2>
+            <p class="text-xs text-slate-500 mt-0.5">授權教師使用題庫管理、成績管理與 TTVS PVQC 管理存取權限。</p>
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <input id="pvqc-email-input" type="email" placeholder="teacher@example.com" class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-64" style="border-radius:0px;" />
+            <button id="btn-pvqc-add" class="btn-green text-xs font-semibold px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition" style="white-space:nowrap;border-radius:0px;">指派教師權限</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-sans border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 border-b border-slate-200 font-bold text-slate-600 uppercase tracking-wider">
+                <th class="py-2.5 px-4">權限教師 Email</th>
+                <th class="py-2.5 px-4">指派管理員</th>
+                <th class="py-2.5 px-4">指派時間</th>
+                <th class="py-2.5 px-4 text-center w-28">操作</th>
+              </tr>
+            </thead>
+            <tbody id="wl-tbody" class="divide-y divide-slate-200"></tbody>
+          </table>
+          <p id="wl-empty" class="hidden py-6 text-center text-xs text-slate-400">目前尚無指派的權限教師</p>
+        </div>
       </div>
 
       <div class="section-bar">
@@ -386,6 +408,7 @@ async function loadDashboard() {
     if (sSnap.exists()) { const d = sSnap.val(); Object.keys(d).forEach(k => allU.push({ email: d[k].email || k.replace(/,/g, '.'), role: 'student', name: d[k].name || '', stunum: d[k].stunum || '' })); }
     cacheSet('dashboard', { stats, users: allU });
     renderStats(stats); renderUsers(allU);
+    loadWhitelist();
   } catch (e) { console.error(e); showToast('載入失敗'); }
   hideLoading();
 }
@@ -516,9 +539,16 @@ document.getElementById('btn-pvqc-add')?.addEventListener('click', async () => {
       addedBy: user.email,
       createdAt: new Date().toISOString()
     });
-    showToast('已將 ' + em + ' 指派為 PVQC 教師');
+    await firebase.database().ref('1zTeStsys/Teacheraccount/' + san).update({
+      email: em,
+      updatedAt: new Date().toISOString()
+    });
+    showToast('已將 ' + em + ' 指派為權限教師');
     document.getElementById('pvqc-email-input').value = '';
+    cacheInvalidate('whitelist');
     cacheInvalidate('dashboard');
+    loadWhitelist();
+    loadDashboard();
   } catch (e) { showToast('設定失敗'); }
 });
 
@@ -539,26 +569,55 @@ async function ensureAdmin() {
 
 /* ── Whitelist ── */
 async function loadWhitelist() {
-  showLoading();
   const cached = cacheGet('whitelist');
-  if (cached) { renderWL(cached); hideLoading(); return; }
-  const snap = await firebase.database().ref('config/teacherWhitelist').once('value');
-  const data = snap.exists() ? snap.val() : null;
-  if (data) cacheSet('whitelist', data);
-  renderWL(data); hideLoading();
+  if (cached) { renderWL(cached); return; }
+  try {
+    const snap = await firebase.database().ref('config/teacherWhitelist').once('value');
+    const data = snap.exists() ? snap.val() : null;
+    if (data) cacheSet('whitelist', data);
+    renderWL(data);
+  } catch(e) {}
 }
+
 function renderWL(data) {
-  const tb = document.getElementById('wl-tbody'); tb.replaceChildren();
+  const tb = document.getElementById('wl-tbody');
+  if (!tb) return;
+  tb.replaceChildren();
   const emp = document.getElementById('wl-empty');
-  if (!data) { emp?.classList.remove('hidden'); return; }
+  if (!data || Object.keys(data).length === 0) {
+    emp?.classList.remove('hidden');
+    return;
+  }
   emp?.classList.add('hidden');
   Object.keys(data).forEach(k => {
-    const d = data[k]; const em = d.email || k.replace(/,/g, '.');
-    const db = mkEl('button', { className: 'btn-danger' }, '移除');
-    db.addEventListener('click', async () => { if (!confirm('確定移除？')) return; await firebase.database().ref('config/teacherWhitelist/' + k).remove(); showToast('已移除'); cacheInvalidate('whitelist'); cacheInvalidate('dashboard'); loadWhitelist(); });
-    const row = mkEl('tr', null, mkEl('td', { className: 'font-medium' }, em), mkEl('td', { className: 'text-gray-500' }, d.addedBy || '—'), mkEl('td', { className: 'text-gray-500' }, d.createdAt || '—'), mkEl('td', { className: 'text-right' }, db));
-    row.style.animation = 'fadeUp 0.25s cubic-bezier(0.16,1,0.3,1) forwards';
-    tb.appendChild(row);
+    const d = data[k];
+    const em = d.email || k.replace(/,/g, '.');
+    const tr = document.createElement('tr');
+    tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-200';
+
+    const emailTd = `<td class="py-3 px-4 font-semibold text-slate-800">${em}</td>`;
+    const adminTd = `<td class="py-3 px-4 text-slate-500">${d.addedBy || '—'}</td>`;
+    const timeTd = `<td class="py-3 px-4 text-slate-500">${d.createdAt ? new Date(d.createdAt).toLocaleDateString('zh-TW') : '—'}</td>`;
+    const actionTd = `<td class="py-3 px-4 text-center"><button class="btn-revoke-btn" style="padding:4px 10px;font-size:11px;font-weight:500;color:#dc2626;border:1px solid #fca5a5;background:#fff;border-radius:0px;cursor:pointer;transition:all 0.15s;">解除權限</button></td>`;
+
+    tr.innerHTML = emailTd + adminTd + timeTd + actionTd;
+    const btnRevoke = tr.querySelector('.btn-revoke-btn');
+    if (btnRevoke) {
+      btnRevoke.addEventListener('click', async () => {
+        if (!confirm('確定解除 ' + em + ' 的教師管理權限？')) return;
+        try {
+          await firebase.database().ref('config/teacherWhitelist/' + k).remove();
+          showToast('已解除 ' + em + ' 的教師權限');
+          cacheInvalidate('whitelist');
+          cacheInvalidate('dashboard');
+          loadWhitelist();
+          loadDashboard();
+        } catch(e) {
+          showToast('解除失敗');
+        }
+      });
+    }
+    tb.appendChild(tr);
   });
 }
 document.getElementById('btn-wl-add')?.addEventListener('click', async () => {

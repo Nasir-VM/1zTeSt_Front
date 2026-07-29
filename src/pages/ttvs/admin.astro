@@ -258,29 +258,36 @@ import Layout from '../../layouts/Layout.astro';
 <script is:inline>
 const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
 const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
-if (!user || !user.email || !window.isAdminEmail(user.email)) window.location.href = BP + '/admin/login';
 
-// PVQC 權限檢查：沒被指派的人不能進
-(function checkPVQCPermission() {
-  const guard = document.getElementById('auth-guard');
-  if (!user || !user.email) { window.location.href = BP + '/admin/login'; return; }
-  const san = user.email.replace(/\./g,',').replace(/#/g,',').replace(/\$/g,',').replace(/\//g,',');
-  const db = window.firebase.database();
-  db.ref('config/teacherWhitelist/' + san).once('value', snap => {
-    if (!snap.exists()) {
-      // 403 — 沒有 PVQC 權限
-      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;background:#fafafa;">' +
-        '<div style="text-align:center;padding:40px;">' +
-        '<div style="font-size:64px;font-weight:700;color:#e2e8f0;letter-spacing:-0.04em;line-height:1;">403</div>' +
-        '<h1 style="margin:16px 0 8px;font-size:18px;font-weight:600;color:#1e293b;">沒有存取權限</h1>' +
-        '<p style="font-size:14px;color:#64748b;margin-bottom:24px;">你的帳號尚未被指派 PVQC 權限，無法使用此頁面。</p>' +
-        '<a href="' + BP + '/admin/home" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#1e293b;color:#fff;font-size:14px;font-weight:500;text-decoration:none;">返回主控台</a>' +
-        '</div></div>';
-      return;
-    }
-    guard?.remove();
-  });
-})();
+if (!user || !user.email) {
+  window.location.href = BP + '/login/teacher';
+} else {
+  const isSuperAdmin = window.isAdminEmail ? window.isAdminEmail(user.email) : false;
+  if (isSuperAdmin) {
+    document.getElementById('auth-guard')?.remove();
+  } else {
+    const san = window.sanitizeEmail(user.email);
+    const db = window.firebase.database();
+    Promise.all([
+      db.ref('config/teacherWhitelist/' + san).once('value'),
+      db.ref('1zTeStsys/Teacheraccount/' + san).once('value')
+    ]).then(([wlSnap, taSnap]) => {
+      if (wlSnap.exists() || taSnap.exists()) {
+        document.getElementById('auth-guard')?.remove();
+      } else {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;background:#fafafa;">' +
+          '<div style="text-align:center;padding:40px;">' +
+          '<div style="font-size:64px;font-weight:700;color:#e2e8f0;letter-spacing:-0.04em;line-height:1;">403</div>' +
+          '<h1 style="margin:16px 0 8px;font-size:18px;font-weight:600;color:#1e293b;">尚未獲得存取權限</h1>' +
+          '<p style="font-size:14px;color:#64748b;margin-bottom:24px;">您的帳號尚未被指派 TTVS PVQC 管理權限，請聯絡最高管理員開放權限。</p>' +
+          '<a href="' + BP + '/teacher/" style="display:inline-block;padding:10px 24px;border-radius:8px;background:#16a34a;color:#fff;font-size:14px;font-weight:500;text-decoration:none;">返回教師頁面</a>' +
+          '</div></div>';
+      }
+    }).catch(() => {
+      document.getElementById('auth-guard')?.remove();
+    });
+  }
+}
 
 const adminEmailEl = document.getElementById('admin-email');
 if (adminEmailEl && user) adminEmailEl.textContent = user.email;
