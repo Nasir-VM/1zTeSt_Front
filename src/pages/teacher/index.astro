@@ -442,7 +442,7 @@ function renderQuestionPage() {
     const editBtn = mkEl('button', { className: 'manage-btn' }, '編輯');
     editBtn.addEventListener('click', () => { editingQuestionKey = q._key; document.getElementById('q-text').value = q.question || ''; document.getElementById('q-a').value = q.A || ''; document.getElementById('q-b').value = q.B || ''; document.getElementById('q-c').value = q.C || ''; document.getElementById('q-d').value = q.D || ''; document.getElementById('q-answer').value = q.answer || ''; document.getElementById('q-explanation').value = q.explanation || ''; document.getElementById('question-form').classList.remove('hidden'); document.getElementById('question-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     const delBtn = mkEl('button', { className: 'delete-btn' }, '刪除');
-    delBtn.addEventListener('click', async () => { Swal.fire({ title: '確定刪除此題目？', icon: 'warning', showCancelButton: true, confirmButtonText: '刪除', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions/' + q._key).remove(); /* Update question_count */ const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap2 = await chRef.once('value'); await chRef.set(Math.max(0, (snap2.val() || 0) - 1)); /* Also update local chapter list */ const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = Math.max(0, ch.question_count - 1); document.getElementById('stat-questions').textContent = String(chapters.reduce((s,c) => s + (c.question_count||0), 0)); showToast('已刪除題目'); renderChapters(); loadQuestions(); } }); });
+    delBtn.addEventListener('click', async () => { Swal.fire({ title: '確定刪除此題目？', icon: 'warning', showCancelButton: true, confirmButtonText: '刪除', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions/' + q._key).remove(); /* Update question_count */ const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap2 = await chRef.once('value'); await chRef.set(Math.max(0, (snap2.val() || 0) - 1)); /* Also update local chapter list */ const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = Math.max(0, ch.question_count - 1);     showToast('已刪除題目'); renderChapters(); loadQuestions(); } }); });
     const row = mkEl('div', { className: 'q-row flex items-start justify-between p-3', style: 'border:1px solid var(--border);border-radius:8px;transition:transform 0.2s cubic-bezier(0.16,1,0.3,1),box-shadow 0.2s;' }, left, mkEl('div', { className: 'flex gap-1' }, editBtn, delBtn));
     row.addEventListener('mouseenter', function() { row.style.transform = 'translateX(2px)'; row.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'; });
     row.addEventListener('mouseleave', function() { row.style.transform = ''; row.style.boxShadow = ''; });
@@ -461,23 +461,27 @@ function renderQuestionPage() {
 document.getElementById('btn-add-question').addEventListener('click', () => { editingQuestionKey = null; ['q-text','q-a','q-b','q-c','q-d','q-answer','q-explanation'].forEach(id => document.getElementById(id).value = ''); document.getElementById('question-form').classList.remove('hidden'); document.getElementById('question-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 document.getElementById('btn-cancel-question').addEventListener('click', () => { document.getElementById('question-form').classList.add('hidden'); editingQuestionKey = null; });
 document.getElementById('btn-save-question').addEventListener('click', async () => {
-  const q = document.getElementById('q-text').value.trim(); const A = document.getElementById('q-a').value.trim() || null; const B = document.getElementById('q-b').value.trim() || null; const C = document.getElementById('q-c').value.trim() || null; const D = document.getElementById('q-d').value.trim() || null; const ans = document.getElementById('q-answer').value.trim(); const ex = document.getElementById('q-explanation').value.trim() || null;
-  if (!q || !ans) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '題目和答案不可為空', showConfirmButton: false, timer: 1800 }); return; }
-  const body = { question: q, A, B, C, D, answer: ans, explanation: ex }; const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
-  if (editingQuestionKey) {
-    await firebase.database().ref(dbPath + '/' + editingQuestionKey).update(body);
-  } else {
-    await firebase.database().ref(dbPath).push(body);
-    /* Increment question_count */
-    const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count');
-    const snap = await chRef.once('value');
-    await chRef.set((snap.val() || 0) + 1);
-    const ch = chapters.find(c => c.key === currentChapterKey);
-    if (ch) ch.question_count = (ch.question_count || 0) + 1;
-    document.getElementById('stat-questions').textContent = String(chapters.reduce((s,c) => s + (c.question_count||0), 0));
+  try {
+    const q = document.getElementById('q-text').value.trim(); const A = document.getElementById('q-a').value.trim() || null; const B = document.getElementById('q-b').value.trim() || null; const C = document.getElementById('q-c').value.trim() || null; const D = document.getElementById('q-d').value.trim() || null; const ans = document.getElementById('q-answer').value.trim(); const ex = document.getElementById('q-explanation').value.trim() || null;
+    if (!q || !ans) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '題目和答案不可為空', showConfirmButton: false, timer: 1800 }); return; }
+    const body = { question: q, A, B, C, D, answer: ans, explanation: ex }; const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+    if (editingQuestionKey) {
+      await firebase.database().ref(dbPath + '/' + editingQuestionKey).update(body);
+    } else {
+      await firebase.database().ref(dbPath).push(body);
+      /* Increment question_count */
+      const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count');
+      const snap = await chRef.once('value');
+      await chRef.set((snap.val() || 0) + 1);
+      const ch = chapters.find(c => c.key === currentChapterKey);
+      if (ch) ch.question_count = (ch.question_count || 0) + 1;
+    }
+    showToast(editingQuestionKey ? '已更新題目' : '已新增題目');
+    document.getElementById('question-form').classList.add('hidden'); editingQuestionKey = null; renderChapters(); loadQuestions();
+  } catch (err) {
+    console.error('[Question] save error:', err);
+    Swal.fire({ icon: 'error', title: '儲存失敗', text: err.message || '請稍後再試' });
   }
-  showToast(editingQuestionKey ? '已更新題目' : '已新增題目');
-  document.getElementById('question-form').classList.add('hidden'); editingQuestionKey = null; renderChapters(); loadQuestions();
 });
 
 /* ── CSV ── */
@@ -491,7 +495,55 @@ function parseTabData(text) { return text.split(/\r?\n/).filter(r => r.trim()).m
 function renderPreview(rows) { const tb = document.getElementById('csv-preview-body'); tb.replaceChildren(); rows.forEach(r => { const tr = document.createElement('tr'); for (let i = 0; i < Math.min(7, r.length); i++) { const td = document.createElement('td'); td.className = 'max-w-[120px] truncate px-3 py-1.5'; td.textContent = r[i] || ''; tr.appendChild(td); } tb.appendChild(tr); }); document.getElementById('csv-preview-count').textContent = rows.length; document.getElementById('csv-import-count').textContent = rows.length; document.getElementById('csv-preview').classList.remove('hidden'); }
 document.getElementById('btn-preview-import').addEventListener('click', () => { const text = document.getElementById('csv-paste').value.trim(); if (!text) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '請先貼上資料', showConfirmButton: false, timer: 1800 }); return; } parsedRows = parseTabData(text); if (!parsedRows.length || parsedRows[0].length < 2) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無法解析', showConfirmButton: false, timer: 1800 }); return; } if (parsedRows[0][0].includes('題目') || parsedRows[0][0].includes('Question')) parsedRows.shift(); if (!parsedRows.length) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無有效資料', showConfirmButton: false, timer: 1800 }); return; } renderPreview(parsedRows); });
 document.getElementById('csv-file').addEventListener('change', function(e) { const file = this.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(ev) { parsedRows = parseTabData(ev.target.result); if (parsedRows.length && (parsedRows[0][0].includes('題目') || parsedRows[0][0].includes('Question'))) parsedRows.shift(); renderPreview(parsedRows); }; reader.readAsText(file, 'utf-8'); });
-document.getElementById('btn-do-import').addEventListener('click', async () => { if (!parsedRows.length) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無資料可匯入', showConfirmButton: false, timer: 1800 }); return; } const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions'; const batch = {}; let imported = 0; for (const row of parsedRows) { if (row.length < 6) continue; const q = row[0]||''; const A = row[1]||null; const B = row[2]||null; const C = row[3]||null; const D = row[4]||null; const ans = row[5]||''; const ex = row[6]||null; if (q && ans) { const key = firebase.database().ref(dbPath).push().key; batch[key] = { question: q, A, B, C, D, answer: ans, explanation: ex }; imported++; } } if (imported > 0) { await firebase.database().ref(dbPath).set(batch); const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap = await chRef.once('value'); await chRef.set((snap.val() || 0) + imported); const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = (ch.question_count || 0) + imported; document.getElementById('stat-questions').textContent = String(chapters.reduce((s,c) => s + (c.question_count||0), 0)); } showToast('已匯入 ' + imported + ' 題'); document.getElementById('csv-modal').classList.add('hidden'); document.getElementById('csv-preview').classList.add('hidden'); document.getElementById('csv-paste').value = ''; parsedRows = []; loadQuestions(); });
+document.getElementById('btn-do-import').addEventListener('click', async () => {
+  try {
+    console.log('[CSV] btn-do-import clicked, parsedRows:', parsedRows.length);
+    if (!parsedRows.length) {
+      Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無資料可匯入', showConfirmButton: false, timer: 1800 });
+      return;
+    }
+    const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+    console.log('[CSV] dbPath:', dbPath, 'currentChapterKey:', currentChapterKey);
+    const batch = {};
+    let imported = 0;
+    for (const row of parsedRows) {
+      if (row.length < 6) continue;
+      const q = row[0] || '';
+      const A = row[1] || null;
+      const B = row[2] || null;
+      const C = row[3] || null;
+      const D = row[4] || null;
+      const ans = row[5] || '';
+      const ex = row[6] || null;
+      if (q && ans) {
+        const key = firebase.database().ref(dbPath).push().key;
+        batch[key] = { question: q, A, B, C, D, answer: ans, explanation: ex };
+        imported++;
+      }
+    }
+    console.log('[CSV] parsed imported:', imported);
+    if (imported > 0) {
+      await firebase.database().ref(dbPath).set(batch);
+      console.log('[CSV] batch set done');
+      const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count');
+      const snap = await chRef.once('value');
+      await chRef.set((snap.val() || 0) + imported);
+      const ch = chapters.find(c => c.key === currentChapterKey);
+      if (ch) ch.question_count = (ch.question_count || 0) + imported;
+      console.log('[CSV] question_count updated');
+    }
+    showToast('已匯入 ' + imported + ' 題');
+    document.getElementById('csv-modal').classList.add('hidden');
+    document.getElementById('csv-preview').classList.add('hidden');
+    document.getElementById('csv-paste').value = '';
+    parsedRows = [];
+    await loadQuestions();
+    console.log('[CSV] loadQuestions done');
+  } catch (err) {
+    console.error('[CSV] import error:', err);
+    Swal.fire({ icon: 'error', title: '匯入失敗', text: err.message || '請稍後再試' });
+  }
+});
 
 document.getElementById('dropdown-logout')?.addEventListener('click', async () => { try { await firebase.auth().signOut(); } catch(e) {} localStorage.removeItem('fb_user'); localStorage.removeItem('last_activity'); window.location.href = BP + '/'; });
 loadChapters();
