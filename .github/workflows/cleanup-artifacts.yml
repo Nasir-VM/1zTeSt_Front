@@ -1,0 +1,37 @@
+name: Cleanup Actions Artifacts
+
+on:
+  schedule:
+    # 每週日 03:00 UTC（台灣時間 11:00）自動清理
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete artifacts older than 7 days
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          now=$(date +%s)
+          cutoff=$(( now - 7 * 24 * 60 * 60 ))
+          deleted=0
+          while read -r id name created_at; do
+            [ -z "$id" ] && continue
+            epoch=$(date -d "$created_at" +%s)
+            if [ "$epoch" -lt "$cutoff" ]; then
+              echo "Deleting artifact '$name' (id=$id, created=$created_at)"
+              if gh api -X DELETE "repos/$REPO/actions/artifacts/$id"; then
+                deleted=$(( deleted + 1 ))
+              else
+                echo "  !! failed to delete artifact $id"
+              fi
+            fi
+          done < <(gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" --jq '.artifacts[] | "\(.id) \(.name) \(.created_at)"')
+          echo "Cleanup done. Deleted $deleted artifact(s)."
