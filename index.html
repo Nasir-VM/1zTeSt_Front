@@ -199,58 +199,6 @@
             padding: 0 10px;
         }
 
-        .url-box {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .url-item {
-            flex: 1;
-            min-width: 260px;
-            background: #f9f7f2;
-            border: 2px solid #eee0c8;
-            border-radius: 16px;
-            padding: 20px;
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-        }
-
-        .url-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .url-item .status-tag {
-            display: inline-block;
-            font-size: 0.85em;
-            font-weight: 700;
-            padding: 4px 14px;
-            border-radius: 25px;
-            margin-bottom: 12px;
-        }
-
-        .url-item .status-tag.closing {
-            background: #fbeaea;
-            color: #c0392b;
-            border: 1px solid #e74c3c;
-        }
-
-        .url-item .status-tag.new {
-            background: #eaf7ee;
-            color: #27ae60;
-            border: 1px solid #2ecc71;
-        }
-
-        .url-item .url-text {
-            font-family: var(--font-family-secondary);
-            font-size: 1.05em;
-            font-weight: 700;
-            color: var(--primary-color);
-            word-break: break-all;
-        }
-
         .btn-primary-custom {
             display: inline-flex;
             align-items: center;
@@ -337,13 +285,8 @@
                 font-size: 1.05em;
                 padding: 0 5px;
             }
-
-            .url-item {
-                min-width: 100%;
-            }
         }
     </style>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -379,16 +322,6 @@
                         此次的更換，也即將在我的 20 歲畫上句點。除舊佈新，邁向新的開始！<br><br>
                         系統有任何問題，歡迎告訴我，我一定會大力修正！
                     </p>
-                    <div class="url-box">
-                        <div class="url-item">
-                            <span class="status-tag closing"><i class="fas fa-times-circle"></i> 即將停用</span>
-                            <div class="url-text">https://1ztests.web.app</div>
-                        </div>
-                        <div class="url-item">
-                            <span class="status-tag new"><i class="fas fa-check-circle"></i> 新家</span>
-                            <div class="url-text">https://1ztests.nsir.uk</div>
-                        </div>
-                    </div>
                     <a href="https://1ztests.nsir.uk" target="_blank" rel="noopener noreferrer" class="btn-primary-custom">
                         <i class="fas fa-arrow-right"></i> 前往新平台 https://1ztests.nsir.uk
                     </a>
