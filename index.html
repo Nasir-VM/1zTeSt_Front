@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1zTeSt 搬家公告｜告別與新開始</title>
+    <meta name="description" content="1zTeSt 線上測驗平台即將搬家！從 1ztests.web.app 搬到 1ztests.nsir.uk，感謝大家兩年來的支持，除舊佈新，邁向新的開始！">
+    <meta name="keywords" content="1zTeSt, 搬家公告, 告別信, 線上測驗, 校園測驗">
+    <meta name="author" content="1zTeSt">
+    <link rel="icon" href="https://i.imgur.com/9fl3wsq.png" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+TC:wght@400;700&family=Exo+2:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p6H9eH3j3z2mXbxqGIdl0u4i3s3G4B6cXX8tK6Xj6xJ8bF4lK2o5j4Q5m9B6j6h6d5k5j6j7k7l8m9n0p1q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        :root {
+            --primary-color: #333;
+            --secondary-color: #555;
+            --accent-color: #ae7d2f;
+            --button-hover-bg: #ffba4c;
+            --background-color: #f9f9f9;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+            --font-family-primary: 'Noto Sans TC', sans-serif;
+            --font-family-secondary: 'Exo 2', sans-serif;
+            --font-family-title: 'Pacifico', cursive;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            color: var(--primary-color);
+            background-color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            padding: 15px 0;
+            z-index: 1000;
+            transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-family: var(--font-family-title);
+            font-size: 2.2em;
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav ul li a {
+            font-size: 1em;
+            font-weight: 600;
+            position: relative;
+            padding: 5px 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            background: var(--primary-color);
+            left: 0;
+            bottom: -2px;
+            transition: width var(--transition-speed) ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            flex: 1;
+            padding-top: var(--header-height);
+        }
+
+        section#farewell {
+            min-height: calc(100vh - var(--header-height));
+            background: url('https://i.meee.com.tw/RfD35xs.gif') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 80px 20px;
+        }
+
+        section#farewell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.72);
+            z-index: 1;
+        }
+
+        section#farewell .content {
+            z-index: 2;
+            max-width: 780px;
+            width: 100%;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .farewell-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px 50px;
+            box-shadow: 0 8px 32px var(--card-shadow);
+            text-align: center;
+        }
+
+        .farewell-card h2 {
+            font-family: var(--font-family-title);
+            font-size: 2.6em;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ae7d2f, #ffba4c);
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .farewell-card p.message {
+            font-size: 1.15em;
+            color: var(--secondary-color);
+            line-height: 2;
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 0 10px;
+        }
+
+        .url-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .url-item {
+            flex: 1;
+            min-width: 260px;
+            background: #f9f7f2;
+            border: 2px solid #eee0c8;
+            border-radius: 16px;
+            padding: 20px;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .url-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .url-item .status-tag {
+            display: inline-block;
+            font-size: 0.85em;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 25px;
+            margin-bottom: 12px;
+        }
+
+        .url-item .status-tag.closing {
+            background: #fbeaea;
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+        }
+
+        .url-item .status-tag.new {
+            background: #eaf7ee;
+            color: #27ae60;
+            border: 1px solid #2ecc71;
+        }
+
+        .url-item .url-text {
+            font-family: var(--font-family-secondary);
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+
+        .btn-primary-custom {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #ae7d2f, #ffba4c);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            font-family: var(--font-family-primary);
+            transition: background var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #ffba4c, #ae7d2f);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .signature {
+            margin-top: 30px;
+            font-family: var(--font-family-title);
+            font-size: 1.5em;
+            color: var(--accent-color);
+        }
+
+        .signature-sub {
+            margin-top: 6px;
+            font-size: 0.95em;
+            color: var(--secondary-color);
+        }
+
+        footer {
+            background: var(--primary-color);
+            padding: 40px 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #fff;
+            margin: 0 10px;
+            font-size: 0.9em;
+            transition: color var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        footer a:hover {
+            color: #ddd;
+        }
+
+        footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .farewell-card {
+                padding: 30px 20px;
+            }
+
+            .farewell-card h2 {
+                font-size: 2em;
+            }
+
+            .farewell-card p.message {
+                font-size: 1.05em;
+                padding: 0 5px;
+            }
+
+            .url-item {
+                min-width: 100%;
+            }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag("js", new Date());
+        gtag("config", "G-2J28ZVEPZF");
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>1zTeSt</h1>
+            <nav>
+                <ul>
+                    <li><a href="https://1ztests.nsir.uk" target="_blank" rel="noopener noreferrer"><i class="fas fa-rocket"></i> 前往新平台</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="farewell" aria-labelledby="farewell-title">
+            <div class="content animate__animated animate__fadeInUp">
+                <div class="farewell-card">
+                    <h2 id="farewell-title">告別與新的開始</h2>
+                    <div class="badge"><i class="fas fa-birthday-cake"></i> 2 週年快樂</div>
+                    <p class="message">
+                        哈囉！各位老師同學們好！<br><br>
+                        系統已經成立 2 週年囉！從一開始的小流量網站，到現在使用者人數逐漸變多，真的非常感謝大家的支持。<br><br>
+                        我們即將更新整體系統效能，進行一次大更新！未來這個連結 <strong>https://1ztests.web.app</strong> 將會停用，我們即將搬家到
+                        <strong>https://1ztests.nsir.uk</strong> 新網址，無論是系統效能還是使用體驗，都希望能夠大大提升！<br><br>
+                        此次的更換，也即將在我的 20 歲畫上句點。除舊佈新，邁向新的開始！<br><br>
+                        系統有任何問題，歡迎告訴我，我一定會大力修正！
+                    </p>
+                    <div class="url-box">
+                        <div class="url-item">
+                            <span class="status-tag closing"><i class="fas fa-times-circle"></i> 即將停用</span>
+                            <div class="url-text">https://1ztests.web.app</div>
+                        </div>
+                        <div class="url-item">
+                            <span class="status-tag new"><i class="fas fa-check-circle"></i> 新家</span>
+                            <div class="url-text">https://1ztests.nsir.uk</div>
+                        </div>
+                    </div>
+                    <a href="https://1ztests.nsir.uk" target="_blank" rel="noopener noreferrer" class="btn-primary-custom">
+                        <i class="fas fa-arrow-right"></i> 前往新平台 https://1ztests.nsir.uk
+                    </a>
+                    <div class="signature">1zTeSt</div>
+                    <div class="signature-sub">除舊佈新 · 邁向新的開始</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 1zTeSt 輕鬆試</p>
+            <p>
+                <a href="https://nasirlin.net" target="_blank" rel="noopener noreferrer" aria-label="Nasir Link">
+                    <i class="fas fa-link"></i>Nasir
+                </a>
+            </p>
+        </div>
+    </footer>
+</body>
+
+</html>
