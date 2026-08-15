@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1zTeSt 輕鬆式 - 系統維護中</title>
+    <meta name="description" content="1zTeSt 正在進行系統維護，暫時無法使用。我們很快就會回來！">
+    <meta name="keywords" content="系統維護, 1zTeSt, 測驗系統, 線上測驗">
+    <meta name="author" content="1zTeSt">
+    <link rel="icon" href="https://i.imgur.com/9fl3wsq.png" type="image/png" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+TC:wght@400;700&family=Exo+2:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-p6H9eH3j3z2mXbxqGIdl0u4i3s3G4B6cXX8tK6Xj6xJ8bF4lK2o5j4Q5m9B6j6h6d5k5j6j7k7l8m9n0p1q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* 從 ind.css 提取的品牌變數 */
+        :root {
+            --primary-color: #333;
+            --secondary-color: #555;
+            --accent-color: #ae7d2f;
+            --background-color: #f9f9f9;
+            --font-family-primary: 'Noto Sans TC', sans-serif;
+            --font-family-secondary: 'Exo 2', sans-serif;
+            --font-family-title: 'Pacifico', cursive;
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        /* 基本重設與字體 */
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 頁首 */
+        header {
+            background: var(--card-bg);
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-family: var(--font-family-title);
+            font-size: 2.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 維護內容區域 */
+        #maintenance-section {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .maintenance-box {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px 50px;
+            box-shadow: 0 8px 32px var(--card-shadow);
+            max-width: 600px;
+            transform: translateY(-10px);
+            opacity: 0;
+            animation: fadeInUp 0.5s ease-out 0.1s forwards;
+        }
+
+        /* 載入動畫 */
+        @keyframes fadeInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .maintenance-icon {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            /* fa-spin 會自動套用旋轉動畫 */
+        }
+
+        #maintenance-section h2 {
+            font-family: var(--font-family-secondary);
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #maintenance-section p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        /* 頁尾 */
+        footer {
+            background: var(--primary-color);
+            color: #ecf0f1;
+            padding: 30px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        footer .container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        footer a:hover {
+            color: var(--accent-color);
+        }
+
+        footer .fab,
+        footer .fas {
+            margin-right: 3px;
+        }
+    </style>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-2J28ZVEPZF");
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>1zTeSt</h1>
+        </div>
+    </header>
+
+    <section id="maintenance-section" role="main">
+        <div class="maintenance-box">
+            <i class="fas fa-cogs fa-spin maintenance-icon" aria-hidden="true"></i>
+            <h2>系統升級中</h2>
+            <p>
+                1zTeSt 正在短暫維護維修，準備變得更棒！<br>
+                我們的工程師正在全力施工中，很快就會以更好的面貌與你見面。感謝你的耐心等待！
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 1zTeSt 輕鬆試</p>
+            <p>
+                <a href="privacy.html" target="_blank" aria-label="隱私權政策">
+                    <i class="fas fa-shield-alt"></i> 隱私權政策及免責聲明
+                </a> |
+                <a href="https://nasirlin.net" target="_blank" aria-label="Nasir Link" id="nasir-link">
+                    <i class="fas fa-user-circle"></i> Nasir
+                </a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

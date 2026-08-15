@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="bg-[#f6f3ec]">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TTVS PVQC 管理後台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Iansui&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Iansui', 'Noto Serif TC', 'Songti TC', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f3f0e8',
+              100: '#e8e2d6',
+              200: '#d4c4ad',
+              300: '#9aab9b',
+              400: '#7d8f7e',
+              500: '#6d7d6e',
+              600: '#5f7561',
+              700: '#4f5d50',
+              800: '#3d4540',
+              900: '#3a3630',
+            },
+            paper: {
+              DEFAULT: '#f6f3ec',
+              card: '#fefcf8',
+            }
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Iansui', 'Noto Serif TC', 'Songti TC', serif;
+      letter-spacing: 0.04em;
+      color: #3a3630;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #d4c4ad;
+      border-radius: 0;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #9aab9b;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .table-panel {
+      min-height: 200px;
+    }
+
+    div:where(.swal2-container) div:where(.swal2-popup) {
+      border-radius: 4px !important;
+      font-family: 'Iansui', 'Noto Serif TC', serif !important;
+      border: 1px solid #e5dfd3 !important;
+    }
+
+    div:where(.swal2-icon) {
+      border-color: #6d7d6e !important;
+      color: #6d7d6e !important;
+    }
+
+    div:where(.swal2-icon).swal2-warning {
+      border-color: #f59e0b !important;
+      color: #f59e0b !important;
+    }
+  </style>
+      
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-2J28ZVEPZF");
+    </script>
+</head>
+
+<body class="text-[#3a3630] antialiased h-screen flex overflow-hidden bg-paper">
+
+  <div id="mobile-overlay"
+    class="fixed inset-0 bg-[#3a3630]/15 backdrop-blur-sm z-30 hidden lg:hidden transition-opacity"
+    onclick="closeNav()"></div>
+
+  <aside id="sidebar"
+    class="bg-paper-card w-72 flex-shrink-0 fixed inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 lg:static z-40 transition-transform duration-300 ease-in-out flex flex-col h-full border-r border-[#e5dfd3]">
+
+    <div class="h-20 flex items-center px-8 border-b border-[#e5dfd3]">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-sm bg-brand-50 flex items-center justify-center text-brand-700 border border-[#e5dfd3]">
+          <i class="fa-solid fa-book-open text-lg opacity-80"></i>
+        </div>
+        <div>
+          <h1 class="font-normal text-[#3a3630] text-lg tracking-[0.12em]">PVQC <span class="text-brand-700">管理</span></h1>
+          <p class="text-[10px] text-[#7a7368] tracking-[0.2em]">TTVS PVQC</p>
+        </div>
+      </div>
+      <button class="lg:hidden ml-auto text-[#7a7368] hover:text-brand-700" onclick="closeNav()">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-4 space-y-1 custom-scrollbar" id="sidebarMenu"></div>
+
+    <div class="p-4 border-t border-[#e5dfd3] text-center">
+      <p class="text-[10px] text-[#7a7368] tracking-[0.14em]">
+        <a href="https://nasirlin.net" target="_blank" rel="noopener" class="hover:text-brand-700 transition-colors">Nasir</a>
+        · 2026
+      </p>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col min-w-0 h-full relative bg-paper">
+
+    <header
+      class="lg:hidden h-16 bg-paper-card border-b border-[#e5dfd3] flex items-center justify-between px-4 sticky top-0 z-20">
+      <div class="flex items-center gap-3">
+        <button onclick="openNav()" class="p-2 -ml-2 text-[#7a7368] hover:text-brand-700 rounded-sm">
+          <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+        <span class="text-[#3a3630] tracking-[0.1em]">管理中心</span>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 lg:p-10 custom-scrollbar">
+
+      <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-normal text-[#3a3630] tracking-[0.1em]" id="pageTitle">成績總覽</h2>
+          <p class="text-sm text-[#7a7368] mt-2 tracking-[0.06em]">TTVS PVQC 單字測驗 · 管理後台</p>
+        </div>
+        <div class="hidden md:block text-right">
+          <p class="text-xs text-[#7a7368] tracking-[0.16em]">今日</p>
+          <p class="text-sm text-[#3a3630] tracking-[0.08em]" id="currentDate">2026/02/17</p>
+        </div>
+      </div>
+
+      <div id="loginPage" class="hidden min-h-[60vh] flex items-center justify-center">
+        <div
+          class="w-full max-w-md bg-paper-card rounded-sm shadow-[0_8px_32px_rgba(58,54,48,0.06)] p-10 text-center border border-[#e5dfd3]">
+          <div
+            class="w-16 h-16 bg-brand-50 flex items-center justify-center text-brand-700 text-2xl mx-auto mb-6 border border-[#e5dfd3]">
+            <i class="fa-solid fa-pen-nib"></i>
+          </div>
+          <h3 class="text-2xl font-normal text-[#3a3630] mb-2 tracking-[0.12em]">老師登入</h3>
+          <p class="text-[#7a7368] text-sm mb-8 px-4 leading-relaxed">請使用已授權的 Google 帳號登入</p>
+
+          <button onclick="handleGoogleLogin()"
+            class="group w-full flex items-center justify-center gap-3 bg-transparent border border-[#e5dfd3] hover:border-brand-500 hover:bg-brand-50/80 text-[#3a3630] py-4 px-6 rounded-sm transition-all duration-300 tracking-[0.08em]">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              class="w-5 h-5 group-hover:scale-110 transition-transform">
+            <span>使用 Google 帳號繼續</span>
+          </button>
+          <p id="loginError" class="mt-4 text-xs text-rose-500 font-medium h-5"></p>
+        </div>
+      </div>
+
+      <div id="mainPage" class="hidden space-y-6">
+        <div class="flex flex-wrap gap-2 mb-6" id="tabs"></div>
+
+        <div id="contentArea">
+          <div id="scores1" class="table-panel hidden animate-fade-in-up"></div>
+          <div id="scores2" class="table-panel hidden animate-fade-in-up"></div>
+          <div id="scores3" class="table-panel hidden animate-fade-in-up"></div>
+          <div id="scores4" class="table-panel hidden animate-fade-in-up"></div>
+          <div id="scores5" class="table-panel hidden animate-fade-in-up"></div>
+          <div id="totalscore" class="table-panel hidden animate-fade-in-up"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "iamnasirlin.firebaseapp.com",
+      databaseURL: "https://iamnasirlin-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "iamnasirlin",
+      storageBucket: "iamnasirlin.firebasestorage.app",
+      messagingSenderId: "725940977300",
+      appId: "1:725940977300:web:698531b7de8af3b5e87e81",
+      measurementId: "G-NJ4BQV6DMG"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+    const ALLOWED_ADMINS = ['lll@mail.ttvs.ntct.edu.tw', 'hi@nasirlin.net'];
+
+    let teacherUser = null;
+    let currentTab = 'scores1';
+
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '/');
+
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+
+    function closeNav() {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    }
+    function openNav() {
+      sidebar.classList.remove('-translate-x-full');
+      overlay.classList.remove('hidden');
+    }
+
+    const tabsData = [
+      { id: 'scores1', label: '看英文選中文', icon: 'fa-solid fa-list-ul' },
+      { id: 'scores2', label: '聽英文發音選中文', icon: 'fa-solid fa-volume-high' },
+      { id: 'scores3', label: '聽英文發音選英文', icon: 'fa-solid fa-headphones' },
+      { id: 'scores4', label: '看中文選英文發音', icon: 'fa-solid fa-language' },
+      { id: 'scores5', label: '看英文選英文發音', icon: 'fa-solid fa-volume-low' },
+      { id: 'totalscore', label: '全部測驗總覽', icon: 'fa-solid fa-star' }
+    ];
+
+    function renderSidebarMenu() {
+      const menu = document.getElementById('sidebarMenu');
+      menu.innerHTML = '';
+
+      const sectionTitle = (text) => `<div class="px-4 mt-6 mb-2 text-[11px] text-[#7a7368] tracking-[0.2em]">${text}</div>`;
+
+      const menuItem = (icon, text, pageId, isAction = false, actionId = '') => {
+        const isActive = teacherUser && pageId === currentTab;
+
+        let classes = "group flex items-center px-4 py-3 text-sm rounded-sm transition-all duration-200 mb-1 tracking-[0.06em] ";
+
+        if (isAction) {
+          classes += "text-[#7a7368] hover:bg-rose-50/60 hover:text-[#a66b6b] mt-auto";
+        } else if (isActive) {
+          classes += "bg-brand-50 text-brand-800 border-l-2 border-brand-600";
+        } else {
+          classes += "text-[#7a7368] hover:bg-[#f3f0e8] hover:text-[#3a3630]";
+        }
+
+        return `
+            <a href="#" class="${classes}" ${pageId ? `data-page="${pageId}"` : ''} ${actionId ? `id="${actionId}"` : ''}>
+                <i class="${icon} w-6 text-center text-base ${isActive ? 'text-brand-700' : (isAction ? 'text-inherit' : 'text-[#9aab9b] group-hover:text-[#6d7d6e]')} transition-colors"></i>
+                <span class="ml-3">${text}</span>
+                ${isActive ? '<i class="fa-solid fa-chevron-right ml-auto text-xs text-brand-400"></i>' : ''}
+            </a>`;
+      };
+
+      if (!teacherUser) {
+        menu.innerHTML += sectionTitle('Access');
+        menu.innerHTML += menuItem('fa-solid fa-arrow-right-to-bracket', '老師登入', 'login', false, 'sidebarLoginBtn');
+      } else {
+        menu.innerHTML += sectionTitle('Data Views');
+        tabsData.forEach(tab => {
+          menu.innerHTML += menuItem(tab.icon, tab.label, tab.id);
+        });
+
+        menu.innerHTML += sectionTitle('System');
+        menu.innerHTML += menuItem('fa-solid fa-arrow-right-from-bracket', '登出系統', null, true, 'sidebarLogoutBtn');
+      }
+
+      document.querySelectorAll('#sidebarMenu a[data-page], #sidebarLogoutBtn, #sidebarLoginBtn').forEach(el => {
+        el.onclick = (e) => {
+          e.preventDefault();
+          if (el.id === 'sidebarLoginBtn') handleGoogleLogin();
+          else if (el.id === 'sidebarLogoutBtn') handleLogout();
+          else activatePage(el.getAttribute('data-page'));
+        }
+      });
+    }
+
+    function renderTabs() {
+      const container = document.getElementById('tabs');
+      if (!teacherUser) return;
+
+      container.innerHTML = tabsData.map(tab => {
+        const isActive = tab.id === currentTab;
+        const activeClass = isActive
+          ? "bg-brand-700 text-[#fefcf8] border border-brand-700"
+          : "bg-paper-card text-[#7a7368] hover:text-[#3a3630] border border-[#e5dfd3]";
+
+        return `
+            <button onclick="activatePage('${tab.id}')" class="${activeClass} px-5 py-2.5 rounded-sm text-sm transition-all duration-200 flex items-center gap-2 tracking-[0.06em]">
+                ${isActive ? '<i class="fa-solid fa-check text-[10px]"></i>' : ''}
+                ${tab.label}
+            </button>
+            `;
+      }).join('');
+    }
+
+    function showPage(pageName) {
+      const loginPage = document.getElementById('loginPage');
+      const mainPage = document.getElementById('mainPage');
+
+      if (pageName === 'login') {
+        loginPage.classList.remove('hidden');
+        mainPage.classList.add('hidden');
+        document.getElementById('pageTitle').textContent = '系統登入';
+      } else {
+        loginPage.classList.add('hidden');
+        mainPage.classList.remove('hidden');
+        const activeTabObj = tabsData.find(t => t.id === currentTab);
+        if (activeTabObj) document.getElementById('pageTitle').textContent = activeTabObj.label;
+      }
+      renderSidebarMenu();
+      renderTabs();
+    }
+
+    function activatePage(pageId) {
+      if (!pageId) return;
+      currentTab = pageId;
+
+      document.querySelectorAll('.table-panel').forEach(el => el.classList.add('hidden'));
+
+      const targetPanel = document.getElementById(pageId);
+      if (targetPanel) {
+        targetPanel.classList.remove('hidden');
+        if (!targetPanel.hasChildNodes()) {
+          const tabInfo = tabsData.find(t => t.id === pageId);
+          loadScores(pageId.toUpperCase().replace('SCORE', 'SCORES'), pageId, tabInfo.label, tabInfo.icon);
+          if (pageId === 'totalscore') loadScores('TOTALSCORES', 'totalscore', '全部測驗總覽', 'fa-solid fa-star');
+          else loadScores(pageId.toUpperCase().replace('SCORES', 'SCORES'), pageId, tabInfo.label, tabInfo.icon);
+        }
+      }
+
+      showPage('main');
+      if (window.innerWidth < 1024) closeNav();
+    }
+
+    function loadScores(scoreKey, domId, title, icon) {
+      const domEl = document.getElementById(domId);
+      domEl.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+            <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-brand-300"></i>
+            <p class="text-sm font-medium animate-pulse">正在同步數據...</p>
+        </div>`;
+
+      db.ref('PVQCSCORES/' + scoreKey).once('value', snap => {
+        let data = [];
+        snap.forEach(c => { let d = c.val(); d._id = c.key; data.push(d); });
+        data = data.reverse();
+
+        if (data.length === 0) {
+          domEl.innerHTML = `
+                 <div class="bg-paper-card rounded-sm border border-[#e5dfd3] p-12 text-center">
+                    <div class="w-16 h-16 bg-brand-50 flex items-center justify-center text-[#9aab9b] mx-auto mb-4 border border-[#e5dfd3]">
+                        <i class="fa-regular fa-folder-open text-2xl"></i>
+                    </div>
+                    <h3 class="text-[#3a3630] mb-2 tracking-[0.1em]">暫無成績</h3>
+                    <p class="text-[#7a7368] text-sm">目前此科目尚無學生提交測驗。</p>
+                 </div>`;
+          return;
+        }
+
+        let html = `
+            <div class="bg-paper-card rounded-sm shadow-[0_8px_32px_rgba(58,54,48,0.05)] border border-[#e5dfd3] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e5dfd3] bg-paper-card flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                         <div class="bg-brand-50 text-brand-800 px-3 py-1 rounded-sm text-xs tracking-[0.1em] border border-[#e5dfd3]">${data.length} 筆</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                         <button id="${domId}-batchDel" disabled class="disabled:opacity-40 disabled:cursor-not-allowed group px-3 py-2 bg-transparent border border-[#e5dfd3] text-[#7a7368] rounded-sm hover:border-[#a66b6b] hover:text-[#a66b6b] transition-all text-sm flex items-center gap-2">
+                            <i class="fa-regular fa-trash-can"></i> <span class="hidden sm:inline">刪除所選</span>
+                         </button>
+                         <button id="${domId}-refresh" class="px-3 py-2 bg-transparent border border-[#e5dfd3] text-[#7a7368] rounded-sm hover:border-brand-500 hover:text-brand-700 transition-all text-sm">
+                            <i class="fa-solid fa-rotate-right"></i>
+                         </button>
+                         <button id="${domId}-export" class="px-3 py-2 bg-brand-800 text-[#fefcf8] rounded-sm hover:bg-brand-700 transition-all text-sm flex items-center gap-2 tracking-[0.06em]">
+                            <i class="fa-solid fa-file-csv"></i> <span class="hidden sm:inline">匯出 CSV</span>
+                         </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[#f3f0e8] border-b border-[#e5dfd3] text-xs tracking-[0.12em] text-[#7a7368]">
+                                <th class="p-4 w-10 text-center"><input type="checkbox" id="${domId}-checkAll" class="rounded text-brand-500 focus:ring-brand-500 bg-gray-100 border-gray-200 w-4 h-4 cursor-pointer"></th>
+                                <th class="p-4">Subject</th>
+                                <th class="p-4">Student ID</th>
+                                <th class="p-4">Name</th>
+                                <th class="p-4 text-center">Score</th>
+                                <th class="p-4">Time</th>
+                                <th class="p-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm text-[#3a3630] divide-y divide-[#ebe6db]">
+            `;
+
+        data.forEach(d => {
+          const score = parseInt(d.score);
+          const scoreClass = score >= 60
+            ? "bg-brand-50 text-brand-800 border-[#d4c4ad]"
+            : "bg-rose-50/80 text-[#a66b6b] border-[#e5dfd3]";
+
+          const initials = d.studentName ? d.studentName.charAt(0) : '?';
+          const colorIndex = (d.studentName?.length || 0) % 5;
+          const colors = ['bg-blue-100 text-blue-600', 'bg-purple-100 text-purple-600', 'bg-indigo-100 text-indigo-600', 'bg-amber-100 text-amber-600', 'bg-teal-100 text-teal-600'];
+
+          html += `
+                <tr class="hover:bg-[#f3f0e8]/80 transition-colors group">
+                    <td class="p-4 text-center"><input type="checkbox" class="score-cb rounded text-brand-500 focus:ring-brand-500 bg-gray-50 border-gray-200 w-4 h-4 cursor-pointer" value="${d._id}"></td>
+                    <td class="p-4 font-medium text-gray-800">${title}</td>
+                    <td class="p-4 font-mono text-gray-500 text-xs">${d.studentId || '-'}</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${colors[colorIndex]}">${initials}</div>
+                            <span class="font-medium text-gray-700">${d.studentName || 'Unknown'}</span>
+                        </div>
+                    </td>
+                    <td class="p-4 text-center">
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${scoreClass}">
+                           ${d.score}
+                        </span>
+                    </td>
+                    <td class="p-4 text-xs text-gray-400">
+                        ${d.timestamp ? new Date(d.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteScore('${scoreKey}', '${d._id}', '${domId}')" class="p-2 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>`;
+        });
+
+        html += `</tbody></table></div></div>`;
+        domEl.innerHTML = html;
+
+        const checkAll = document.getElementById(`${domId}-checkAll`);
+        const cbs = document.querySelectorAll(`#${domId} .score-cb`);
+        const delBtn = document.getElementById(`${domId}-batchDel`);
+
+        if (checkAll && cbs.length > 0) {
+          checkAll.onclick = () => {
+            cbs.forEach(cb => cb.checked = checkAll.checked);
+            delBtn.disabled = !checkAll.checked;
+          };
+          cbs.forEach(cb => {
+            cb.onchange = () => {
+              checkAll.checked = [...cbs].every(c => c.checked);
+              delBtn.disabled = ![...cbs].some(c => c.checked);
+            };
+          });
+        }
+
+        document.getElementById(`${domId}-refresh`).onclick = () => loadScores(scoreKey, domId, title, icon);
+        document.getElementById(`${domId}-batchDel`).onclick = () => batchDelete(scoreKey, domId);
+        document.getElementById(`${domId}-export`).onclick = () => exportCSV(scoreKey, domId, title);
+      });
+    }
+
+    function deleteScore(key, id, domId) {
+      Swal.fire({
+        title: '確定要刪除這筆成績嗎？',
+        text: "此操作無法復原。",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#5f7561', cancelButtonColor: '#9aab9b',
+        confirmButtonText: '確定刪除'
+      }).then(res => {
+        if (res.isConfirmed) {
+          db.ref(`PVQCSCORES/${key}/${id}`).remove().then(() => {
+            Swal.fire({ icon: 'success', title: '已刪除成績嘍！', timer: 1500, showConfirmButton: false });
+            reloadTab(domId);
+          });
+        }
+      });
+    }
+
+    function batchDelete(key, domId) {
+      const selected = [...document.querySelectorAll(`#${domId} .score-cb:checked`)];
+      if (!selected.length) return;
+      Swal.fire({
+        title: `確定要刪除這 ${selected.length} 筆成績嗎？`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#5f7561', cancelButtonColor: '#9aab9b',
+        confirmButtonText: '確定刪除'
+      }).then(res => {
+        if (res.isConfirmed) {
+          let u = {}; selected.forEach(s => u[s.value] = null);
+          db.ref(`PVQCSCORES/${key}`).update(u).then(() => {
+            Swal.fire({ icon: 'success', title: '已批次刪除成績嘍！', timer: 1500, showConfirmButton: false });
+            reloadTab(domId);
+          });
+        }
+      });
+    }
+
+    function reloadTab(domId) {
+      const t = tabsData.find(x => x.id === domId);
+      if (t) loadScores(t.id === 'totalscore' ? 'TOTALSCORES' : t.id.toUpperCase().replace('SCORES', 'SCORES'), domId, t.label, t.icon);
+    }
+
+    function exportCSV(key, domId, title) {
+      db.ref(`PVQCSCORES/${key}`).once('value', s => {
+        let csv = ["科目,學號,姓名,分數,時間"];
+        s.forEach(c => {
+          let d = c.val();
+          let time = d.timestamp ? new Date(d.timestamp).toLocaleString() : '';
+          csv.push(`"${title}","${d.studentId || ''}","${d.studentName || ''}","${d.score || 0}","${time}"`);
+        });
+        let blob = new Blob(['\uFEFF' + csv.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url; a.download = `${title}_Export.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      });
+    }
+
+    function handleGoogleLogin() {
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+        .then(res => {
+          if (ALLOWED_ADMINS.includes(res.user.email)) {
+            teacherUser = res.user.displayName;
+            showPage('main');
+            activatePage('scores1');
+          } else {
+            Swal.fire('Access Denied', 'Authentication failed.', 'error');
+            auth.signOut();
+          }
+        })
+        .catch(e => document.getElementById('loginError').textContent = e.message);
+    }
+
+    function handleLogout() {
+      auth.signOut().then(() => {
+        teacherUser = null;
+        showPage('login');
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user && ALLOWED_ADMINS.includes(user.email)) {
+        teacherUser = user.displayName;
+        showPage('main');
+        activatePage('scores1');
+      } else {
+        showPage('login');
+      }
+    });
+
+  </script>
+</body>
+
+</html>

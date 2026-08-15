@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1zTeSt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-p6H9eH3j3z2mXbxqGIdl0u4i3s3G4B6cXX8tK6Xj6xJ8bF4lK2o5j4Q5m9B6j6h6d5k5j6j7k7l8m9n0p1q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+TC:wght@400;700&family=Exo+2:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link href="indcss.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #333;
+            --secondary-color: #555;
+            --accent-color: #ae7d2f;
+            --background-color: #f9f9f9;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+            --font-family-primary: 'Noto Sans TC', sans-serif;
+            --font-family-secondary: 'Exo 2', sans-serif;
+            --font-family-title: 'Pacifico', cursive;
+            --modal-overlay-bg: rgba(0, 0, 0, 0.5);
+            --button-hover-bg: #ffba4c;
+            --button-bg: var(--accent-color);
+            --input-bg: #f0f0f0;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --nav-active-bg: #fff;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            color: var(--primary-color);
+            background-color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            padding: 15px 0;
+            z-index: 1000;
+            transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header.scrolled {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-family: var(--font-family-title);
+            font-size: 2.5em;
+            color: var(--primary-color);
+            transition: color var(--transition-speed) ease;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav ul li a {
+            font-size: 1em;
+            font-weight: 600;
+            position: relative;
+            padding: 5px 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            background: var(--primary-color);
+            left: 0;
+            bottom: -2px;
+            transition: width var(--transition-speed) ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 25px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .menu-toggle div {
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 1.5px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .menu-toggle.active div:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active div:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        section#home {
+            min-height: 100vh;
+            background: url('https://i.meee.com.tw/RfD35xs.gif') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        section#home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            z-index: 1;
+        }
+
+        section#home .content {
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+            padding: 0;
+            border-radius: 0;
+            max-width: 800px;
+            background: transparent;
+            box-shadow: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section#home h1 {
+            font-family: var(--font-family-title);
+            font-size: 6em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        section#home p {
+            font-size: 1.3em;
+            max-width: 800px;
+            margin: 20px auto 30px;
+            color: #555;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-enter {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        .btn-enter:hover {
+            background: var(--button-hover-bg);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--primary-color);
+            padding: 40px 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        footer a {
+            color: #fff;
+            margin: 0 10px;
+            font-size: 1em;
+            transition: color var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        footer a:hover {
+            color: #ddd;
+        }
+
+        footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        footer p,
+        footer a {
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            section#home h1 {
+                font-size: 4em;
+            }
+
+            section#home p {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                width: 80%;
+                max-width: 1100px;
+            }
+        }
+    </style>
+        
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-2J28ZVEPZF");
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>1zTeSt</h1>
+            <nav>
+                <ul id="nav-links">
+                    <li><a href="https://1ztest.web.app"><i class="fas fa-home"></i> 回到首頁</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section id="home" aria-labelledby="home-title">
+        <div class="content animate__animated animate__fadeInUp" data-aos="fade-up">
+            <h1 id="home-title" class="animate__animated animate__bounceIn" data-aos="bounce-in">404</h1>
+            <p class="animate__animated animate__fadeInUp" data-aos="fade-up" data-aos-delay="500">
+                抱歉，尼看得這個頁面沒有東C喔！請回首頁嘻嘻。
+            </p>
+            <button class="btn-enter" onclick="window.location.href='https://1ztests.web.app'">回到首頁</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p> &copy; 2025 1zTeSt 輕鬆試</p>
+            <p>
+                <a href="https://nasirlin.net" target="_blank" aria-label="Nasir">
+                    <i class="fas fa-user-circle"></i> Nasir
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+    </script>
+
+</body>
+
+</html>

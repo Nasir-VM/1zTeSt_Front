@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1zTeSt 教師の登入入口</title>
+  <link rel="icon" href="https://i.imgur.com/9fl3wsq.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-p6H9eH3j3z2mXbxqGIdl0u4i3s3G4B6cXX8tK6Xj6xJ8bF4lK2o5j4Q5m9B6j6h6d5k5j6j7k7l8m9n0p1q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pacifico&family=Noto+Sans+TC:wght@400;700&family=Exo+2:wght@500;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <link rel="stylesheet" href="../1zfunct/style/variables.css" />
+  <link rel="stylesheet" href="../1zfunct/style/tea.css" />
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-2J28ZVEPZF");
+    </script>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <h1>1zTeSt</h1>
+      <nav>
+        <ul id="nav-links">
+          <li>
+            <a href="../index.html" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-user"></i> 1zTeSt
+            </a>
+          </li>
+          <li>
+            <a href="../start.html" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-user"></i> 如何開始
+            </a>
+          </li>
+          <li id="auth-links" style="display: none;">
+            <a href="#" id="question-bank"><i class="fas fa-book"></i> 題庫管理</a>
+            <a href="#" id="score-management"><i class="fas fa-chart-bar"></i> 成績管理</a>
+            <a href="#" id="csv-converter"><i class="fas fa-file-csv"></i> 批次匯入工具</a>
+            <a href="#" id="logout"><i class="fas fa-sign-out-alt"></i> 登出</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="menu-toggle" id="mobile-menu" aria-label="導航選單切換" aria-expanded="false" role="button" tabindex="0">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  </header>
+  <div id="loading-overlay"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #ffffff 0%, #f0f2f5 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(10px); transition: opacity 0.4s ease, visibility 0.4s;">
+    <div class="premium-spinner"></div>
+    <style>
+      .premium-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(174, 125, 47, 0.1);
+        border-left: 4px solid #ae7d2f;
+        border-radius: 50%;
+        animation: spin-premium 1s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+      }
+
+      @keyframes spin-premium {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </div>
+
+  <section id="home" aria-labelledby="home-title" style="display: none;">
+    <div class="content animate__animated animate__fadeInUp" data-aos="fade-up">
+      <h1 id="home-title" class="animate__animated animate__bounceIn" data-aos="bounce-in">
+        1zTeSt 教師登入口
+      </h1>
+      <p class="animate__animated animate__fadeInUp" data-aos="fade-up" data-aos-delay="100">
+        教師專用登入口，管理學生測驗和成績。立即登入ㄅㄚ！
+      </p>
+      <button class="google-btn-premium" id="open-login">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" style="margin-right: 12px;">
+          <path fill="#EA4335"
+            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+          <path fill="#4285F4"
+            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+          <path fill="#FBBC05"
+            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z" />
+          <path fill="#34A853"
+            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+          <path fill="none" d="M0 0h48v48H0z" />
+        </svg>
+        使用 Google 帳號登入
+      </button>
+      <style>
+        .google-btn-premium {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background-color: #ffffff;
+          color: #3c4043;
+          border: 1px solid #dadce0;
+          border-radius: 24px;
+          padding: 10px 24px;
+          font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+          font-size: 15px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .google-btn-premium:hover {
+          background-color: #f8f9fa;
+          border-color: #d2e3fc;
+          box-shadow: 0 1px 3px 1px rgba(66, 133, 244, 0.15);
+        }
+
+        .google-btn-premium:active {
+          background-color: #eeeeee;
+        }
+      </style>
+    </div>
+  </section>
+
+  <div id="adminContent" style="display: none;">
+    <div id="chapter-management-section">
+      <div class="section-title">
+        <h2>章節管理</h2>
+        <p>新增、編輯或刪除章節</p>
+      </div>
+      <div class="mb-3">
+        <button class="admin-btn btn-toggle" onclick="openAddChapterModal()">新增章節</button>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>章節名稱</th>
+              <th>限制測驗題數</th>
+              <th>是否開放</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="chaptersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="question-bank-section">
+      <div class="section-title">
+        <h2>題庫管理</h2>
+        <p>在選擇的章節內新增、編輯或刪除題目</p>
+      </div>
+      <div class="mb-3 d-flex align-items-center flex-wrap">
+        <label for="chapterSelect" class="me-2 mb-2">選擇章節:</label>
+        <select id="chapterSelect" class="form-select w-auto mb-2" onchange="loadQuestions()">
+          <option value="">--選擇章節--</option>
+        </select>
+      </div>
+      <div class="button-group mb-3">
+        <button class="admin-btn btn-gold" onclick="openAddQuestionModal()">新增題目</button>
+        <button class="admin-btn btn-gold" onclick="exportToCSV()">匯出題目 CSV</button>
+        <a class="admin-btn btn-gold" href="https://imgur.com/upload" target="_blank" rel="noopener noreferrer">
+          圖片上傳
+        </a>
+        <button class="admin-btn btn-purple" onclick="openBatchImportModal()">
+          匯入
+        </button>
+        <button class="admin-btn btn-purple" onclick="downloadTemplate()">
+          匯入範本
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table table table-striped table-hover">
+          <thead>
+            <tr>
+              <th style="min-width: 120px;">題目</th>
+              <th>A</th>
+              <th>B</th>
+              <th>C</th>
+              <th>D</th>
+              <th>答案</th>
+              <th>詳解</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="questionsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="score-management-section" style="display: none;">
+      <div class="section-title">
+        <h2>成績管理</h2>
+        <p>查看和管理學生的測驗成績 (預設顯示今日，可篩選章節、日期、搜尋及欄位排序)</p>
+      </div>
+      <div class="mb-3 d-flex align-items-center flex-wrap">
+        <label for="scoreChapterFilter" class="me-2 mb-2">篩選章節:</label>
+        <select id="scoreChapterFilter" class="form-select w-auto mb-2" onchange="filterAndSearchScores()">
+          <option value="">--所有章節--</option>
+        </select>
+
+        <label for="scoreDateFilter" class="ms-md-3 me-2 mb-2">篩選日期:</label>
+        <select id="scoreDateFilter" class="form-select w-auto mb-2" onchange="filterAndSearchScores()">
+          <option value="today">--僅顯示今日--</option>
+          <option value="">--所有日期--</option>
+        </select>
+
+      </div>
+      <div class="mb-3">
+        <input type="text" id="scoreSearchInput" class="form-control" placeholder="搜尋成績 (姓名、信箱、學號等)"
+          onkeyup="filterAndSearchScores()" />
+      </div>
+      <div class="mb-3">
+        <button class="admin-btn btn-gold" onclick="exportScoresToCSV()">匯出成績 CSV</button>
+        <button class="admin-btn btn-purple ms-2" onclick="loadScores()">成績重整</button>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table table table-striped table-hover" id="scoresTable">
+          <thead>
+            <tr>
+              <th onclick="sortScores(0, false)">測驗日期<span class="sort-indicator" id="scores-sort-0"></span></th>
+              <th onclick="sortScores(1, false)">測驗章節<span class="sort-indicator" id="scores-sort-1"></span></th>
+              <th onclick="sortScores(2, true)">測驗時長<span class="sort-indicator" id="scores-sort-2"></span></th>
+              <th onclick="sortScores(3, false)">測驗者姓名<span class="sort-indicator" id="scores-sort-3"></span></th>
+              <th onclick="sortScores(4, false)">測驗者信箱<span class="sort-indicator" id="scores-sort-4"></span></th>
+              <th onclick="sortScores(5, false)">測驗者學號<span class="sort-indicator" id="scores-sort-5"></span></th>
+              <th onclick="sortScores(6, true)">分數<span class="sort-indicator" id="scores-sort-6"></span></th>
+            </tr>
+          </thead>
+          <tbody id="scoresTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="csvGeneratorSection">
+      <div class="section-title">
+        <h2>1zTeSt 批次匯入題目轉換器</h2>
+        <p>
+          <b>新版本！！輸入題目資料，自動拆題整理到下面表格。（AI稀有！請好好珍惜資源！）</b><br>
+          1️⃣ <b>貼上題目（可一次多題，格式亂也行）</b><br>
+          2️⃣ <b>點「1zTeSt AI分析」</b><br>
+          3️⃣ <b>保存並下載CSV，就可以匯入系統</b>
+        </p>
+        <div style="margin-bottom:12px">
+          <textarea id="rawQuestionsInput" class="form-control"
+            style="width:100%;min-height:110px;font-size:1rem;margin-bottom:7px;font-size:1rem;"
+            placeholder="請輸入題目ㄛ"></textarea> <button id="gemini-analyze-btn" type="button" class="admin-btn btn-gold"
+            style="margin-bottom:6px;">1zTeSt AI分析</button>
+          <span id="gemini-loading" style="display:none;color:#37ad0f;font-weight:bold;">
+            <i class="fa fa-spinner fa-spin"></i> 智能分析中...
+          </span>
+          <span id="gemini-log" style="margin-left:10px;font-size:0.95em;"></span>
+        </div>
+        <p class="mt-2 mb-2"><strong>標準格式（可手動微調）：</strong></p>
+        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+題目        A       B       C       D       複選   答案   詳解
+        </pre>
+      </div>
+      <div id="csvTableEditor" class="mb-3">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>題目</th>
+              <th>A</th>
+              <th>B</th>
+              <th>C</th>
+              <th>D</th>
+              <th>複選</th>
+              <th>答案</th>
+              <th>詳解</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="csvTableBody"></tbody>
+        </table>
+        <button id="addRowBtn" class="btn btn-secondary">新增一列</button>
+      </div>
+      <div class="mb-3" id="actionButtons">
+        <button id="clearBtn" class="admin-btn btn-purple">清除內容</button>
+        <button id="saveDownloadBtn" class="admin-btn btn-gold">保存並下載 CSV</button>
+        <button id="backToMenuBtn2" class="admin-btn btn-purple" onclick="backToMenu()">
+          回 題目選單
+        </button>
+      </div>
+      <div id="log2"></div>
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 1zTeSt 輕鬆試</p>
+      <p>
+        <a href="../privacy.html" target="_blank" aria-label="隱私權政策">
+          <i class="fab fa-facebook"></i> 隱私權政策及免責聲明
+        </a> |
+        <a href="https://nasirlin.net" target="_blank" aria-label="Nasir">
+          <i class="fab fa-facebook"></i>Nasir
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <div class="modal fade" id="addChapterModal" tabindex="-1" aria-labelledby="addChapterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="addChapterForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addChapterModalLabel">新增章節</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="chapterName" class="form-label">章節名稱</label>
+              <input type="text" class="form-control" id="chapterName" required />
+            </div>
+            <div class="mb-3">
+              <label for="chapterLimit" class="form-label">限制測驗題數 (0 或空白 = 不限制)</label>
+              <input type="number" class="form-control" id="chapterLimit" placeholder="0" min="0" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="admin-btn btn-delete" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="admin-btn btn-toggle">新增</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="editChapterModal" tabindex="-1" aria-labelledby="editChapterModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editChapterForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editChapterModalLabel">編輯章節</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editChapterId" />
+            <div class="mb-3">
+              <label for="editChapterName" class="form-label">章節名稱</label>
+              <input type="text" class="form-control" id="editChapterName" required />
+            </div>
+            <div class="mb-3">
+              <label for="editChapterLimit" class="form-label">限制測驗題數 (0 = 不限制)</label>
+              <input type="number" class="form-control" id="editChapterLimit" placeholder="0" min="0" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="admin-btn btn-delete" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="admin-btn btn-toggle">更新</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="addQuestionForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addModalLabel">新增題目</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="addQuestion" class="form-label">題目</label>
+              <textarea class="form-control" id="addQuestion" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="addOptionA" class="form-label">選項 A</label>
+              <input type="text" class="form-control" id="addOptionA" required />
+            </div>
+            <div class="mb-3">
+              <label for="addOptionB" class="form-label">選項 B</label>
+              <input type="text" class="form-control" id="addOptionB" required />
+            </div>
+            <div class="mb-3">
+              <label for="addOptionC" class="form-label">選項 C</label>
+              <input type="text" class="form-control" id="addOptionC" />
+            </div>
+            <div class="mb-3">
+              <label for="addOptionD" class="form-label">選項 D</label>
+              <input type="text" class="form-control" id="addOptionD" />
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="isMultipleChoice">
+              <label class="form-check-label" for="isMultipleChoice">是否為複選題</label>
+            </div>
+            <div class="mb-3" id="addSingleAnswerDiv">
+              <label for="addSingleAnswerSelect" class="form-label">答案 (單選)</label>
+              <select class="form-select" id="addSingleAnswerSelect">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div class="mb-3" id="addMultipleAnswerDiv" style="display: none;">
+              <label class="form-label d-block">答案 (複選)</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="A" id="addMultiA">
+                <label class="form-check-label" for="addMultiA">A</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="B" id="addMultiB">
+                <label class="form-check-label" for="addMultiB">B</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="C" id="addMultiC">
+                <label class="form-check-label" for="addMultiC">C</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="D" id="addMultiD">
+                <label class="form-check-label" for="addMultiD">D</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="addExplanation" class="form-label">詳解</label>
+              <textarea class="form-control" id="addExplanation"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="admin-btn btn-delete" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="admin-btn btn-gold">新增</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="editQuestionForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">編輯題目</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editChapterId" />
+            <input type="hidden" id="editQuestionId" />
+            <div class="mb-3">
+              <label for="editQuestion" class="form-label">題目</label>
+              <textarea class="form-control" id="editQuestion" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="editOptionA" class="form-label">選項 A</label>
+              <input type="text" class="form-control" id="editOptionA" required />
+            </div>
+            <div class="mb-3">
+              <label for="editOptionB" class="form-label">選項 B</label>
+              <input type="text" class="form-control" id="editOptionB" required />
+            </div>
+            <div class="mb-3">
+              <label for="editOptionC" class="form-label">選項 C</label>
+              <input type="text" class="form-control" id="editOptionC" />
+            </div>
+            <div class="mb-3">
+              <label for="editOptionD" class="form-label">選項 D</label>
+              <input type="text" class="form-control" id="editOptionD" />
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="editIsMultipleChoice">
+              <label class="form-check-label" for="editIsMultipleChoice">是否為複選題</label>
+            </div>
+            <div class="mb-3" id="editSingleAnswerDiv">
+              <label for="editSingleAnswerSelect" class="form-label">答案 (單選)</label>
+              <select class="form-select" id="editSingleAnswerSelect">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div class="mb-3" id="editMultipleAnswerDiv" style="display: none;">
+              <label class="form-label d-block">答案 (複選)</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="A" id="editMultiA">
+                <label class="form-check-label" for="editMultiA">A</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="B" id="editMultiB">
+                <label class="form-check-label" for="editMultiB">B</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="C" id="editMultiC">
+                <label class="form-check-label" for="editMultiC">C</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="D" id="editMultiD">
+                <label class="form-check-label" for="editMultiD">D</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editExplanation" class="form-label">詳解</label>
+              <textarea class="form-control" id="editExplanation"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="admin-btn btn-delete" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="admin-btn btn-gold">更新</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="viewContentModal" tabindex="-1" aria-labelledby="viewContentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewContentModalLabel">內容詳情</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body view-content" id="viewContentBody">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="admin-btn btn-delete" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="batchImportModal" tabindex="-1" aria-labelledby="batchImportModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="batchImportForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="batchImportModalLabel">批次匯入題目</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>請選擇 CSV 檔案，需包含欄位：<br>
+              <strong>題目,A,B,C,D,複選,答案,詳解</strong><br>
+              <small>「複選」欄位：1(或Y)=複選，其餘視為單選。<br>
+                若為複選題，答案請以「/」分隔，例如：A/C</small>
+            </p>
+            <div class="mb-3">
+              <input type="file" id="csvFileInput" accept=".csv" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="admin-btn btn-delete" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="admin-btn btn-purple">開始匯入</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="../1zfunct/funct/teatea/teaaacher.js"></script>
+  <script src="../1zfunct/funct/teatea/batchimport.js"></script>
+  <script src="../1zfunct/funct/teatea/exam.js"></script>
+
+</body>
+
+</html>

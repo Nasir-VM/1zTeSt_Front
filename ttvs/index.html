@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTVS PVQC 單字測驗系統</title>
+  <meta name="keywords" content="單字測驗, PVQC, TTVS, 挑戰, 英文, Quiz">
+  <link rel="icon" href="https://i.imgur.com/9fl3wsq.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Iansui&display=swap" rel="stylesheet">
+  <link href="functions/main.css" rel="stylesheet">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2J28ZVEPZF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag("js", new Date());
+    gtag("config", "G-2J28ZVEPZF");
+  </script>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <span class="logo"><span class="icon">✎</span>TTVS PVQC</span>
+    </div>
+  </header>
+
+  <section id="home">
+    <div class="content" id="homeContent">
+      <h1>TTVS PVQC<br>單字測驗</h1>
+      <p>
+        靜下來，一題一題慢慢做～<br>
+        <b>一定可以考過證照的！加油！</b>
+      </p>
+      <div class="mascot" aria-hidden="true">— · —</div>
+      <button class="btn-start" id="startQuizBtn" aria-label="開始挑戰">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" style="display:block;margin:auto;"
+          xmlns="http://www.w3.org/2000/svg">
+          <circle cx="19" cy="19" r="18" fill="none" stroke="currentColor" stroke-width="2" />
+          <polygon points="15,12 28,19 15,26" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <div class="container" id="quizContainer" style="display:none;">
+    <div class="action-row">
+      <button class="btn" id="endTestBtn">結束</button>
+    </div>
+    <div class="quiz-title" id="quizTitle">PVQC 資訊類英文單字測驗</div>
+    <div id="quiz"></div>
+    <div class="score" id="score"></div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <footer>
+    <div class="footer-main">© 2026 TTVS PVQC</div>
+    <div class="footer-links">
+      <a href="https://nasirlin.net" target="_blank" rel="noopener">Nasir</a>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "iamnasirlin.firebaseapp.com",
+      databaseURL: "https://iamnasirlin-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "iamnasirlin",
+      storageBucket: "iamnasirlin.firebasestorage.app",
+      messagingSenderId: "725940977300",
+      appId: "1:725940977300:web:698531b7de8af3b5e87e81",
+      measurementId: "G-NJ4BQV6DMG"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+    let WORD_BANK = [];
+    let studentId = '';
+    let studentName = '';
+    let selectedPartIndex = null;
+    let selectMode = null;
+
+    let totalScoreSent = false;
+    let questionIndex = 0;
+    let quizQuestions = [];
+    let score = 0;
+    let partScores = [0, 0, 0, 0, 0];
+    let quizPartsOrder = [];
+
+    async function loadWordBank() {
+      try {
+        const response = await fetch('ttvs.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        WORD_BANK = await response.json();
+        console.log(`成功載入 ${WORD_BANK.length} 個單字`);
+
+        const startBtn = document.getElementById('startQuizBtn');
+        if (startBtn) {
+          startBtn.disabled = false;
+          startBtn.style.opacity = 1;
+        }
+
+      } catch (error) {
+        console.error('載入單字庫失敗:', error);
+        alert('無法載入題庫 (words.json)。如果您是在本機直接開啟檔案，請改用 Live Server 或上傳至伺服器測試。');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const startBtn = document.getElementById('startQuizBtn');
+      if (startBtn) {
+        startBtn.disabled = true;
+        startBtn.style.opacity = 0.5;
+      }
+      loadWordBank();
+    });
+
+    document.getElementById('startQuizBtn').addEventListener('click', handleGoogleLogin);
+
+    function handleGoogleLogin() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          const sanitizedEmail = user.email.replace(/[.#$/]/g, ',');
+          db.ref('1zTeStsys/Studentaccount/' + sanitizedEmail).once('value')
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                studentId = userData.stunum || '';
+                studentName = userData.name || user.displayName || '';
+
+                if (!studentId || !studentName) {
+                  showMissingDataForm(user);
+                  return;
+                }
+                showSelectMenu();
+              } else {
+                showMissingDataForm(user);
+              }
+            });
+        })
+        .catch((error) => {
+          alert('登入失敗: ' + error.message);
+        });
+    }
+
+    function showMissingDataForm(user) {
+      const homeContent = document.getElementById('homeContent');
+      if (homeContent) homeContent.style.display = 'none';
+      const section = document.getElementById('home');
+
+      let form = document.getElementById('missingDataForm');
+      if (form) form.remove();
+
+      form = document.createElement('div');
+      form.className = 'content';
+      form.id = 'missingDataForm';
+      form.innerHTML = `
+        <div style="margin-bottom: 20px;">
+          <h2 style="color:var(--ink); font-family:var(--font-title); letter-spacing:.12em;">請補全資料</h2>
+          <p style="color:var(--text-muted); font-size:0.95em; line-height:1.9;">您好，這是您首次使用此帳號登入，或資料庫中尚無您的學號與姓名。<br>請填寫真實資料，以便記錄成績。</p>
+        </div>
+        <div class="input-group">
+          <label class="input-label-fancy" for="realStudentId">真實學號</label>
+          <input type="text" maxlength="6" pattern="\\d{6}" id="realStudentId" placeholder="例如: 112001" inputmode="numeric">
+        </div>
+        <div class="input-group">
+          <label class="input-label-fancy" for="realStudentName">真實姓名</label>
+          <input type="text" maxlength="12" id="realStudentName" placeholder="例如: 王小明">
+        </div>
+        <div class="input-error" id="missingDataError"></div>
+        <button class="btn btn-primary-custom" id="saveDataBtn">儲存並開始</button>
+      `;
+
+      section.appendChild(form);
+
+      document.getElementById('saveDataBtn').onclick = () => saveMissingData(user);
+    }
+
+    function saveMissingData(user) {
+      const sId = document.getElementById('realStudentId').value.trim();
+      const sName = document.getElementById('realStudentName').value.trim();
+      const errorDiv = document.getElementById('missingDataError');
+
+      if (!/^\d{6}$/.test(sId)) {
+        errorDiv.textContent = '請輸入正確的6位數學號';
+        return;
+      }
+      if (!sName || sName.length < 2) {
+        errorDiv.textContent = '請輸入您的全名';
+        return;
+      }
+
+      const sanitizedEmail = user.email.replace(/[.#$/]/g, ',');
+      db.ref('1zTeStsys/Studentaccount/' + sanitizedEmail).update({
+        stunum: sId,
+        name: sName,
+        email: user.email
+      }).then(() => {
+        studentId = sId;
+        studentName = sName;
+        document.getElementById('missingDataForm').remove();
+        showSelectMenu();
+      }).catch((err) => {
+        errorDiv.textContent = '儲存失敗: ' + err.message;
+      });
+    }
+
+    const PARTS = [
+      { name: "看英文選中文", num: 100, scoreKey: "SCORES1" },
+      { name: "聽英文發音選中文", num: 100, scoreKey: "SCORES2" },
+      { name: "聽英文發音選英文", num: 100, scoreKey: "SCORES3" },
+      { name: "看中文選英文發音", num: 100, scoreKey: "SCORES4" },
+      { name: "看英文選英文發音", num: 100, scoreKey: "SCORES5" }
+    ];
+
+    function getPointsPerQuestion(partIdx) {
+      return 100 / PARTS[partIdx].num;
+    }
+
+    function showSelectMenu() {
+      document.getElementById('home').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+
+      document.getElementById('quizTitle').textContent = "請選擇章節或全測驗";
+      document.getElementById('score').textContent = '';
+      document.getElementById('result').textContent = '';
+
+      let html = '';
+      html += `<button class="btn-menu" onclick="startQuizSelector('all')">全部測驗 · 100 題</button>`;
+      for (let i = 0; i < PARTS.length; i++) {
+        html += `<button class="btn-menu" onclick="startQuizSelector(${i})">${PARTS[i].name} · ${PARTS[i].num} 題</button>`;
+      }
+      html += `<button class="btn btn-danger" onclick="exitQuiz()" style="margin-top:20px;">跳出測驗</button>`;
+
+      document.getElementById('quiz').innerHTML = html;
+      document.getElementById('endTestBtn').style.display = 'none';
+    }
+
+    window.startQuizSelector = function (mode) {
+      selectMode = mode;
+      selectedPartIndex = (mode === "all") ? null : parseInt(mode, 10);
+      startQuiz();
+    }
+
+    window.exitQuiz = function () {
+      document.getElementById('quizContainer').style.display = 'none';
+      document.getElementById('home').style.display = '';
+      document.getElementById('homeContent').style.display = '';
+
+      const stepForm = document.getElementById('stepForm');
+      if (stepForm) stepForm.remove();
+      const missingDataForm = document.getElementById('missingDataForm');
+      if (missingDataForm) missingDataForm.remove();
+    };
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getRandomOptions(correct, allOptions, key, count = 4) {
+      const others = shuffle(allOptions.filter(opt => opt[key] !== correct[key]));
+      const options = shuffle([correct, ...others.slice(0, count - 1)]);
+      return options;
+    }
+
+    function buildQuizQuestions() {
+      let questions = [];
+      quizPartsOrder = [];
+
+      if (!WORD_BANK || WORD_BANK.length === 0) {
+        console.error("WORD_BANK is empty!");
+        return [];
+      }
+
+      if (selectMode === "all") {
+        for (let p = 0; p < PARTS.length; p++) {
+          const part = PARTS[p];
+          quizPartsOrder.push(p);
+          const chosenWords = shuffle([...WORD_BANK]).slice(0, part.num);
+          for (let i = 0; i < chosenWords.length; i++) {
+            questions.push({
+              part: p,
+              word: chosenWords[i],
+              isCorrect: undefined
+            });
+          }
+        }
+      } else {
+        quizPartsOrder = [selectedPartIndex];
+        const part = PARTS[selectedPartIndex];
+        const chosenWords = shuffle([...WORD_BANK]).slice(0, part.num);
+        for (let i = 0; i < chosenWords.length; i++) {
+          questions.push({
+            part: selectedPartIndex,
+            word: chosenWords[i],
+            isCorrect: undefined
+          });
+        }
+      }
+      return questions;
+    }
+
+    function speak(text) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      window.speechSynthesis.speak(utter);
+    }
+
+    function startQuiz() {
+      questionIndex = 0;
+      quizQuestions = buildQuizQuestions();
+      score = 0;
+      partScores = [0, 0, 0, 0, 0];
+      totalScoreSent = false;
+      document.getElementById('score').textContent = '';
+      document.getElementById('result').textContent = '';
+      document.getElementById('endTestBtn').style.display = '';
+
+      if (quizQuestions.length === 0) {
+        alert("題庫載入異常或題目數量不足，請檢查 words.json 或開發者工具 console。");
+        return;
+      }
+
+      renderQuestion();
+    }
+
+    function getCurrentPartIndex() {
+      if (!quizQuestions[questionIndex]) return selectedPartIndex !== null ? selectedPartIndex : 0;
+      return quizQuestions[questionIndex].part;
+    }
+
+    function renderQuestion() {
+      if (questionIndex >= quizQuestions.length) {
+        return showResult();
+      }
+      const { part, word } = quizQuestions[questionIndex];
+      const partName = PARTS[part].name;
+      const partStart = selectMode === "all" ? PARTS.slice(0, part).reduce((a, b) => a + b.num, 0) : 0;
+      const partQuestionNo = questionIndex - partStart + 1;
+      let html = `<div style="font-size:.92em;margin-bottom:14px;letter-spacing:.1em;text-align:center;color:var(--ink-muted);padding-bottom:10px;border-bottom:1px solid var(--border);">第 ${part + 1} 部分 · ${partName}<br><span style="font-size:.88em;opacity:.85;">第 ${partQuestionNo} 題，共 ${PARTS[part].num} 題</span></div>`;
+      let options = [];
+      switch (part) {
+        case 0:
+          html += `<div class="question">英文：<b>${word.en}</b></div>`;
+          options = getRandomOptions(word, WORD_BANK, 'zh');
+          html += renderOptions(options, 'zh', word.zh);
+          break;
+        case 1:
+          html += `<div class="question">聽發音選中文：<button class="speaker-btn" onclick="speak('${word.en}')">🔊</button></div>`;
+          options = getRandomOptions(word, WORD_BANK, 'zh');
+          html += renderOptions(options, 'zh', word.zh);
+          break;
+        case 2:
+          html += `<div class="question">聽發音選英文：<button class="speaker-btn" onclick="speak('${word.en}')">🔊</button></div>`;
+          options = getRandomOptions(word, WORD_BANK, 'en');
+          html += renderOptions(options, 'en', word.en);
+          break;
+        case 3: {
+          const enOptions = getRandomOptions(word, WORD_BANK, 'en');
+          html += `<div class="question">中文：<b>${word.zh}</b></div>`;
+          html += `<div class="options" style="gap: 6px 10px; flex-wrap:wrap; display:flex; flex-direction:column; align-items:center;">`;
+          html += `<div style="display:flex;gap:8px 8px;flex-wrap:wrap;justify-content:center;">`;
+          enOptions.forEach((opt, idx) => {
+            html += `<button class="option-btn" type="button" onclick="speak('${opt.en.replace(/'/g, "\\'")}')" style="width:47%;"><span style="font-size:1.25em;">🔊</span>  #${idx + 1}</button>`;
+          });
+          html += `</div>`;
+          html += `<hr>`;
+          html += `<div style="display:flex;gap:8px 8px;flex-wrap:wrap;justify-content:center;">`;
+          enOptions.forEach((opt, idx) => {
+            html += `<button class="option-btn" onclick="checkAnswer('${opt.en.replace(/'/g, "\\'")}', '${word.en.replace(/'/g, "\\'")}', this, true)" style="width:47%;">答案 #${idx + 1}</button>`;
+          });
+          html += `</div>`;
+          html += `</div>`;
+          break;
+        }
+        case 4: {
+          const enOptions = getRandomOptions(word, WORD_BANK, 'en');
+          html += `<div class="question">英文：<b>${word.en}</b><br>下列哪個發音與此單字相同？</div>`;
+          html += `<div class="options" style="gap: 6px 10px; flex-wrap:wrap; display:flex; flex-direction:column; align-items:center;">`;
+          html += `<div style="display:flex;gap:8px 8px;flex-wrap:wrap;justify-content:center;">`;
+          enOptions.forEach((opt, idx) => {
+            html += `<button class="option-btn" type="button" onclick="speak('${opt.en.replace(/'/g, "\\'")}')" style="width:47%;"><span style="font-size:1.25em;">🔊</span>  #${idx + 1}</button>`;
+          });
+          html += `</div>`;
+          html += `<hr>`;
+          html += `<div style="display:flex;gap:8px 8px;flex-wrap:wrap;justify-content:center;">`;
+          enOptions.forEach((opt, idx) => {
+            html += `<button class="option-btn" onclick="checkAnswer('${opt.en.replace(/'/g, "\\'")}', '${word.en.replace(/'/g, "\\'")}', this, true)" style="width:47%;">答案 #${idx + 1}</button>`;
+          });
+          html += `</div>`;
+          html += `</div>`;
+          break;
+        }
+      }
+      html += `<button class="btn btn-primary-custom next-btn" id="nextBtn" onclick="nextQuestion()" disabled style="margin:16px auto 0 auto;display:block;max-width:200px;">下一題</button>`;
+      document.getElementById('quiz').innerHTML = html;
+      showPartScore();
+    }
+
+    function renderOptions(options, field, correctAns) {
+      let html = '<div class="options">';
+      options.forEach(opt => {
+        html += `<button class="option-btn" onclick="checkAnswer('${opt[field].replace(/'/g, "\\'")}', '${correctAns.replace(/'/g, "\\'")}', this)">${opt[field]}</button>`;
+      });
+      html += '</div>';
+      return html;
+    }
+
+    window.speak = speak;
+    window.checkAnswer = checkAnswer;
+    window.nextQuestion = nextQuestion;
+    window.startQuiz = startQuiz;
+
+    function checkAnswer(selected, correct, btn, isPronounce = false) {
+      document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      if (isPronounce && btn.innerText && btn.innerText.startsWith('答案')) speak(selected);
+
+      let curPartIdx = getCurrentPartIndex();
+
+      if (selected === correct) {
+        btn.classList.add('correct');
+        quizQuestions[questionIndex].isCorrect = true;
+      } else {
+        btn.classList.add('incorrect');
+        quizQuestions[questionIndex].isCorrect = false;
+        document.querySelectorAll('.option-btn').forEach(b => {
+          const onclickAttr = b.getAttribute('onclick');
+          if (
+            (!isPronounce && b.textContent === correct) ||
+            (isPronounce && onclickAttr && onclickAttr.includes(`'${correct}'`))
+          ) {
+            b.classList.add('correct');
+          }
+        });
+      }
+      document.getElementById('nextBtn').disabled = false;
+      document.getElementById('nextBtn').focus();
+      showPartScore();
+    }
+
+    function nextQuestion() {
+      questionIndex++;
+      let isPartEnd = false;
+      if (selectMode === "all") {
+        let acc = 0;
+        for (let i = 0; i < PARTS.length; i++) {
+          acc += PARTS[i].num;
+          if (questionIndex === acc) {
+            isPartEnd = true;
+            savePartScoreToFirebase(i);
+            break;
+          }
+        }
+      } else {
+        if (questionIndex === quizQuestions.length) {
+          isPartEnd = true;
+          savePartScoreToFirebase(selectedPartIndex);
+        }
+      }
+      renderQuestion();
+      if (isPartEnd && questionIndex < quizQuestions.length) showPartSum();
+    }
+
+    function showPartScore() {
+      const curPartIdx = getCurrentPartIndex();
+      const curPart = PARTS[curPartIdx];
+      let points = getPointsPerQuestion(curPartIdx);
+      let partStart = selectMode === "all" ? PARTS.slice(0, curPartIdx).reduce((a, b) => a + b.num, 0) : 0;
+      let partEnd = partStart + curPart.num;
+      let partScore = 0;
+      for (let i = partStart; i <= Math.min(questionIndex, partEnd - 1); i++) {
+        if (quizQuestions[i] && quizQuestions[i].isCorrect) {
+          partScore += points;
+        }
+      }
+      partScores[curPartIdx] = partScore;
+      document.getElementById('score').textContent = `本部分目前分數：${partScore.toFixed(1)} / 100`;
+    }
+
+    function showPartSum() {
+      const prevPartIdx = quizQuestions[questionIndex - 1].part;
+      if (prevPartIdx < 0) return;
+
+      const scoreText = `第${prevPartIdx + 1}部分結束，本部分分數：${partScores[prevPartIdx].toFixed(1)} / 100`;
+      document.getElementById('score').textContent = scoreText;
+
+      setTimeout(() => {
+        if (document.getElementById('quizContainer').style.display === 'block' && questionIndex < quizQuestions.length) {
+          showPartScore();
+        }
+      }, 2000);
+    }
+
+    function showResult(forceEnd = false) {
+      if (totalScoreSent) {
+        renderResultPage(forceEnd);
+        return;
+      }
+
+      let totalAnswered = forceEnd ? questionIndex : quizQuestions.length;
+      let tempScore = 0;
+      for (let i = 0; i < totalAnswered; i++) {
+        if (quizQuestions[i] && quizQuestions[i].isCorrect) {
+          let curPartIdx = quizQuestions[i].part;
+          tempScore += getPointsPerQuestion(curPartIdx);
+        }
+      }
+
+      const onComplete = function () {
+        totalScoreSent = true;
+        renderResultPage(forceEnd);
+      };
+
+      if (selectMode === "all") {
+        saveTotalScoreToFirebase(tempScore, totalAnswered, onComplete);
+      } else {
+        savePartScoreToFirebase(selectedPartIndex, tempScore, onComplete);
+      }
+    }
+
+    function renderResultPage(forceEnd) {
+      let totalAnswered = forceEnd ? questionIndex : quizQuestions.length;
+      let correctCount = 0;
+
+      for (let i = 0; i < totalAnswered; i++) {
+        if (quizQuestions[i] && quizQuestions[i].isCorrect) {
+          correctCount++;
+        }
+      }
+
+      let totalScore = 0;
+      let maxScore = 0;
+
+      if (selectMode === "all") {
+        totalScore = partScores.reduce((sum, score) => sum + score, 0);
+        maxScore = partScores.length * 100;
+      } else {
+        totalScore = partScores[selectedPartIndex];
+        maxScore = 100;
+      }
+
+      document.getElementById('quiz').innerHTML = '';
+      document.getElementById('score').textContent = '';
+      document.getElementById('result').innerHTML =
+        `<h2>挑戰結束！</h2>
+        <p style="font-size:1.07em;">總分：<strong>${totalScore.toFixed(1)} / ${maxScore.toFixed(1)}</strong></p>
+        <p>答對題數：<strong>${correctCount} / ${totalAnswered}</strong></p>
+        <p style="color:var(--ink-muted);">得分率：<strong>${(maxScore === 0 ? 0 : (totalScore / maxScore * 100)).toFixed(1)}%</strong></p>
+        <button class="btn btn-primary-custom start-btn" onclick="showSelectMenu()">回選單</button>`;
+
+      document.getElementById('endTestBtn').style.display = 'none';
+    }
+
+    document.getElementById('endTestBtn').addEventListener('click', function () {
+      if (confirm('確定要提前結束測驗嗎？將會以目前進度計分。')) {
+        showResult(true);
+      }
+    });
+
+    function savePartScoreToFirebase(partIdx, customScore = null, cb) {
+      if (partIdx < 0 || partIdx >= PARTS.length) { if (cb) cb(); return; }
+
+      let scoreKey = PARTS[partIdx].scoreKey;
+      let scoreValue = customScore !== null ? customScore : partScores[partIdx];
+      db.ref('PVQCSCORES/' + scoreKey).push({
+        studentId: studentId,
+        studentName: studentName,
+        score: parseFloat(scoreValue.toFixed(1)),
+        timestamp: new Date().toISOString()
+      }).then(cb || function () { }).catch(cb || function () { });
+    }
+
+    function saveTotalScoreToFirebase(totalScore, questionCount, cb) {
+      db.ref('PVQCSCORES/TOTALSCORES').push({
+        studentId: studentId,
+        studentName: studentName,
+        score: parseFloat(totalScore.toFixed(1)),
+        totalQuestions: questionCount,
+        timestamp: new Date().toISOString()
+      }).then(cb || function () { }).catch(cb || function () { });
+    }
+  </script>
+</body>
+
+</html>

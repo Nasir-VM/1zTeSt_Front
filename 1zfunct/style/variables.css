@@ -1,0 +1,28 @@
+:root {
+    --primary-color: #333;
+    --secondary-color: #555;
+    --accent-color: #ae7d2f;
+    --background-color: #f9f9f9;
+
+    --header-height: 70px;
+
+    --transition-speed: 0.3s;
+    --font-family-primary: 'Noto Sans TC', sans-serif;
+    --font-family-secondary: 'Exo 2', sans-serif;
+    --font-family-title: 'Pacifico', cursive;
+
+    --modal-overlay-bg: rgba(0, 0, 0, 0.5);
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --nav-active-bg: #fff;
+    --button-bg: var(--accent-color);
+    --button-hover-bg: #ffba4c;
+    --input-bg: #f0f0f0;
+    --card-bg: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+
+    --progress-bg: #ddd;
+    --progress-fill: var(--accent-color);
+
+    --highlight-correct: #add8e6;
+    --selected-answer-bg: #add8e6;
+}
