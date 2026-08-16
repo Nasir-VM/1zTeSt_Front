@@ -157,7 +157,7 @@ import Layout from '../../layouts/Layout.astro';
   .section-title { font-size: 15px; font-weight: 600; color: var(--black); }
   .section-count { font-size: 12px; color: var(--gray-3); }
 
-  /* ── Source tabs (segmented) ── */
+  /* ── Source tabs (underline style, matches topnav) ── */
   .src-tab { padding: 7px 14px; font-size: 13px; font-weight: 500; color: var(--gray-2); background: transparent; border: none; cursor: pointer; transition: color 0.15s, border-color 0.15s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
   .src-tab:hover { color: #16a34a; }
   .src-tab.active { color: #16a34a; border-bottom-color: #16a34a; font-weight: 600; }
@@ -280,17 +280,19 @@ async function loadQuiz() {
   renderQuiz();
 }
 
-function quizScorePath(teacherKey, dateKey, studentSan, attemptKey) {
-  return 'QUIZSCORES/' + teacherKey + '/' + dateKey + '/' + studentSan + '/' + attemptKey;
+function quizScorePath(teacherKey, dateKey, studentSan, attemptKey, innerKey) {
+  let p = 'QUIZSCORES/' + teacherKey + '/' + dateKey + '/' + studentSan + '/' + attemptKey;
+  if (innerKey) p += '/' + innerKey;
+  return p;
 }
 
 async function editScore(path, cache, refresh) {
   const { value: v } = await Swal.fire({
     title: '輸入新分數',
-    text: '目前：' + (cache ? cache.score : '-'),
+    text: '目前：' + (cache && cache.score != null ? cache.score + (cache.total != null ? ' / ' + cache.total : '') : '-'),
     input: 'number',
     inputAttributes: { min: '0', step: '1' },
-    inputValue: cache ? cache.score : '',
+    inputValue: cache && cache.score != null ? cache.score : '',
     showCancelButton: true,
     confirmButtonText: '儲存',
     cancelButtonText: '取消',
@@ -323,44 +325,72 @@ function renderQuiz() {
   }
   document.getElementById('quiz-empty').classList.add('hidden');
   const q = (document.getElementById('quiz-search').value || '').trim().toLowerCase();
+  const forceOpen = !!q;
 
   Object.keys(quizData).sort().forEach(teacherKey => {
-    const teacherNode = buildNode('▶', teacherKey.replace(/,/g, '.'), '教師');
-    tree.appendChild(teacherNode);
+    const teacherDisplay = teacherKey.replace(/,/g, '.');
+    const datesAll = Object.keys(quizData[teacherKey] || {}).sort().reverse();
+    const teacherNode = buildNode('▶', teacherDisplay, '教師', (box) => {
+      datesAll.forEach(dateKey => {
+        const studentsAll = Object.keys(quizData[teacherKey][dateKey] || {}).sort();
+        const studentsMatch = q ? studentsAll.filter(s => {
+          const attempts = quizData[teacherKey][dateKey][s] || {};
+          return s.toLowerCase().includes(q) || Object.keys(attempts).some(k => {
+            const v = attempts[k];
+            const recs = v && v.score !== undefined ? [v] : Object.values(v || {});
+            return recs.some(r => (r.name || '').toLowerCase().includes(q) || (r.student || '').toLowerCase().includes(q));
+          });
+        }) : studentsAll;
+        if (q && !studentsMatch.length) return;
 
-    Object.keys(quizData[teacherKey] || {}).sort().reverse().forEach(dateKey => {
-      const studentsAll = Object.keys(quizData[teacherKey][dateKey] || {}).sort();
-      const studentsMatch = q ? studentsAll.filter(s => {
-        const attempts = quizData[teacherKey][dateKey][s] || {};
-        return s.toLowerCase().includes(q) || Object.keys(attempts).some(k => {
-          const r = attempts[k] || {};
-          return (r.name || '').toLowerCase().includes(q) || (r.student || '').toLowerCase().includes(q);
+        const dateNode = buildNode('▶', dateKey, studentsMatch.length + ' 位學生', (box) => {
+          studentsMatch.forEach(studentSan => {
+            const attempts = quizData[teacherKey][dateKey][studentSan] || {};
+            const attemptKeys = Object.keys(attempts);
+            const studentNode = buildNode('▶', studentSan, attemptKeys.length + ' 筆作答', (box) => {
+              attemptKeys.forEach(attemptKey => {
+                const inner = attempts[attemptKey];
+                if (inner && inner.score !== undefined) {
+                  // 舊格式：attemptKey 直接是成績
+                  const fullPath = quizScorePath(teacherKey, dateKey, studentSan, attemptKey);
+                  box.appendChild(buildScoreRow({
+                    name: inner.name || inner.student || attemptKey,
+                    sub: [inner.student || '', inner.type || '', inner.time || '', inner.date || ''].filter(Boolean).join(' · '),
+                    score: inner.score, total: inner.total,
+                    editCb: () => editScore(fullPath, inner, renderQuiz),
+                    delCb: () => deleteRecord(fullPath, inner.name || inner.student || attemptKey, renderQuiz)
+                  }));
+                } else {
+                  // 新格式：attemptKey 下還有一層真正的成績
+                  const innerKeys = inner && typeof inner === 'object' ? Object.keys(inner) : [];
+                  const attemptNode = buildNode('▶', attemptKey, innerKeys.length + ' 筆成績', (box) => {
+                    innerKeys.forEach(innerKey => {
+                      const rec = inner[innerKey] || {};
+                      const fullPath = quizScorePath(teacherKey, dateKey, studentSan, attemptKey, innerKey);
+                      box.appendChild(buildScoreRow({
+                        name: rec.name || rec.student || innerKey,
+                        sub: [rec.student || '', rec.type || '', rec.time || '', rec.date || ''].filter(Boolean).join(' · '),
+                        score: rec.score, total: rec.total,
+                        editCb: () => editScore(fullPath, rec, renderQuiz),
+                        delCb: () => deleteRecord(fullPath, rec.name || rec.student || innerKey, renderQuiz)
+                      }));
+                    });
+                  });
+                  box.appendChild(attemptNode);
+                  if (forceOpen) openNode(attemptNode);
+                }
+              });
+            });
+            box.appendChild(studentNode);
+            if (forceOpen) openNode(studentNode);
+          });
         });
-      }) : studentsAll;
-
-      if (q && !studentsMatch.length) return;
-
-      const dateNode = buildNode('▶', dateKey, studentsMatch.length + ' 位學生');
-      teacherNode.appendChild(dateNode);
-
-      studentsMatch.forEach(studentSan => {
-        const attempts = quizData[teacherKey][dateKey][studentSan] || {};
-        const studentNode = buildNode('▶', studentSan, Object.keys(attempts).length + ' 筆作答');
-        dateNode.appendChild(studentNode);
-
-        Object.keys(attempts).forEach(attemptKey => {
-          const rec = attempts[attemptKey] || {};
-          const fullPath = quizScorePath(teacherKey, dateKey, studentSan, attemptKey);
-          studentNode.appendChild(buildScoreRow({
-            name: rec.name || rec.student || attemptKey,
-            sub: [rec.student || '', rec.type || '', rec.time || '', rec.date || ''].filter(Boolean).join(' · '),
-            score: rec.score, total: rec.total,
-            editCb: () => editScore(fullPath, rec, renderQuiz),
-            delCb: () => deleteRecord(fullPath, rec.name || rec.student || attemptKey, renderQuiz)
-          }));
-        });
+        box.appendChild(dateNode);
+        if (forceOpen) openNode(dateNode);
       });
     });
+    tree.appendChild(teacherNode);
+    if (forceOpen) openNode(teacherNode);
   });
 }
 
@@ -380,11 +410,14 @@ function renderPvqc() {
   }
   document.getElementById('pvqc-empty').classList.add('hidden');
   const q = (document.getElementById('pvqc-search').value || '').trim().toLowerCase();
+  const forceOpen = !!q;
 
   Object.keys(pvqcData).sort().forEach(rootKey => {
-    const rootNode = buildNode('▶', rootKey, '資料區');
+    const rootNode = buildNode('▶', rootKey, '資料區', (box) => {
+      walkPvqc(rootKey, pvqcData[rootKey], box, q);
+    });
     tree.appendChild(rootNode);
-    walkPvqc(rootKey, pvqcData[rootKey], rootNode, q);
+    if (forceOpen) openNode(rootNode);
   });
 }
 
@@ -392,11 +425,11 @@ function isScoreRecord(v) {
   return v && typeof v === 'object' && v.score !== undefined;
 }
 
-function walkPvqc(pathPrefix, data, parentNode, q) {
+function walkPvqc(pathPrefix, data, parentBox, q) {
   if (!data || typeof data !== 'object') return;
   const keys = Object.keys(data);
   if (!keys.length) {
-    parentNode.appendChild(buildText('（空）'));
+    parentBox.appendChild(buildText('（空）'));
     return;
   }
 
@@ -406,7 +439,7 @@ function walkPvqc(pathPrefix, data, parentNode, q) {
       const haystack = [rec.student || '', rec.studentName || '', rec.studentId || '', rec.name || '', k].join(' ').toLowerCase();
       if (q && !haystack.includes(q)) return;
       const p = pathPrefix + '/' + k;
-      parentNode.appendChild(buildScoreRow({
+      parentBox.appendChild(buildScoreRow({
         name: rec.studentName || rec.studentId || rec.name || k,
         sub: [(rec.student || rec.studentId || ''), rec.time || rec.timestamp || rec.date || ''].filter(Boolean).join(' · '),
         score: rec.score, total: rec.total,
@@ -421,14 +454,16 @@ function walkPvqc(pathPrefix, data, parentNode, q) {
     const child = data[k];
     const childKeys = child && typeof child === 'object' ? Object.keys(child) : [];
     const recCount = childKeys.filter(ck => child[ck] && typeof child[ck] === 'object' && child[ck].score !== undefined).length;
-    const node = buildNode('▶', k, recCount ? recCount + ' 筆成績' : childKeys.length + ' 項');
-    parentNode.appendChild(node);
-    walkPvqc(pathPrefix + '/' + k, child, node, q);
+    const node = buildNode('▶', k.replace(/,/g, '.'), recCount ? recCount + ' 筆成績' : childKeys.length + ' 項', (box) => {
+      walkPvqc(pathPrefix + '/' + k, child, box, q);
+    });
+    parentBox.appendChild(node);
+    if (q) openNode(node);
   });
 }
 
 /* ══════════ UI builders ══════════ */
-function buildNode(caretSym, title, meta) {
+function buildNode(caretSym, title, meta, buildChildren) {
   const wrap = document.createElement('div');
   wrap.className = 'tree-node';
   const head = document.createElement('div');
@@ -438,19 +473,35 @@ function buildNode(caretSym, title, meta) {
       '<div class="min-w-0"><div class="node-title">' + esc(title) + '</div>' + (meta ? '<div class="node-meta">' + esc(meta) + '</div>' : '') + '</div>' +
     '</div>';
   wrap.appendChild(head);
+  wrap._buildChildren = buildChildren || null;
   head.addEventListener('click', () => {
-    const children = wrap.querySelector('.node-children');
-    if (children) {
-      children.remove();
-      wrap.querySelector('.caret').textContent = caretSym;
+    if (wrap.querySelector('.node-children')) {
+      collapseNode(wrap);
     } else {
-      const box = document.createElement('div');
-      box.className = 'node-children';
-      wrap.appendChild(box);
-      wrap.querySelector('.caret').textContent = '▼';
+      openNode(wrap);
     }
   });
   return wrap;
+}
+
+function openNode(wrap) {
+  if (wrap.querySelector('.node-children')) {
+    // 已開啟，確保其子層也建立（for force-open chains）
+    return;
+  }
+  const box = document.createElement('div');
+  box.className = 'node-children';
+  wrap.appendChild(box);
+  const caret = wrap.querySelector('.caret');
+  if (caret) caret.textContent = '▼';
+  if (wrap._buildChildren) wrap._buildChildren(box);
+}
+
+function collapseNode(wrap) {
+  const children = wrap.querySelector('.node-children');
+  if (children) children.remove();
+  const caret = wrap.querySelector('.caret');
+  if (caret) caret.textContent = '▶';
 }
 
 function buildText(t) {
@@ -468,7 +519,7 @@ function buildScoreRow(opts) {
       '<div class="score-name">' + esc(opts.name) + '</div>' +
       (opts.sub ? '<div class="score-sub">' + esc(opts.sub) + '</div>' : '') +
     '</div>' +
-    '<div class="score-val">' + (opts.score ?? '-') + (opts.total != null ? ' / ' + opts.total : '') + '</div>' +
+    '<div class="score-val">' + (opts.score != null ? opts.score : '-') + (opts.total != null ? ' / ' + opts.total : '') + '</div>' +
     '<div class="score-actions">' +
       '<button class="btn-mini green btn-edit-score">修改</button>' +
       '<button class="btn-mini red btn-del-score">刪除</button>' +
@@ -479,15 +530,16 @@ function buildScoreRow(opts) {
 }
 
 function expandAllNodes(container) {
-  container.querySelectorAll('.tree-node').forEach(node => {
-    if (!node.querySelector('.node-children')) {
-      const box = document.createElement('div');
-      box.className = 'node-children';
-      node.appendChild(box);
-      const caret = node.querySelector('.caret');
-      if (caret) { caret.textContent = '▼'; }
-    }
-  });
+  // 由上而下遞迴展開
+  const stack = [container];
+  while (stack.length) {
+    const el = stack.pop();
+    el.querySelectorAll(':scope > .tree-node').forEach(node => {
+      openNode(node);
+      const box = node.querySelector('.node-children');
+      if (box) stack.push(box);
+    });
+  }
 }
 
 function collapseAllNodes(container) {
@@ -502,8 +554,14 @@ function wireExpandButtons() {
   document.getElementById('btn-collapse-all-pvqc').onclick = () => collapseAllNodes(document.getElementById('pvqc-tree'));
 }
 
-document.getElementById('quiz-search').addEventListener('input', renderQuiz);
-document.getElementById('pvqc-search').addEventListener('input', renderPvqc);
+document.getElementById('quiz-search').addEventListener('input', () => {
+  document.getElementById('quiz-tree').replaceChildren();
+  renderQuiz();
+});
+document.getElementById('pvqc-search').addEventListener('input', () => {
+  document.getElementById('pvqc-tree').replaceChildren();
+  renderPvqc();
+});
 
 loadQuiz();
 loadPvqc();

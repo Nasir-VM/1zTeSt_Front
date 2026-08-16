@@ -263,20 +263,19 @@ function esc(s) {
 
 const db = window.fbDB;
 let TEACHERS = null;      // Teacherquestion snapshot
-let QUESTIONDATA = null;  // QuestionData snapshot
+let QUESTIONDATA = {};    // { teacherKey: { chapterId: {...} } } — lazy per-chapter cache
 let curSel = null;        // { teacherKey, chapterId, chapter }
 let qFilter = '';
+let qLoading = false;
 
-/* ── Load everything in one shot ── */
+/* ── Load teachers (lightweight) first ── */
 async function loadAll() {
   try {
-    const [tSnap, qdSnap] = await Promise.all([
-      db.ref('Teacherquestion').once('value'),
-      db.ref('QuestionData').once('value')
-    ]);
+    showToast('載入中...');
+    const tSnap = await db.ref('Teacherquestion').once('value');
     TEACHERS = tSnap.exists() ? tSnap.val() : null;
-    QUESTIONDATA = qdSnap.exists() ? qdSnap.val() : null;
     renderTeacherSelect();
+    showToast('題庫清單已載入');
   } catch (e) {
     console.error(e);
     showToast('載入失敗');
@@ -331,10 +330,36 @@ function renderChapters(teacherKey) {
     card.addEventListener('click', () => {
       curSel = { teacherKey, chapterId: chId, chapter: ch };
       renderChapters(teacherKey);
-      renderQuestions();
+      loadQuestions();
     });
     grid.appendChild(card);
   });
+}
+
+async function loadQuestions() {
+  const tbody = document.getElementById('q-tbody');
+  const empty = document.getElementById('q-empty');
+  tbody.replaceChildren();
+  if (!curSel) {
+    empty.classList.remove('hidden');
+    empty.textContent = '請先選擇教師與章節';
+    return;
+  }
+  const tk = curSel.teacherKey, chId = curSel.chapterId;
+  document.getElementById('q-current-title').textContent = curSel.chapter.name || chId;
+  document.getElementById('q-current-meta').textContent = (curSel.chapter.subject || '') + '　・　載入中...';
+  empty.classList.remove('hidden');
+  empty.textContent = '載入中...';
+
+  // 若未快取才抓取（lazy，單章節快）
+  if (!QUESTIONDATA[tk] || !QUESTIONDATA[tk][chId]) {
+    qLoading = true;
+    const snap = await db.ref('QuestionData/' + tk + '/' + chId).once('value');
+    qLoading = false;
+    if (!QUESTIONDATA[tk]) QUESTIONDATA[tk] = {};
+    QUESTIONDATA[tk][chId] = snap.exists() ? snap.val() : null;
+  }
+  renderQuestions();
 }
 
 function formatOptions(q) {
@@ -352,7 +377,7 @@ function renderQuestions() {
     empty.textContent = '請先選擇教師與章節';
     return;
   }
-  const data = QUESTIONDATA && QUESTIONDATA[curSel.teacherKey] && QUESTIONDATA[curSel.teacherKey][curSel.chapterId];
+  const data = QUESTIONDATA[curSel.teacherKey] && QUESTIONDATA[curSel.teacherKey][curSel.chapterId];
   document.getElementById('q-current-title').textContent = curSel.chapter.name || curSel.chapterId;
   document.getElementById('q-current-meta').textContent =
     (curSel.chapter.subject || '') + '　・　' + (data ? Object.keys(data).length : 0) + ' 題';
