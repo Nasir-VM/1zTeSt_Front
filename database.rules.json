@@ -20,30 +20,37 @@
       }
     },
     "Teacherquestion": {
-      ".read": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()",
+      ".read": "auth != null && (root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
       "$sanitizedEmail": {
         ".read": "auth != null",
         ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
         "chapters": {
           "$chapterId": {
             ".read": "auth != null",
-            "questions": {
-              ".read": "auth != null",
-              "$questionId": {
-                ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
-              }
-            }
+            ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
           }
+        }
+      }
+    },
+    "QuestionData": {
+      ".read": "auth != null && (root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+      "$sanitizedEmail": {
+        "$chapterId": {
+          ".read": "auth != null && (root.child('Teacherquestion').child($sanitizedEmail).child('chapters').child($chapterId).child('open').val() === true || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
         }
       }
     },
     "config": {
       "admins": {
-        ".read": "auth != null",
-        ".write": "auth != null"
+        ".read": "auth != null && (root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || auth.token.email === 'nasir101405@gmail.com')",
+        "$email": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()"
+        }
       },
       "teacherWhitelist": {
-        ".read": "auth != null",
+        ".read": "auth != null && (root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || auth.token.email === 'nasir101405@gmail.com')",
         "$email": {
           ".read": "auth != null",
           ".write": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()"
@@ -51,10 +58,9 @@
       }
     },
     "QUIZSCORES": {
-      ".read": "auth != null",
       ".write": "auth != null && (!data.exists() || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
       "$teacherSan": {
-        ".read": "auth != null",
+        ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
         ".write": "auth != null && (!data.exists() || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
       }
     },
@@ -63,10 +69,9 @@
       ".write": "auth != null"
     },
     "PVQCSCORES": {
-      ".read": "auth != null",
-      ".write": "auth != null && (!data.exists() || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+      ".read": "auth != null && (root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
       "$teacherSan": {
-        ".read": "auth != null",
+        ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
         ".write": "auth != null && (!data.exists() || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
       }
     },

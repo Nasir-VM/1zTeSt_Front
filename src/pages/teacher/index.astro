@@ -412,7 +412,7 @@ let questionPage = 0;
 
 async function loadQuestions() {
   const el = document.getElementById('question-list'); el.replaceChildren();
-  const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+  const dbPath = 'QuestionData/' + teacherSan + '/' + currentChapterKey;
   const snap = await firebase.database().ref(dbPath).once('value');
   if (!snap.exists()) {
     var empty = mkEl('div', { className: 'empty-state' });
@@ -442,7 +442,7 @@ function renderQuestionPage() {
     const editBtn = mkEl('button', { className: 'manage-btn' }, '編輯');
     editBtn.addEventListener('click', () => { editingQuestionKey = q._key; document.getElementById('q-text').value = q.question || ''; document.getElementById('q-a').value = q.A || ''; document.getElementById('q-b').value = q.B || ''; document.getElementById('q-c').value = q.C || ''; document.getElementById('q-d').value = q.D || ''; document.getElementById('q-answer').value = q.answer || ''; document.getElementById('q-explanation').value = q.explanation || ''; document.getElementById('question-form').classList.remove('hidden'); document.getElementById('question-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     const delBtn = mkEl('button', { className: 'delete-btn' }, '刪除');
-    delBtn.addEventListener('click', async () => { Swal.fire({ title: '確定刪除此題目？', icon: 'warning', showCancelButton: true, confirmButtonText: '刪除', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions/' + q._key).remove(); /* Update question_count */ const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap2 = await chRef.once('value'); await chRef.set(Math.max(0, (snap2.val() || 0) - 1)); /* Also update local chapter list */ const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = Math.max(0, ch.question_count - 1);     showToast('已刪除題目'); renderChapters(); loadQuestions(); } }); });
+    delBtn.addEventListener('click', async () => { Swal.fire({ title: '確定刪除此題目？', icon: 'warning', showCancelButton: true, confirmButtonText: '刪除', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref('QuestionData/' + teacherSan + '/' + currentChapterKey + '/' + q._key).remove(); /* Update question_count */ const chRef = firebase.database().ref('Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/question_count'); const snap2 = await chRef.once('value'); await chRef.set(Math.max(0, (snap2.val() || 0) - 1)); /* Also update local chapter list */ const ch = chapters.find(c => c.key === currentChapterKey); if (ch) ch.question_count = Math.max(0, ch.question_count - 1);     showToast('已刪除題目'); renderChapters(); loadQuestions(); } }); });
     const row = mkEl('div', { className: 'q-row flex items-start justify-between p-3', style: 'border:1px solid var(--border);border-radius:8px;transition:transform 0.2s cubic-bezier(0.16,1,0.3,1),box-shadow 0.2s;' }, left, mkEl('div', { className: 'flex gap-1' }, editBtn, delBtn));
     row.addEventListener('mouseenter', function() { row.style.transform = 'translateX(2px)'; row.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'; });
     row.addEventListener('mouseleave', function() { row.style.transform = ''; row.style.boxShadow = ''; });
@@ -464,7 +464,7 @@ document.getElementById('btn-save-question').addEventListener('click', async () 
   try {
     const q = document.getElementById('q-text').value.trim(); const A = document.getElementById('q-a').value.trim() || null; const B = document.getElementById('q-b').value.trim() || null; const C = document.getElementById('q-c').value.trim() || null; const D = document.getElementById('q-d').value.trim() || null; const ans = document.getElementById('q-answer').value.trim(); const ex = document.getElementById('q-explanation').value.trim() || null;
     if (!q || !ans) { Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '題目和答案不可為空', showConfirmButton: false, timer: 1800 }); return; }
-    const body = { question: q, A, B, C, D, answer: ans, explanation: ex }; const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+    const body = { question: q, A, B, C, D, answer: ans, explanation: ex }; const dbPath = 'QuestionData/' + teacherSan + '/' + currentChapterKey;
     if (editingQuestionKey) {
       await firebase.database().ref(dbPath + '/' + editingQuestionKey).update(body);
     } else {
@@ -502,7 +502,7 @@ document.getElementById('btn-do-import').addEventListener('click', async () => {
       Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: '無資料可匯入', showConfirmButton: false, timer: 1800 });
       return;
     }
-    const dbPath = 'Teacherquestion/' + teacherSan + '/chapters/' + currentChapterKey + '/questions';
+    const dbPath = 'QuestionData/' + teacherSan + '/' + currentChapterKey;
     console.log('[CSV] dbPath:', dbPath, 'currentChapterKey:', currentChapterKey);
     const batch = {};
     let imported = 0;

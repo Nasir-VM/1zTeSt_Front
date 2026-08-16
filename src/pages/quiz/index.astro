@@ -691,7 +691,7 @@ document.getElementById('chapter-select').addEventListener('change', async () =>
     const subjectSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters/' + chKey + '/subject').once('value');
     currentChapterSubject = subjectSnap.val() || '';
 
-    const questionsSnap = await firebase.database().ref('Teacherquestion/' + san + '/chapters/' + chKey + '/questions').once('value');
+    const questionsSnap = await firebase.database().ref('QuestionData/' + san + '/' + chKey).once('value');
     if (!questionsSnap.exists()) {
       Swal.fire({ icon: 'info', title: '這個章節還沒有題目喔～', text: '請稍後再試，或請老師出題。', timer: 2500, showConfirmButton: false });
       return;

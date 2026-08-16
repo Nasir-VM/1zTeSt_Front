@@ -391,16 +391,18 @@ async function loadDashboard() {
   try {
     const cached = cacheGet('dashboard');
     if (cached) { renderStats(cached.stats); renderUsers(cached.users); hideLoading(); return; }
-    const [sSnap, tSnap, qSnap, aSnap] = await Promise.all([
+    const [sSnap, tSnap, qSnap, aSnap, qdSnap] = await Promise.all([
       firebase.database().ref('1zTeStsys/Studentaccount').once('value'),
       firebase.database().ref('1zTeStsys/Teacheraccount').once('value'),
       firebase.database().ref('Teacherquestion').once('value'),
       firebase.database().ref('config/admins').once('value'),
+      firebase.database().ref('QuestionData').once('value'),
     ]);
     let tS = 0, tT = 0, tCh = 0, tQ = 0, tSc = 0;
     if (sSnap.exists()) tS = Object.keys(sSnap.val()).length;
     if (tSnap.exists()) { const d = tSnap.val(); tT = Object.keys(d).length; Object.keys(d).forEach(k => { const t = d[k]; if (t.Teacherscores) tSc += Object.keys(t.Teacherscores).length; }); }
-    if (qSnap.exists()) { const d = qSnap.val(); Object.keys(d).forEach(tk => { if (d[tk].chapters) Object.keys(d[tk].chapters).forEach(ck => { tCh++; if (d[tk].chapters[ck].questions) tQ += Object.keys(d[tk].chapters[ck].questions).length; }); }); }
+    if (qSnap.exists()) { const d = qSnap.val(); Object.keys(d).forEach(tk => { if (d[tk].chapters) tCh += Object.keys(d[tk].chapters).length; }); }
+    if (qdSnap.exists()) { const d = qdSnap.val(); Object.keys(d).forEach(tk => { if (d[tk]) Object.keys(d[tk]).forEach(ck => { if (d[tk][ck]) tQ += Object.keys(d[tk][ck]).length; }); }); }
     const stats = { totalMembers: tS + tT, totalStudents: tS, totalTeachers: tT, totalChapters: tCh, totalQuestions: tQ, totalScores: tSc };
     const allU = [];
     if (aSnap.exists()) { const a = aSnap.val(); Object.keys(a).forEach(k => allU.push({ email: a[k].email || k, role: 'admin', name: '', stunum: '' })); }
