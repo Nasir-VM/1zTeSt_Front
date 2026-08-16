@@ -169,23 +169,31 @@ import Layout from '../../layouts/Layout.astro';
 
   /* ── Tree ── */
   .tree-node { border: 1px solid var(--border); background: #fff; }
-  .node-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 16px; cursor: pointer; user-select: none; }
+  .node-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; user-select: none; }
   .node-head:hover { background: var(--gray-bg); }
+  .node-icon { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0; font-size: 12px; color: #fff; }
+  .node-icon.k-teacher { background: #1f2937; }
+  .node-icon.k-date { background: #16a34a; }
+  .node-icon.k-student { background: #2563eb; }
+  .node-icon.k-attempt { background: #d97706; }
+  .node-main { flex: 1; min-width: 0; }
   .node-title { font-size: 13px; font-weight: 600; color: var(--gray-1); word-break: break-all; }
-  .node-meta { font-size: 11px; color: var(--gray-3); margin-top: 2px; }
-  .node-children { border-top: 1px solid #f3f4f6; padding: 12px 14px; background: #fafafa; display: flex; flex-direction: column; gap: 8px; }
-  .caret { display: inline-block; width: 14px; font-size: 10px; color: #94a3b8; transition: transform 0.15s; }
+  .node-meta { font-size: 11px; color: var(--gray-3); margin-top: 1px; }
+  .node-children { border-top: 1px solid #f3f4f6; margin: 0 0 0 22px; padding: 10px 0 10px 18px; border-left: 2px solid #e5e5e5; background: #fcfcfc; display: flex; flex-direction: column; gap: 6px; }
+  .caret { display: inline-block; width: 16px; height: 16px; flex-shrink: 0; color: #94a3b8; transition: transform 0.15s; }
   .caret.open { transform: rotate(90deg); }
 
   /* ── Score rows ── */
-  .score-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #fff; border: 1px solid #f3f4f6; }
-  .score-row:hover { border-color: #d6d3d1; }
+  .score-row { display: flex; align-items: center; gap: 12px; padding: 9px 12px; background: #fff; border: 1px solid #eef0f2; border-radius: 8px; transition: border-color 0.15s, box-shadow 0.15s; }
+  .score-row:hover { border-color: #d6d3d1; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .score-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; padding: 6px 8px; background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; flex-shrink: 0; }
+  .score-badge-num { font-size: 14px; font-weight: 700; color: #15803d; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .score-badge-total { font-size: 9px; color: #86b79a; line-height: 1.2; }
   .score-info { flex: 1; min-width: 0; }
   .score-name { font-size: 13px; font-weight: 600; color: #111; }
-  .score-sub { font-size: 11px; color: #999; margin-top: 2px; word-break: break-all; }
-  .score-val { font-size: 15px; font-weight: 700; color: #166534; white-space: nowrap; }
+  .score-sub { font-size: 11px; color: #999; margin-top: 1px; word-break: break-all; }
   .score-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .btn-mini { padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border-radius: 4px; }
+  .btn-mini { padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border-radius: 6px; }
   .btn-mini.green { background: #16a34a; color: #fff; border: 1px solid #16a34a; }
   .btn-mini.green:hover { background: #15803d; }
   .btn-mini.red { background: #fff; color: #dc2626; border: 1px solid #fca5a5; }
@@ -330,7 +338,7 @@ function renderQuiz() {
   Object.keys(quizData).sort().forEach(teacherKey => {
     const teacherDisplay = teacherKey.replace(/,/g, '.');
     const datesAll = Object.keys(quizData[teacherKey] || {}).sort().reverse();
-    const teacherNode = buildNode('▶', teacherDisplay, '教師', (box) => {
+    const teacherNode = buildNode('teacher', teacherDisplay, '教師', (box) => {
       datesAll.forEach(dateKey => {
         const studentsAll = Object.keys(quizData[teacherKey][dateKey] || {}).sort();
         const studentsMatch = q ? studentsAll.filter(s => {
@@ -343,11 +351,11 @@ function renderQuiz() {
         }) : studentsAll;
         if (q && !studentsMatch.length) return;
 
-        const dateNode = buildNode('▶', dateKey, studentsMatch.length + ' 位學生', (box) => {
+        const dateNode = buildNode('date', dateKey, studentsMatch.length + ' 位學生', (box) => {
           studentsMatch.forEach(studentSan => {
             const attempts = quizData[teacherKey][dateKey][studentSan] || {};
             const attemptKeys = Object.keys(attempts);
-            const studentNode = buildNode('▶', studentSan, attemptKeys.length + ' 筆作答', (box) => {
+            const studentNode = buildNode('student', studentSan, attemptKeys.length + ' 筆作答', (box) => {
               attemptKeys.forEach(attemptKey => {
                 const inner = attempts[attemptKey];
                 if (inner && inner.score !== undefined) {
@@ -363,7 +371,7 @@ function renderQuiz() {
                 } else {
                   // 新格式：attemptKey 下還有一層真正的成績
                   const innerKeys = inner && typeof inner === 'object' ? Object.keys(inner) : [];
-                  const attemptNode = buildNode('▶', attemptKey, innerKeys.length + ' 筆成績', (box) => {
+                  const attemptNode = buildNode('attempt', attemptKey, innerKeys.length + ' 筆成績', (box) => {
                     innerKeys.forEach(innerKey => {
                       const rec = inner[innerKey] || {};
                       const fullPath = quizScorePath(teacherKey, dateKey, studentSan, attemptKey, innerKey);
@@ -420,9 +428,9 @@ function renderPvqc() {
     // ── 已知結構一：_ttvs/{teacherSan}/ttvs/{attempt} ──
     if (rootKey === '_ttvs') {
       rootLabel = 'TTVS 教師即時成績';
-      const rootNode = buildNode('▶', rootKey, rootLabel, (box) => {
+const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
         Object.keys(pvqcData[rootKey] || {}).forEach(teacherSan => {
-          const teacherNode = buildNode('▶', teacherSan.replace(/,/g, '.'), '教師', (box) => {
+          const teacherNode = buildNode('teacher', teacherSan.replace(/,/g, '.'), '教師', (box) => {
             const sub = pvqcData[rootKey][teacherSan] || {};
             walkPvqc('PVQCSCORES/_ttvs/' + teacherSan, sub, box, q);
           });
@@ -451,16 +459,16 @@ function renderPvqc() {
       });
       if (looksLikeDateTree) {
         rootLabel = '教師遷移成績（' + rootKey.replace(/,/g, '.') + '）';
-        const rootNode = buildNode('▶', rootKey.replace(/,/g, '.'), rootLabel, (box) => {
+        const rootNode = buildNode('folder', rootKey.replace(/,/g, '.'), rootLabel, (box) => {
           firstKeys.sort().reverse().forEach(dateKey => {
-            const dateNode = buildNode('▶', dateKey, '日期', (box) => {
+            const dateNode = buildNode('date', dateKey, '日期', (box) => {
               Object.keys(firstLevel[dateKey] || {}).forEach(stuId => {
                 const stuSub = firstLevel[dateKey][stuId] || {};
                 const stuKeys = Object.keys(stuSub);
-                const stuNode = buildNode('▶', stuId, stuKeys.length + ' 類', (box) => {
+                const stuNode = buildNode('student', stuId, stuKeys.length + ' 類', (box) => {
                   stuKeys.forEach(subType => {
                     const label = PVQC_LABELS[subType] || subType;
-                    const subNode = buildNode('▶', label, subType, (box) => {
+                    const subNode = buildNode('folder', label, subType, (box) => {
                       walkPvqc('PVQCSCORES/' + rootKey + '/' + dateKey + '/' + stuId + '/' + subType, stuSub[subType], box, q);
                     });
                     box.appendChild(subNode);
@@ -482,7 +490,7 @@ function renderPvqc() {
     }
 
     // ── 未知結構：通用巡覽 ──
-    const rootNode = buildNode('▶', rootKey, rootLabel, (box) => {
+    const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
       walkPvqc('PVQCSCORES/' + rootKey, pvqcData[rootKey], box, q);
     });
     tree.appendChild(rootNode);
@@ -523,7 +531,7 @@ function walkPvqc(pathPrefix, data, parentBox, q) {
     const child = data[k];
     const childKeys = child && typeof child === 'object' ? Object.keys(child) : [];
     const recCount = childKeys.filter(ck => child[ck] && typeof child[ck] === 'object' && child[ck].score !== undefined).length;
-    const node = buildNode('▶', k.replace(/,/g, '.'), recCount ? recCount + ' 筆成績' : childKeys.length + ' 項', (box) => {
+    const node = buildNode('folder', k.replace(/,/g, '.'), recCount ? recCount + ' 筆成績' : childKeys.length + ' 項', (box) => {
       walkPvqc(pathPrefix + '/' + k, child, box, q);
     });
     parentBox.appendChild(node);
@@ -532,15 +540,25 @@ function walkPvqc(pathPrefix, data, parentBox, q) {
 }
 
 /* ══════════ UI builders ══════════ */
-function buildNode(caretSym, title, meta, buildChildren) {
+const KIND_META = {
+  teacher: { icon: '教', cls: 'k-teacher' },
+  date:    { icon: '日', cls: 'k-date' },
+  student: { icon: '生', cls: 'k-student' },
+  attempt: { icon: '答', cls: 'k-attempt' },
+  folder:  { icon: '⊞', cls: 'k-attempt' },
+  blank:   { icon: '·', cls: 'k-date' }
+};
+
+function buildNode(kind, title, meta, buildChildren) {
+  const km = KIND_META[kind] || KIND_META.blank;
   const wrap = document.createElement('div');
   wrap.className = 'tree-node';
   const head = document.createElement('div');
   head.className = 'node-head';
   head.innerHTML =
-    '<div class="flex items-center gap-2 min-w-0"><span class="caret">' + caretSym + '</span>' +
-      '<div class="min-w-0"><div class="node-title">' + esc(title) + '</div>' + (meta ? '<div class="node-meta">' + esc(meta) + '</div>' : '') + '</div>' +
-    '</div>';
+    '<svg class="caret" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/></svg>' +
+    '<span class="node-icon ' + km.cls + '">' + km.icon + '</span>' +
+    '<div class="node-main"><div class="node-title">' + esc(title) + '</div>' + (meta ? '<div class="node-meta">' + esc(meta) + '</div>' : '') + '</div>';
   wrap.appendChild(head);
   wrap._buildChildren = buildChildren || null;
   head.addEventListener('click', () => {
@@ -555,14 +573,13 @@ function buildNode(caretSym, title, meta, buildChildren) {
 
 function openNode(wrap) {
   if (wrap.querySelector('.node-children')) {
-    // 已開啟，確保其子層也建立（for force-open chains）
     return;
   }
   const box = document.createElement('div');
   box.className = 'node-children';
   wrap.appendChild(box);
   const caret = wrap.querySelector('.caret');
-  if (caret) caret.textContent = '▼';
+  if (caret) caret.classList.add('open');
   if (wrap._buildChildren) wrap._buildChildren(box);
 }
 
@@ -570,7 +587,7 @@ function collapseNode(wrap) {
   const children = wrap.querySelector('.node-children');
   if (children) children.remove();
   const caret = wrap.querySelector('.caret');
-  if (caret) caret.textContent = '▶';
+  if (caret) caret.classList.remove('open');
 }
 
 function buildText(t) {
@@ -583,12 +600,14 @@ function buildText(t) {
 function buildScoreRow(opts) {
   const row = document.createElement('div');
   row.className = 'score-row';
+  const scoreNum = opts.score != null ? opts.score : '-';
+  const totalHtml = opts.total != null ? '<span class="score-badge-total">/ ' + opts.total + '</span>' : '';
   row.innerHTML =
+    '<div class="score-badge"><span class="score-badge-num">' + scoreNum + '</span>' + totalHtml + '</div>' +
     '<div class="score-info">' +
       '<div class="score-name">' + esc(opts.name) + '</div>' +
       (opts.sub ? '<div class="score-sub">' + esc(opts.sub) + '</div>' : '') +
     '</div>' +
-    '<div class="score-val">' + (opts.score != null ? opts.score : '-') + (opts.total != null ? ' / ' + opts.total : '') + '</div>' +
     '<div class="score-actions">' +
       '<button class="btn-mini green btn-edit-score">修改</button>' +
       '<button class="btn-mini red btn-del-score">刪除</button>' +
@@ -613,7 +632,7 @@ function expandAllNodes(container) {
 
 function collapseAllNodes(container) {
   container.querySelectorAll('.node-children').forEach(box => box.remove());
-  container.querySelectorAll('.caret').forEach(c => c.textContent = '▶');
+  container.querySelectorAll('.caret').forEach(c => c.classList.remove('open'));
 }
 
 function wireExpandButtons() {
