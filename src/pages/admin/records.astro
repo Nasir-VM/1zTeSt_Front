@@ -1,0 +1,439 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="成績冊">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+
+  <!-- Top Navbar -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <div class="topnav-left">
+        <a href="/" class="topnav-logo">1zTeSt</a>
+        <span class="topnav-divider"></span>
+        <span class="topnav-subtitle">成績冊</span>
+      </div>
+      <div class="topnav-tabs">
+        <a href="/admin/home" class="topnav-tab">總覽</a>
+        <button data-tab="dashboard" class="topnav-tab active">成績冊</button>
+        <a href="/ttvs/admin" class="topnav-tab">TTVS</a>
+        <a href="/" class="topnav-tab">回首頁</a>
+      </div>
+      <div class="topnav-right">
+        <div class="profile-menu">
+          <button id="profile-trigger" class="profile-btn">
+            <div id="avatar-circle" class="avatar"></div>
+            <svg class="chevron" id="profile-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+          </button>
+          <div id="profile-dropdown" class="dropdown">
+            <div class="dropdown-head">
+              <p class="dropdown-label">管理員</p>
+              <p id="dropdown-email" class="dropdown-email"></p>
+            </div>
+            <button id="dropdown-logout" class="dropdown-item danger">登出</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="main-content w-full flex-1">
+    <!-- Data source tabs -->
+    <div class="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3">
+      <button data-src="quiz" class="src-tab active">QUIZSCORES 一般測驗</button>
+      <button data-src="pvqc" class="src-tab">PVQCSCORES TTVS 成績</button>
+    </div>
+
+    <!-- QUIZSCORES panel -->
+    <section id="panel-quiz" class="panel p-5 border border-slate-200 shadow-sm bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800">一般測驗成績</h2>
+          <p class="text-xs text-slate-500 mt-0.5">教師 → 日期 → 學生 → 作答紀錄（點擊展開）</p>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input id="quiz-search" type="text" placeholder="搜尋學生/姓名..." class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-56" style="border-radius:0px;" />
+          <button id="btn-expand-all-quiz" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部展開</button>
+          <button id="btn-collapse-all" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部收合</button>
+        </div>
+      </div>
+      <div id="quiz-tree" class="space-y-3"></div>
+      <p id="quiz-empty" class="hidden py-8 text-center text-sm text-slate-400">尚無測驗成績</p>
+    </section>
+
+    <!-- PVQCSCORES panel -->
+    <section id="panel-pvqc" class="panel p-5 border border-slate-200 shadow-sm bg-white hidden">
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800">TTVS 成績</h2>
+          <p class="text-xs text-slate-500 mt-0.5">含 _ttvs、舊版 pvqc_scores 與殘留節點（點擊展開）</p>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input id="pvqc-search" type="text" placeholder="搜尋學生/姓名..." class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-56" style="border-radius:0px;" />
+          <button id="btn-expand-all-pvqc" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部展開</button>
+          <button id="btn-collapse-all-pvqc" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部收合</button>
+        </div>
+      </div>
+      <div id="pvqc-tree" class="space-y-3"></div>
+      <p id="pvqc-empty" class="hidden py-8 text-center text-sm text-slate-400">尚無 TTVS 成績</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast-wrap"></div>
+</Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+  :root { --black:#111; --gray-1:#333; --gray-2:#666; --gray-3:#999; --gray-4:#ccc; --gray-bg:#f5f5f5; --white:#fff; --border:#e5e5e5; }
+  body { font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
+  .topnav { position:sticky; top:0; z-index:40; background:rgba(255,255,255,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); }
+  .topnav-inner { display:flex; align-items:center; gap:16px; max-width:1200px; margin:0 auto; padding:0 24px; height:56px; }
+  .topnav-left { display:flex; align-items:center; gap:12px; }
+  .topnav-logo { font-family:"Georgia","Noto Serif TC",serif; font-size:18px; font-weight:700; color:#111; }
+  .topnav-divider { width:1px; height:18px; background:var(--border); }
+  .topnav-subtitle { font-size:13px; color:var(--gray-2); }
+  .topnav-tabs { display:flex; align-items:center; gap:4px; flex:1; }
+  .topnav-tab { padding:6px 12px; font-size:13px; color:var(--gray-2); text-decoration:none; border-radius:6px; transition:all .15s; cursor:pointer; }
+  .topnav-tab:hover { color:#111; background:#f5f5f5; }
+  .topnav-tab.active { color:#166534; background:#f0fdf4; font-weight:600; }
+  .topnav-right { display:flex; align-items:center; gap:12px; }
+  .profile-btn { display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; padding:4px; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:#166534; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; overflow:hidden; }
+  .chevron { width:14px; height:14px; color:var(--gray-3); transition:transform .2s; }
+  .chevron.open { transform:rotate(180deg); }
+  .profile-menu { position:relative; }
+  .dropdown { position:absolute; right:0; top:44px; width:220px; background:#fff; border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,.08); opacity:0; pointer-events:none; transform:translateY(-6px); transition:all .18s; z-index:50; }
+  .dropdown.open { opacity:1; pointer-events:auto; transform:translateY(0); }
+  .dropdown-head { padding:14px 16px; border-bottom:1px solid var(--border); }
+  .dropdown-label { font-size:11px; color:var(--gray-3); }
+  .dropdown-email { font-size:13px; color:#111; font-weight:600; word-break:break-all; }
+  .dropdown-item { display:block; width:100%; text-align:left; padding:12px 16px; font-size:13px; background:none; border:none; cursor:pointer; transition:background .15s; }
+  .dropdown-item:hover { background:#f5f5f5; }
+  .dropdown-item.danger { color:#dc2626; }
+  .main-content { max-width:1200px; margin:0 auto; padding:28px 24px; }
+  .src-tab { padding:7px 14px; font-size:13px; font-weight:600; color:#64748b; background:transparent; border:1px solid transparent; cursor:pointer; transition:all .15s; }
+  .src-tab:hover { color:#111; background:#f5f5f5; }
+  .src-tab.active { color:#166534; background:#f0fdf4; border-color:#bbf7d0; border-radius:8px; }
+  .tree-node { border:1px solid var(--border); background:#fff; }
+  .node-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 16px; cursor:pointer; user-select:none; }
+  .node-head:hover { background:#fafafa; }
+  .node-title { font-size:13px; font-weight:600; color:#1f2937; word-break:break-all; }
+  .node-meta { font-size:11px; color:#999; margin-top:2px; }
+  .node-children { border-top:1px solid #f3f4f6; padding:12px 14px; background:#fafafa; display:flex; flex-direction:column; gap:8px; }
+  .caret { display:inline-block; width:14px; font-size:10px; color:#94a3b8; transition:transform .15s; }
+  .caret.open { transform:rotate(90deg); }
+  .score-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; background:#fff; border:1px solid #f3f4f6; }
+  .score-row:hover { border-color:#d6d3d1; }
+  .score-info { flex:1; min-width:0; }
+  .score-name { font-size:13px; font-weight:600; color:#111; }
+  .score-sub { font-size:11px; color:#999; margin-top:2px; word-break:break-all; }
+  .score-val { font-size:15px; font-weight:700; color:#166534; white-space:nowrap; }
+  .score-actions { display:flex; gap:6px; flex-shrink:0; }
+  .btn-mini { padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; border-radius:4px; }
+  .btn-mini.green { background:#16a34a; color:#fff; border:1px solid #16a34a; }
+  .btn-mini.green:hover { background:#15803d; }
+  .btn-mini.red { background:#fff; color:#dc2626; border:1px solid #fca5a5; }
+  .btn-mini.red:hover { background:#fef2f2; }
+  .toast-wrap { position:fixed; top:16px; right:16px; z-index:100; display:flex; flex-direction:column; gap:8px; }
+  .toast-item { background:#111; color:#fff; padding:10px 18px; font-size:13px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.2); animation:fadeIn .2s; }
+  .toast-item.out { opacity:0; transition:opacity .2s; }
+  .no-match { padding:20px; text-align:center; font-size:12px; color:#999; background:#fff; border:1px dashed var(--border); }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  @media (max-width:640px) {
+    .topnav-inner { padding:0 12px; gap:8px; }
+    .topnav-tab { padding:6px 8px; font-size:12px; }
+    .main-content { padding:20px 16px; }
+    .score-actions { flex-direction:column; }
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email || !window.isAdminEmail(user.email)) {
+  window.location.href = BP + '/admin/login';
+} else {
+  document.getElementById('auth-guard')?.remove();
+}
+
+const avatarEl = document.getElementById('avatar-circle');
+const dropdownEmail = document.getElementById('dropdown-email');
+if (user?.email) {
+  if (user.photoURL) {
+    avatarEl.innerHTML = '<img src="' + user.photoURL + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />';
+  } else {
+    avatarEl.textContent = user.email[0].toUpperCase();
+  }
+  dropdownEmail.textContent = user.email;
+}
+let ddOpen = false;
+const dd = document.getElementById('profile-dropdown');
+const chev = document.getElementById('profile-chevron');
+document.getElementById('profile-trigger')?.addEventListener('click', e => { e.stopPropagation(); ddOpen = !ddOpen; dd.classList.toggle('open', ddOpen); chev.classList.toggle('open', ddOpen); });
+document.addEventListener('click', () => { if (ddOpen) { ddOpen = false; dd.classList.remove('open'); chev.classList.remove('open'); } });
+dd?.addEventListener('click', e => e.stopPropagation());
+
+function showToast(msg) {
+  const w = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item'; el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+const db = window.fbDB;
+let quizData = null;
+let pvqcData = null;
+
+/* ── Tab switching ── */
+document.querySelectorAll('.src-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.src-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const isQuiz = btn.dataset.src === 'quiz';
+    document.getElementById('panel-quiz').classList.toggle('hidden', !isQuiz);
+    document.getElementById('panel-pvqc').classList.toggle('hidden', isQuiz);
+  });
+});
+
+/* ══════════ QUIZSCORES ══════════ */
+async function loadQuiz() {
+  const snap = await db.ref('QUIZSCORES').once('value');
+  quizData = snap.exists() ? snap.val() : null;
+  renderQuiz();
+}
+
+function quizScorePath(teacherKey, dateKey, studentSan, attemptKey) {
+  return 'QUIZSCORES/' + teacherKey + '/' + dateKey + '/' + studentSan + '/' + attemptKey;
+}
+
+async function editScore(path, cache, refresh) {
+  const { value: v } = await Swal.fire({
+    title: '輸入新分數', input: 'number', inputAttributes: { min: '0', step: '1' },
+    showCancelButton: true, confirmButtonText: '儲存', cancelButtonText: '取消', allowOutsideClick: () => !Swal.isLoading()
+  });
+  if (v === null || v === undefined || v === '') return;
+  try {
+    await db.ref(path + '/score').set(Number(v));
+    if (cache) cache.score = Number(v);
+    showToast('已更新分數');
+    if (refresh) refresh();
+  } catch (e) { showToast('更新失敗'); console.error(e); }
+}
+
+async function deleteRecord(path, refresh) {
+  if (!confirm('確定刪除這筆紀錄？此操作無法復原！')) return;
+  try {
+    await db.ref(path).remove();
+    showToast('已刪除紀錄');
+    if (refresh) refresh();
+  } catch (e) { showToast('刪除失敗'); console.error(e); }
+}
+
+function renderQuiz() {
+  const tree = document.getElementById('quiz-tree');
+  tree.replaceChildren();
+  if (!quizData || !Object.keys(quizData).length) {
+    document.getElementById('quiz-empty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('quiz-empty').classList.add('hidden');
+  const q = (document.getElementById('quiz-search').value || '').trim().toLowerCase();
+
+  Object.keys(quizData).sort().forEach(teacherKey => {
+    const teacherNode = buildNode('▶', teacherKey, '教師');
+    tree.appendChild(teacherNode);
+
+    Object.keys(quizData[teacherKey] || {}).sort().reverse().forEach(dateKey => {
+      const studentsAll = Object.keys(quizData[teacherKey][dateKey] || {}).sort();
+      const studentsMatch = q ? studentsAll.filter(s => {
+        const attempts = quizData[teacherKey][dateKey][s] || {};
+        return s.toLowerCase().includes(q) || Object.keys(attempts).some(k => {
+          const r = attempts[k] || {};
+          return (r.name || '').toLowerCase().includes(q) || (r.student || '').toLowerCase().includes(q);
+        });
+      }) : studentsAll;
+
+      if (q && !studentsMatch.length) return;
+
+      const dateNode = buildNode('▶', dateKey, studentsMatch.length + ' 位學生');
+      teacherNode.appendChild(dateNode);
+
+      studentsMatch.forEach(studentSan => {
+        const attempts = quizData[teacherKey][dateKey][studentSan] || {};
+        const studentNode = buildNode('▶', studentSan, Object.keys(attempts).length + ' 筆作答');
+        dateNode.appendChild(studentNode);
+
+        Object.keys(attempts).forEach(attemptKey => {
+          const rec = attempts[attemptKey] || {};
+          const fullPath = quizScorePath(teacherKey, dateKey, studentSan, attemptKey);
+          studentNode.appendChild(buildScoreRow({
+            name: rec.name || rec.student || attemptKey,
+            sub: [rec.student || '', rec.type || '', rec.time || '', rec.date || ''].filter(Boolean).join(' · '),
+            score: rec.score, total: rec.total,
+            editCb: () => editScore(fullPath, rec, renderQuiz),
+            delCb: () => deleteRecord(fullPath, renderQuiz)
+          }));
+        });
+      });
+    });
+  });
+}
+
+/* ══════════ PVQCSCORES ══════════ */
+async function loadPvqc() {
+  const snap = await db.ref('PVQCSCORES').once('value');
+  pvqcData = snap.exists() ? snap.val() : null;
+  renderPvqc();
+}
+
+function renderPvqc() {
+  const tree = document.getElementById('pvqc-tree');
+  tree.replaceChildren();
+  if (!pvqcData || !Object.keys(pvqcData).length) {
+    document.getElementById('pvqc-empty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('pvqc-empty').classList.add('hidden');
+  const q = (document.getElementById('pvqc-search').value || '').trim().toLowerCase();
+
+  Object.keys(pvqcData).sort().forEach(rootKey => {
+    const rootNode = buildNode('▶', rootKey, '資料區');
+    tree.appendChild(rootNode);
+    walkPvqc(rootKey, pvqcData[rootKey], rootNode, q);
+  });
+}
+
+function isScoreRecord(v) {
+  return v && typeof v === 'object' && v.score !== undefined;
+}
+
+function walkPvqc(pathPrefix, data, parentNode, q) {
+  if (!data || typeof data !== 'object') return;
+  const keys = Object.keys(data);
+  if (!keys.length) {
+    parentNode.appendChild(buildText('（空）'));
+    return;
+  }
+
+  if (keys.every(k => isScoreRecord(data[k]))) {
+    keys.forEach(k => {
+      const rec = data[k] || {};
+      const haystack = [rec.student || '', rec.studentName || '', rec.studentId || '', rec.name || '', k].join(' ').toLowerCase();
+      if (q && !haystack.includes(q)) return;
+      const p = pathPrefix + '/' + k;
+      parentNode.appendChild(buildScoreRow({
+        name: rec.studentName || rec.studentId || rec.name || k,
+        sub: [(rec.student || rec.studentId || ''), rec.time || rec.timestamp || rec.date || ''].filter(Boolean).join(' · '),
+        score: rec.score, total: rec.total,
+        editCb: () => editScore(p, rec, renderPvqc),
+        delCb: () => deleteRecord(p, renderPvqc)
+      }));
+    });
+    return;
+  }
+
+  keys.forEach(k => {
+    const child = data[k];
+    const childKeys = child && typeof child === 'object' ? Object.keys(child) : [];
+    const recCount = childKeys.filter(ck => child[ck] && typeof child[ck] === 'object' && child[ck].score !== undefined).length;
+    const node = buildNode('▶', k, recCount ? recCount + ' 筆成績' : childKeys.length + ' 項');
+    parentNode.appendChild(node);
+    walkPvqc(pathPrefix + '/' + k, child, node, q);
+  });
+}
+
+/* ══════════ UI builders ══════════ */
+function buildNode(caretSym, title, meta) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tree-node';
+  const head = document.createElement('div');
+  head.className = 'node-head';
+  head.innerHTML =
+    '<div class="flex items-center gap-2 min-w-0"><span class="caret">' + caretSym + '</span>' +
+      '<div class="min-w-0"><div class="node-title">' + esc(title) + '</div>' + (meta ? '<div class="node-meta">' + esc(meta) + '</div>' : '') + '</div>' +
+    '</div>';
+  wrap.appendChild(head);
+  head.addEventListener('click', () => {
+    const children = wrap.querySelector('.node-children');
+    if (children) {
+      children.remove();
+      wrap.querySelector('.caret').textContent = caretSym;
+    } else {
+      const box = document.createElement('div');
+      box.className = 'node-children';
+      wrap.appendChild(box);
+      wrap.querySelector('.caret').textContent = '▼';
+    }
+  });
+  return wrap;
+}
+
+function buildText(t) {
+  const d = document.createElement('div');
+  d.className = 'no-match';
+  d.textContent = t;
+  return d;
+}
+
+function buildScoreRow(opts) {
+  const row = document.createElement('div');
+  row.className = 'score-row';
+  row.innerHTML =
+    '<div class="score-info">' +
+      '<div class="score-name">' + esc(opts.name) + '</div>' +
+      (opts.sub ? '<div class="score-sub">' + esc(opts.sub) + '</div>' : '') +
+    '</div>' +
+    '<div class="score-val">' + (opts.score ?? '-') + (opts.total != null ? ' / ' + opts.total : '') + '</div>' +
+    '<div class="score-actions">' +
+      '<button class="btn-mini green btn-edit-score">修改</button>' +
+      '<button class="btn-mini red btn-del-score">刪除</button>' +
+    '</div>';
+  row.querySelector('.btn-edit-score').addEventListener('click', opts.editCb);
+  row.querySelector('.btn-del-score').addEventListener('click', opts.delCb);
+  return row;
+}
+
+function expandAllNodes(container) {
+  container.querySelectorAll('.tree-node').forEach(node => {
+    if (!node.querySelector('.node-children')) {
+      const box = document.createElement('div');
+      box.className = 'node-children';
+      node.appendChild(box);
+      const caret = node.querySelector('.caret');
+      if (caret) { caret.textContent = '▼'; }
+    }
+  });
+}
+
+function collapseAllNodes(container) {
+  container.querySelectorAll('.node-children').forEach(box => box.remove());
+  container.querySelectorAll('.caret').forEach(c => c.textContent = '▶');
+}
+
+function wireExpandButtons() {
+  document.getElementById('btn-expand-all-quiz').onclick = () => expandAllNodes(document.getElementById('quiz-tree'));
+  document.getElementById('btn-collapse-all').onclick = () => collapseAllNodes(document.getElementById('quiz-tree'));
+  document.getElementById('btn-expand-all-pvqc').onclick = () => expandAllNodes(document.getElementById('pvqc-tree'));
+  document.getElementById('btn-collapse-all-pvqc').onclick = () => collapseAllNodes(document.getElementById('pvqc-tree'));
+}
+
+document.getElementById('quiz-search').addEventListener('input', renderQuiz);
+document.getElementById('pvqc-search').addEventListener('input', renderPvqc);
+
+document.getElementById('dropdown-logout')?.addEventListener('click', async () => {
+  try { await window.fbAuth.signOut(); } catch (e) {}
+  localStorage.removeItem('fb_user');
+  localStorage.removeItem('last_activity');
+  window.location.href = BP + '/';
+});
+
+loadQuiz();
+loadPvqc();
+wireExpandButtons();
+</script>

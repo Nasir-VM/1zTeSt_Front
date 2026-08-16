@@ -425,8 +425,8 @@ function renderStats(s) {
   const cards = [
     { l: '會員數', v: s.totalMembers, sub: '學生 ' + s.totalStudents + '　教師 ' + s.totalTeachers },
     { l: '章節', v: s.totalChapters },
-    { l: '題目', v: s.totalQuestions },
-    { l: '測驗紀錄', v: s.totalScores }
+    { l: '題目', v: s.totalQuestions, link: BP + '/admin/questions' },
+    { l: '測驗紀錄', v: s.totalScores, link: BP + '/admin/records' }
   ];
   const g = document.getElementById('stats-grid'); g.replaceChildren();
   cards.forEach((c, i) => {
@@ -437,6 +437,11 @@ function renderStats(s) {
     );
     if (c.sub) info.appendChild(mkEl('p', { className: 'stat-sub' }, c.sub));
     const card = mkEl('div', { className: 'stat-card' }, img, info);
+    if (c.link) {
+      card.style.cursor = 'pointer';
+      card.title = '前往查看';
+      card.addEventListener('click', () => { window.location.href = c.link; });
+    }
     card.style.animationDelay = (i * 0.06) + 's';
     g.appendChild(card);
   });

@@ -1,0 +1,362 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="所有題目">
+  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
+
+  <!-- Top Navbar -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <div class="topnav-left">
+        <a href="/" class="topnav-logo">1zTeSt</a>
+        <span class="topnav-divider"></span>
+        <span class="topnav-subtitle">所有題目</span>
+      </div>
+      <div class="topnav-tabs">
+        <a href="/admin/home" class="topnav-tab">總覽</a>
+        <button data-tab="dashboard" class="topnav-tab active">所有題目</button>
+        <a href="/ttvs/admin" class="topnav-tab">TTVS</a>
+        <a href="/" class="topnav-tab">回首頁</a>
+      </div>
+      <div class="topnav-right">
+        <div class="profile-menu">
+          <button id="profile-trigger" class="profile-btn">
+            <div id="avatar-circle" class="avatar"></div>
+            <svg class="chevron" id="profile-chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+          </button>
+          <div id="profile-dropdown" class="dropdown">
+            <div class="dropdown-head">
+              <p class="dropdown-label">管理員</p>
+              <p id="dropdown-email" class="dropdown-email"></p>
+            </div>
+            <button id="dropdown-logout" class="dropdown-item danger">登出</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="main-content w-full flex-1">
+    <!-- Teacher Selector -->
+    <div class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800">選擇教師</h2>
+          <p class="text-xs text-slate-500 mt-0.5">查看該教師的所有章節與題目</p>
+        </div>
+        <select id="teacher-select" class="border border-slate-200 px-4 py-2 text-sm text-slate-700 focus:border-slate-800 focus:outline-none bg-white min-w-[260px]" style="border-radius:0px;">
+          <option value="">-- 載入中... --</option>
+        </select>
+      </div>
+
+      <!-- Chapters grid -->
+      <div id="chapters-wrap" class="mt-6">
+        <div id="chapters-hint" class="py-10 text-center text-sm text-slate-400">請先選擇教師</div>
+      </div>
+    </div>
+
+    <!-- Question list of selected chapter -->
+    <div id="questions-panel" class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white hidden">
+      <div class="flex items-center justify-between flex-wrap gap-3 border-b border-slate-200 pb-3 mb-4">
+        <div>
+          <h2 id="questions-title" class="text-sm font-bold text-slate-800">題目列表</h2>
+          <p id="questions-sub" class="text-xs text-slate-500 mt-0.5"></p>
+        </div>
+        <button id="btn-delete-chapter" class="text-xs font-semibold px-4 py-2 text-red-600 border border-red-300 bg-white hover:bg-red-50 transition" style="border-radius:0px;">刪除整個章節</button>
+      </div>
+      <div id="questions-list" class="space-y-3"></div>
+      <p id="questions-empty" class="hidden py-8 text-center text-sm text-slate-400">此章節沒有題目</p>
+    </div>
+  </main>
+
+  <div id="toast" class="toast-wrap"></div>
+</Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+  :root { --black:#111; --gray-1:#333; --gray-2:#666; --gray-3:#999; --gray-4:#ccc; --gray-bg:#f5f5f5; --white:#fff; --border:#e5e5e5; }
+  body { font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
+  .topnav { position:sticky; top:0; z-index:40; background:rgba(255,255,255,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); }
+  .topnav-inner { display:flex; align-items:center; gap:16px; max-width:1200px; margin:0 auto; padding:0 24px; height:56px; }
+  .topnav-left { display:flex; align-items:center; gap:12px; }
+  .topnav-logo { font-family:"Georgia","Noto Serif TC",serif; font-size:18px; font-weight:700; color:#111; }
+  .topnav-divider { width:1px; height:18px; background:var(--border); }
+  .topnav-subtitle { font-size:13px; color:var(--gray-2); }
+  .topnav-tabs { display:flex; align-items:center; gap:4px; flex:1; }
+  .topnav-tab { padding:6px 12px; font-size:13px; color:var(--gray-2); text-decoration:none; border-radius:6px; transition:all .15s; cursor:pointer; }
+  .topnav-tab:hover { color:#111; background:#f5f5f5; }
+  .topnav-tab.active { color:#166534; background:#f0fdf4; font-weight:600; }
+  .topnav-right { display:flex; align-items:center; gap:12px; }
+  .profile-btn { display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; padding:4px; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:#166534; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; overflow:hidden; }
+  .chevron { width:14px; height:14px; color:var(--gray-3); transition:transform .2s; }
+  .chevron.open { transform:rotate(180deg); }
+  .profile-menu { position:relative; }
+  .dropdown { position:absolute; right:0; top:44px; width:220px; background:#fff; border:1px solid var(--border); box-shadow:0 8px 24px rgba(0,0,0,.08); opacity:0; pointer-events:none; transform:translateY(-6px); transition:all .18s; z-index:50; }
+  .dropdown.open { opacity:1; pointer-events:auto; transform:translateY(0); }
+  .dropdown-head { padding:14px 16px; border-bottom:1px solid var(--border); }
+  .dropdown-label { font-size:11px; color:var(--gray-3); }
+  .dropdown-email { font-size:13px; color:#111; font-weight:600; word-break:break-all; }
+  .dropdown-item { display:block; width:100%; text-align:left; padding:12px 16px; font-size:13px; background:none; border:none; cursor:pointer; transition:background .15s; }
+  .dropdown-item:hover { background:#f5f5f5; }
+  .dropdown-item.danger { color:#dc2626; }
+  .main-content { max-width:1200px; margin:0 auto; padding:28px 24px; }
+  .panel { background:#fff; border:1px solid var(--border); }
+  .chapter-card { border:1px solid var(--border); transition:all .15s; background:#fff; cursor:pointer; }
+  .chapter-card:hover { border-color:#bbf7d0; box-shadow:0 4px 12px rgba(0,0,0,.05); }
+  .chapter-card.selected { border-color:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,.15); }
+  .open-badge { display:inline-block; padding:2px 8px; font-size:11px; font-weight:600; border-radius:9999px; }
+  .open-badge.open { background:#dcfce7; color:#166534; }
+  .open-badge.closed { background:#f1f5f9; color:#64748b; }
+  .q-item { border:1px solid var(--border); padding:16px; transition:border-color .15s; }
+  .q-item:hover { border-color:#d6d3d1; }
+  .q-title { font-size:13px; font-weight:700; color:#1f2937; line-height:1.6; }
+  .q-option { font-size:13px; color:#4b5563; padding:8px 12px; background:#f9fafb; border:1px solid #f3f4f6; margin-top:6px; line-height:1.5; }
+  .q-option.correct { background:#f0fdf4; border-color:#bbf7d0; color:#166534; font-weight:600; }
+  .q-answer { display:inline-block; margin-top:10px; padding:4px 10px; font-size:12px; font-weight:600; background:#fefce8; color:#a16207; border:1px solid #fef08a; }
+  .q-explain { margin-top:8px; font-size:12px; color:#6b7280; }
+  .empty-msg { padding:40px 0; text-align:center; font-size:14px; color:#999; }
+  .toast-wrap { position:fixed; top:16px; right:16px; z-index:100; display:flex; flex-direction:column; gap:8px; }
+  .toast-item { background:#111; color:#fff; padding:10px 18px; font-size:13px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.2); animation:fadeIn .2s; }
+  .toast-item.out { opacity:0; transition:opacity .2s; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-bottom:20px; }
+  .teacher-stat { border:1px solid var(--border); padding:14px 16px; background:#fff; }
+  .teacher-stat-name { font-size:12px; font-weight:600; color:#111; word-break:break-all; }
+  .teacher-stat-meta { font-size:11px; color:#999; margin-top:3px; }
+  @media (max-width:640px) {
+    .topnav-inner { padding:0 12px; gap:8px; }
+    .topnav-tab { padding:6px 8px; font-size:12px; }
+    .main-content { padding:20px 16px; }
+  }
+</style>
+
+<script is:inline>
+const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
+const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email || !window.isAdminEmail(user.email)) {
+  window.location.href = BP + '/admin/login';
+} else {
+  document.getElementById('auth-guard')?.remove();
+}
+
+const avatarEl = document.getElementById('avatar-circle');
+const dropdownEmail = document.getElementById('dropdown-email');
+if (user?.email) {
+  if (user.photoURL) {
+    avatarEl.innerHTML = '<img src="' + user.photoURL + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />';
+  } else {
+    avatarEl.textContent = user.email[0].toUpperCase();
+  }
+  dropdownEmail.textContent = user.email;
+}
+let ddOpen = false;
+const dd = document.getElementById('profile-dropdown');
+const chev = document.getElementById('profile-chevron');
+document.getElementById('profile-trigger')?.addEventListener('click', e => { e.stopPropagation(); ddOpen = !ddOpen; dd.classList.toggle('open', ddOpen); chev.classList.toggle('open', ddOpen); });
+document.addEventListener('click', () => { if (ddOpen) { ddOpen = false; dd.classList.remove('open'); chev.classList.remove('open'); } });
+dd?.addEventListener('click', e => e.stopPropagation());
+
+function showToast(msg) {
+  const w = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item'; el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+let teacherMeta = {};  // { san: { chapters: {...} } } from Teacherquestion
+let currentTeacher = null;
+let currentChapter = null;
+
+const teacherSelect = document.getElementById('teacher-select');
+const chaptersWrap = document.getElementById('chapters-wrap');
+const questionsPanel = document.getElementById('questions-panel');
+
+/* ── Load all teachers ── */
+async function loadTeachers() {
+  const snap = await window.fbDB.ref('Teacherquestion').once('value');
+  teacherMeta = snap.exists() ? snap.val() : {};
+  teacherSelect.innerHTML = '<option value="">' + (Object.keys(teacherMeta).length ? '-- 選擇教師 --' : '-- 尚無教師題庫 --') + '</option>';
+  Object.keys(teacherMeta).forEach(san => {
+    const opt = document.createElement('option');
+    opt.value = san;
+    opt.textContent = san;
+    teacherSelect.appendChild(opt);
+  });
+}
+
+/* ── Render chapters of selected teacher ── */
+function renderChapters() {
+  const data = teacherMeta[currentTeacher];
+  const wrap = document.createElement('div');
+  if (!data || !data.chapters || !Object.keys(data.chapters).length) {
+    wrap.innerHTML = '<div class="py-10 text-center text-sm text-slate-400">此教師尚無章節</div>';
+    chaptersWrap.replaceChildren(wrap);
+    questionsPanel.classList.add('hidden');
+    return;
+  }
+  const stat = document.createElement('div');
+  stat.className = 'stats-grid';
+  stat.innerHTML = '<div class="teacher-stat"><div class="teacher-stat-name">' + esc(currentTeacher) + '</div><div class="teacher-stat-meta">' + Object.keys(data.chapters).length + ' 個章節</div></div>';
+  wrap.appendChild(stat);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+  Object.keys(data.chapters).forEach(chId => {
+    const ch = data.chapters[chId];
+    const card = document.createElement('div');
+    card.className = 'chapter-card p-4' + (currentChapter === chId ? ' selected' : '');
+    const qCount = ch.question_count != null ? ch.question_count : 0;
+    card.innerHTML =
+      '<div class="flex items-center justify-between mb-2">' +
+        '<span class="open-badge ' + (ch.open === true || ch.open === 'true' ? 'open' : 'closed') + '">' + (ch.open ? '開放中' : '未開放') + '</span>' +
+        (ch.antiChe ? '<span class="open-badge open">防作弊</span>' : '') +
+      '</div>' +
+      '<div class="text-[13px] font-bold text-slate-800 mb-1">' + esc(ch.name || '(未命名章節)') + '</div>' +
+      '<div class="text-xs text-slate-500 mb-3">' + (esc(ch.subject || '無科目')) + '　·　' + qCount + ' 題</div>' +
+      '<div class="flex gap-2">' +
+        '<button class="btn-open-ch flex-1 text-xs font-semibold px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 transition" data-ch="' + chId + '" style="border-radius:0px;">查看題目</button>' +
+        '<button class="btn-del-ch text-xs font-semibold px-3 py-1.5 text-red-600 border border-red-300 bg-white hover:bg-red-50 transition" data-ch="' + chId + '" style="border-radius:0px;">刪除</button>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  chaptersWrap.replaceChildren(wrap);
+  questionsPanel.classList.add('hidden');
+}
+
+/* ── Render questions of a chapter ── */
+async function loadQuestions(san, chId) {
+  currentChapter = chId;
+  renderChapters();
+  const ch = teacherMeta[san]?.chapters?.[chId];
+  document.getElementById('questions-title').textContent = ch && ch.name ? ch.name : '題目列表';
+  document.getElementById('questions-sub').textContent = san;
+  const list = document.getElementById('questions-list');
+  list.innerHTML = '<div class="py-8 text-center text-sm text-slate-400">載入中...</div>';
+  questionsPanel.classList.remove('hidden');
+  try {
+    const snap = await window.fbDB.ref('QuestionData/' + san + '/' + chId).once('value');
+    const data = snap.exists() ? snap.val() : null;
+    const keys = data ? Object.keys(data) : [];
+    if (!keys.length) {
+      list.innerHTML = '';
+      document.getElementById('questions-empty').classList.remove('hidden');
+      return;
+    }
+    document.getElementById('questions-empty').classList.add('hidden');
+    list.replaceChildren();
+    keys.forEach(qKey => {
+      const q = data[qKey];
+      if (!q) return;
+      const item = document.createElement('div');
+      item.className = 'q-item';
+      const opts = ['A', 'B', 'C', 'D'].filter(o => q[o]).map(o =>
+        '<div class="q-option' + (q.answer === o ? ' correct' : '') + '"><b>' + o + '.</b> ' + esc(q[o]) + (q.answer === o ? '　✓ 答案' : '') + '</div>'
+      ).join('');
+      item.innerHTML =
+        '<div class="flex items-start justify-between gap-3">' +
+          '<div class="flex-1"><div class="q-title">' + esc(q.question || '(無題目內容)') + '</div></div>' +
+          '<button class="btn-del-q text-xs font-semibold px-2.5 py-1 text-red-600 border border-red-200 bg-white hover:bg-red-50 transition shrink-0" data-q="' + qKey + '" style="border-radius:0px;">刪除</button>' +
+        '</div>' +
+        opts +
+        (q.answer ? '<div><span class="q-answer">答案：' + esc(q.answer) + '</span></div>' : '') +
+        (q.explanation ? '<div class="q-explain">💡 ' + esc(q.explanation) + '</div>' : '');
+      list.appendChild(item);
+    });
+    attachQuestionEvents(san, chId);
+  } catch (e) {
+    console.error(e);
+    list.innerHTML = '<div class="py-8 text-center text-sm text-red-500">載入失敗：' + esc(e.message || e) + '</div>';
+  }
+}
+
+function attachQuestionEvents(san, chId) {
+  document.querySelectorAll('.btn-del-q').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const qKey = btn.dataset.q;
+      if (!confirm('確定刪除此題目？此操作無法復原！')) return;
+      try {
+        await window.fbDB.ref('QuestionData/' + san + '/' + chId + '/' + qKey).remove();
+        const chRef = window.fbDB.ref('Teacherquestion/' + san + '/chapters/' + chId + '/question_count');
+        const snap = await chRef.once('value');
+        await chRef.set(Math.max(0, (snap.val() || 0) - 1));
+        if (teacherMeta[san]?.chapters?.[chId]) teacherMeta[san].chapters[chId].question_count = Math.max(0, (teacherMeta[san].chapters[chId].question_count || 0) - 1);
+        showToast('已刪除題目');
+        loadQuestions(san, chId);
+      } catch (e) {
+        showToast('刪除失敗');
+        console.error(e);
+      }
+    });
+  });
+}
+
+/* ── Events ── */
+teacherSelect.addEventListener('change', () => {
+  currentTeacher = teacherSelect.value;
+  currentChapter = null;
+  if (!currentTeacher) {
+    chaptersWrap.innerHTML = '<div class="py-10 text-center text-sm text-slate-400">請先選擇教師</div>';
+    questionsPanel.classList.add('hidden');
+    return;
+  }
+  renderChapters();
+});
+
+chaptersWrap.addEventListener('click', (e) => {
+  const openBtn = e.target.closest('.btn-open-ch');
+  const delBtn = e.target.closest('.btn-del-ch');
+  if (openBtn) { loadQuestions(currentTeacher, openBtn.dataset.ch); return; }
+  if (delBtn) {
+    const chId = delBtn.dataset.ch;
+    if (!confirm('確定刪除整個章節（含全部題目）？此操作無法復原！')) return;
+    (async () => {
+      try {
+        await window.fbDB.ref('Teacherquestion/' + currentTeacher + '/chapters/' + chId).remove();
+        await window.fbDB.ref('QuestionData/' + currentTeacher + '/' + chId).remove();
+        delete teacherMeta[currentTeacher].chapters[chId];
+        showToast('已刪除章節');
+        renderChapters();
+      } catch (e) {
+        showToast('刪除失敗');
+        console.error(e);
+      }
+    })();
+  }
+});
+
+document.getElementById('btn-delete-chapter')?.addEventListener('click', async () => {
+  if (!currentTeacher || !currentChapter) return;
+  if (!confirm('確定刪除整個章節（含全部題目）？此操作無法復原！')) return;
+  try {
+    await window.fbDB.ref('Teacherquestion/' + currentTeacher + '/chapters/' + currentChapter).remove();
+    await window.fbDB.ref('QuestionData/' + currentTeacher + '/' + currentChapter).remove();
+    delete teacherMeta[currentTeacher].chapters[currentChapter];
+    currentChapter = null;
+    showToast('已刪除章節');
+    renderChapters();
+  } catch (e) {
+    showToast('刪除失敗');
+    console.error(e);
+  }
+});
+
+document.getElementById('dropdown-logout')?.addEventListener('click', async () => {
+  try { await window.fbAuth.signOut(); } catch (e) {}
+  localStorage.removeItem('fb_user');
+  localStorage.removeItem('last_activity');
+  window.location.href = BP + '/';
+});
+
+loadTeachers().catch(() => {
+  teacherSelect.innerHTML = '<option value="">-- 載入失敗 --</option>';
+});
+</script>
