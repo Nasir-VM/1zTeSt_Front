@@ -72,7 +72,7 @@ import Layout from '../../layouts/Layout.astro';
       <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
         <div>
           <h2 class="text-sm font-bold text-slate-800">TTVS 成績</h2>
-          <p class="text-xs text-slate-500 mt-0.5">含 _ttvs、舊版 pvqc_scores 與殘留節點（點擊展開）</p>
+          <p class="text-xs text-slate-500 mt-0.5">_ttvs 教師即時成績　・　教師遷移成績（日期 → 學生 → 類別）</p>
         </div>
         <div class="flex items-center gap-2 w-full sm:w-auto">
           <input id="pvqc-search" type="text" placeholder="搜尋學生/姓名..." class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-56" style="border-radius:0px;" />
@@ -412,9 +412,78 @@ function renderPvqc() {
   const q = (document.getElementById('pvqc-search').value || '').trim().toLowerCase();
   const forceOpen = !!q;
 
+  const PVQC_LABELS = { pvqc_scores1: '第一類', pvqc_scores2: '第二類', pvqc_scores3: '第三類', pvqc_totalscores: '總成績' };
+
   Object.keys(pvqcData).sort().forEach(rootKey => {
-    const rootNode = buildNode('▶', rootKey, '資料區', (box) => {
-      walkPvqc(rootKey, pvqcData[rootKey], box, q);
+    let rootLabel = '資料區';
+
+    // ── 已知結構一：_ttvs/{teacherSan}/ttvs/{attempt} ──
+    if (rootKey === '_ttvs') {
+      rootLabel = 'TTVS 教師即時成績';
+      const rootNode = buildNode('▶', rootKey, rootLabel, (box) => {
+        Object.keys(pvqcData[rootKey] || {}).forEach(teacherSan => {
+          const teacherNode = buildNode('▶', teacherSan.replace(/,/g, '.'), '教師', (box) => {
+            const sub = pvqcData[rootKey][teacherSan] || {};
+            walkPvqc('PVQCSCORES/_ttvs/' + teacherSan, sub, box, q);
+          });
+          box.appendChild(teacherNode);
+          if (forceOpen) openNode(teacherNode);
+        });
+      });
+      tree.appendChild(rootNode);
+      if (forceOpen) openNode(rootNode);
+      return;
+    }
+
+    // ── 已知結構二：{teacherSan}/{dateKey}/{studentId}/{pvqc_scoresX|pvqc_totalscores}/{attempt} ──
+    // hi@nasirlin,net 是第一層教師 key，其下是日期
+    if (pvqcData[rootKey] && typeof pvqcData[rootKey] === 'object') {
+      const firstLevel = pvqcData[rootKey];
+      const firstKeys = Object.keys(firstLevel);
+      // 檢查第二層是否為日期（有第三層學生ID）
+      const looksLikeDateTree = firstKeys.length > 0 && firstKeys.every(dk => {
+        const v = firstLevel[dk];
+        if (!v || typeof v !== 'object') return false;
+        return Object.keys(v).every(sk => {
+          const sv = v[sk];
+          return sv && typeof sv === 'object' && Object.keys(sv).some(tk => PVQC_LABELS[tk] !== undefined);
+        });
+      });
+      if (looksLikeDateTree) {
+        rootLabel = '教師遷移成績（' + rootKey.replace(/,/g, '.') + '）';
+        const rootNode = buildNode('▶', rootKey.replace(/,/g, '.'), rootLabel, (box) => {
+          firstKeys.sort().reverse().forEach(dateKey => {
+            const dateNode = buildNode('▶', dateKey, '日期', (box) => {
+              Object.keys(firstLevel[dateKey] || {}).forEach(stuId => {
+                const stuSub = firstLevel[dateKey][stuId] || {};
+                const stuKeys = Object.keys(stuSub);
+                const stuNode = buildNode('▶', stuId, stuKeys.length + ' 類', (box) => {
+                  stuKeys.forEach(subType => {
+                    const label = PVQC_LABELS[subType] || subType;
+                    const subNode = buildNode('▶', label, subType, (box) => {
+                      walkPvqc('PVQCSCORES/' + rootKey + '/' + dateKey + '/' + stuId + '/' + subType, stuSub[subType], box, q);
+                    });
+                    box.appendChild(subNode);
+                    if (forceOpen) openNode(subNode);
+                  });
+                });
+                box.appendChild(stuNode);
+                if (forceOpen) openNode(stuNode);
+              });
+            });
+            box.appendChild(dateNode);
+            if (forceOpen) openNode(dateNode);
+          });
+        });
+        tree.appendChild(rootNode);
+        if (forceOpen) openNode(rootNode);
+        return;
+      }
+    }
+
+    // ── 未知結構：通用巡覽 ──
+    const rootNode = buildNode('▶', rootKey, rootLabel, (box) => {
+      walkPvqc('PVQCSCORES/' + rootKey, pvqcData[rootKey], box, q);
     });
     tree.appendChild(rootNode);
     if (forceOpen) openNode(rootNode);
