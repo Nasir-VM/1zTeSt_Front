@@ -43,23 +43,9 @@ firebase.auth().onAuthStateChanged(async (user) => {
     const email = user.email;
     const sanitized = window.sanitizeEmail(email);
 
-    const [wlSnap, teacherSnap] = await Promise.all([
-      firebase.database().ref('config/teacherWhitelist/' + sanitized).once('value'),
-      firebase.database().ref('1zTeStsys/Teacheraccount/' + sanitized).once('value')
-    ]);
-
-    const isSuperAdmin = window.isAdminEmail ? window.isAdminEmail(email) : false;
-    const isWhitelisted = wlSnap.exists();
+    /* 註冊即教師：任何登入者自動建立 teacheraccount（普通教師） */
+    const teacherSnap = await firebase.database().ref('1zTeStsys/Teacheraccount/' + sanitized).once('value');
     const isTeacherAcc = teacherSnap.exists();
-
-    if (!isSuperAdmin && !isWhitelisted && !isTeacherAcc) {
-      hideEl('login-area');
-      showEl('logged-in-info');
-      setText('user-display-name', email);
-      document.getElementById('login-error') && (document.getElementById('login-error').textContent = '此帳號尚未被授權為教師');
-      document.getElementById('login-error') && document.getElementById('login-error').classList.remove('hidden');
-      return;
-    }
 
     if (!isTeacherAcc) {
       await firebase.database().ref('1zTeStsys/Teacheraccount/' + sanitized).set({ email: email, createdAt: new Date().toISOString() });
