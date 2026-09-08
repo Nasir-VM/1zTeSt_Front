@@ -1,0 +1,187 @@
+---
+// Mobile Bottom Navigation Bar (Floating Frosted Glass Dock)
+---
+
+<nav id="mobile-bottom-nav" class="fixed bottom-3 left-3 right-3 z-40 mx-auto max-w-md md:hidden pointer-events-auto select-none transition-all duration-300">
+  <div class="relative flex items-center justify-around rounded-full border border-white/80 bg-white/85 px-2 py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
+    
+    <!-- Home / 首頁 -->
+    <a href="/" data-nav="home" class="bottom-nav-item group relative flex flex-col items-center justify-center rounded-full px-3.5 py-1.5 transition-all duration-200">
+      <div class="active-indicator absolute inset-0 rounded-full bg-emerald-100/80 opacity-0 transition-opacity duration-200 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <svg class="h-5 w-5 transition-transform duration-200 group-active:scale-90" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+        <span class="mt-0.5 text-[11px] font-medium tracking-tight">首頁</span>
+      </div>
+    </a>
+
+    <!-- Quiz / 測驗 -->
+    <a href="/quiz/" data-nav="quiz" class="bottom-nav-item group relative flex flex-col items-center justify-center rounded-full px-3.5 py-1.5 transition-all duration-200">
+      <div class="active-indicator absolute inset-0 rounded-full bg-emerald-100/80 opacity-0 transition-opacity duration-200 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <svg class="h-5 w-5 transition-transform duration-200 group-active:scale-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0.5-.05"/>
+          <path d="M6 6h10"/>
+          <path d="M6 10h10"/>
+          <path d="M6 14h6"/>
+        </svg>
+        <span class="mt-0.5 text-[11px] font-medium tracking-tight">測驗</span>
+      </div>
+    </a>
+
+    <!-- Center Action / 題庫管理 or 快捷 -->
+    <a href="/teacher/" data-nav="teacher" id="bottom-nav-action-btn" class="bottom-nav-item group relative flex flex-col items-center justify-center rounded-full px-3.5 py-1.5 transition-all duration-200">
+      <div class="active-indicator absolute inset-0 rounded-full bg-emerald-100/80 opacity-0 transition-opacity duration-200 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <div class="flex h-5 w-5 items-center justify-center">
+          <svg class="h-5 w-5 transition-transform duration-200 group-active:scale-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </div>
+        <span id="bottom-nav-action-text" class="mt-0.5 text-[11px] font-medium tracking-tight">題庫</span>
+      </div>
+    </a>
+
+    <!-- Guide / 指南 -->
+    <a href="/guide" data-nav="guide" class="bottom-nav-item group relative flex flex-col items-center justify-center rounded-full px-3.5 py-1.5 transition-all duration-200">
+      <div class="active-indicator absolute inset-0 rounded-full bg-emerald-100/80 opacity-0 transition-opacity duration-200 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <svg class="h-5 w-5 transition-transform duration-200 group-active:scale-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="mt-0.5 text-[11px] font-medium tracking-tight">指南</span>
+      </div>
+    </a>
+
+    <!-- Me / 我的 or 登入 -->
+    <a href="/login/teacher" data-nav="user" id="bottom-nav-user-btn" class="bottom-nav-item group relative flex flex-col items-center justify-center rounded-full px-3.5 py-1.5 transition-all duration-200">
+      <div class="active-indicator absolute inset-0 rounded-full bg-emerald-100/80 opacity-0 transition-opacity duration-200 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <div id="bottom-nav-avatar" class="flex h-5 w-5 items-center justify-center overflow-hidden rounded-full transition-transform duration-200 group-active:scale-90">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+        </div>
+        <span id="bottom-nav-user-text" class="mt-0.5 text-[11px] font-medium tracking-tight">我的</span>
+      </div>
+    </a>
+
+  </div>
+</nav>
+
+<style>
+  .bottom-nav-item {
+    color: #64748b;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav-item.active {
+    color: #15803d; /* Emerald 700 / Primary */
+    font-weight: 600;
+  }
+  .bottom-nav-item.active .active-indicator {
+    opacity: 1;
+  }
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    #mobile-bottom-nav {
+      bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    }
+  }
+</style>
+
+<script is:inline>
+(function() {
+  function initBottomNav() {
+    var path = window.location.pathname;
+    var navItems = document.querySelectorAll('.bottom-nav-item');
+    var userBtn = document.getElementById('bottom-nav-user-btn');
+    var userText = document.getElementById('bottom-nav-user-text');
+    var avatarEl = document.getElementById('bottom-nav-avatar');
+    var actionBtn = document.getElementById('bottom-nav-action-btn');
+    var actionText = document.getElementById('bottom-nav-action-text');
+
+    var activeKey = 'home';
+    if (path.indexOf('/quiz') === 0) {
+      activeKey = 'quiz';
+    } else if (path.indexOf('/teacher') === 0 || path.indexOf('/admin') === 0) {
+      activeKey = 'teacher';
+    } else if (path.indexOf('/guide') === 0 || path.indexOf('/disclaimer') === 0 || path.indexOf('/privacy') === 0) {
+      activeKey = 'guide';
+    } else if (path.indexOf('/login') === 0) {
+      activeKey = 'user';
+    } else if (path === '/' || path === '') {
+      activeKey = 'home';
+    }
+
+    navItems.forEach(function(item) {
+      if (item.getAttribute('data-nav') === activeKey) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    try {
+      var fbUser = JSON.parse(localStorage.getItem('fb_user') || 'null');
+      if (fbUser && fbUser.email) {
+        if (userText) userText.textContent = fbUser.name ? fbUser.name.slice(0, 4) : '帳號';
+        if (userBtn) {
+          userBtn.href = (fbUser.role === 'teacher' || fbUser.role === 'admin') ? '/teacher/' : '/quiz/';
+          userBtn.onclick = function(e) {
+            if (window.location.pathname.startsWith('/teacher') || window.location.pathname.startsWith('/quiz')) {
+              e.preventDefault();
+              if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                  title: '目前使用者',
+                  html: '<div style="text-align:center;"><p class="text-sm font-semibold text-slate-700">' + (fbUser.name || '') + '</p><p class="text-xs text-slate-500">' + fbUser.email + '</p><span class="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">' + (fbUser.role === 'teacher' ? '教師' : fbUser.role === 'admin' ? '管理員' : '學生') + '</span></div>',
+                  showCancelButton: true,
+                  confirmButtonText: '登出',
+                  confirmButtonColor: '#ef4444',
+                  cancelButtonText: '關閉'
+                }).then(function(result) {
+                  if (result.isConfirmed) {
+                    localStorage.removeItem('fb_user');
+                    localStorage.removeItem('last_activity');
+                    if (window.firebase && window.firebase.auth) {
+                      window.firebase.auth().signOut().then(function() {
+                        window.location.href = '/';
+                      }).catch(function() {
+                        window.location.href = '/';
+                      });
+                    } else {
+                      window.location.href = '/';
+                    }
+                  }
+                });
+              }
+            }
+          };
+        }
+
+        if (fbUser.photoURL && avatarEl) {
+          avatarEl.innerHTML = '<img src="' + fbUser.photoURL + '" alt="Avatar" class="h-full w-full object-cover rounded-full" />';
+        }
+
+        if (fbUser.role === 'teacher' || fbUser.role === 'admin') {
+          if (actionBtn) actionBtn.href = '/teacher/';
+          if (actionText) actionText.textContent = '題庫';
+        } else {
+          if (actionBtn) actionBtn.href = '/quiz/';
+          if (actionText) actionText.textContent = '快選';
+        }
+      } else {
+        if (userText) userText.textContent = '登入';
+        if (userBtn) userBtn.href = '/login/teacher';
+      }
+    } catch(e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBottomNav);
+  } else {
+    initBottomNav();
+  }
+})();
+</script>
