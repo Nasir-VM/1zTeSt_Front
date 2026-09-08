@@ -27,7 +27,7 @@ import Layout from '../../layouts/Layout.astro';
           </button>
           <div id="profile-dropdown" class="dropdown">
             <div class="dropdown-head">
-              <p class="dropdown-label">管理員</p>
+              <p class="dropdown-label">管理員帳號</p>
               <p id="dropdown-email" class="dropdown-email"></p>
             </div>
             <button id="dropdown-logout" class="dropdown-item danger">登出</button>
@@ -39,56 +39,68 @@ import Layout from '../../layouts/Layout.astro';
 
   <!-- Content -->
   <main class="main-content w-full flex-1">
-    <div class="section-bar">
-      <h2 class="section-title">題目管理</h2>
-      <span class="section-count">瀏覽所有教師的題庫</span>
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+      <div>
+        <h1 class="text-xl font-bold text-slate-800">題庫內容總覽</h1>
+        <p class="text-xs text-slate-500 mt-1">瀏覽與管理全校所有教師發布之題庫與題目內容</p>
+      </div>
     </div>
 
     <!-- Teacher selector + chapters -->
-    <div class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white" style="border-radius:0px;">
-      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
+    <div class="panel p-6 mb-8">
+      <div class="flex items-center justify-between mb-5 pb-4 border-b border-slate-100 flex-wrap gap-4">
         <div>
-          <h2 class="text-sm font-bold text-slate-800">選擇教師</h2>
-          <p class="text-xs text-slate-500 mt-0.5">點擊章節卡片以查看題目</p>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </span>
+            <h2 class="text-base font-bold text-slate-800">選擇教師與章節</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">點擊下方章節卡片即可載入題目清單</p>
         </div>
         <div class="flex items-center gap-2 w-full sm:w-auto">
-          <select id="teacher-select" class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-72 bg-white" style="border-radius:0px;">
+          <select id="teacher-select" class="input-modern flex-1 sm:w-72 bg-white">
             <option value="">載入中...</option>
           </select>
         </div>
       </div>
       <div id="chapter-grid" class="stats-grid"></div>
-      <p id="chapter-empty" class="empty-msg hidden">該教師尚無章節</p>
+      <p id="chapter-empty" class="empty-msg hidden py-8 text-center text-sm text-slate-400">該教師尚無章節</p>
     </div>
 
     <!-- Questions list -->
-    <div class="panel !rounded-none border border-slate-200 shadow-none overflow-hidden" style="border-radius:0px;">
-      <div class="panel-search border-b border-slate-200 p-3 bg-slate-50/50">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h2 class="text-sm font-bold text-slate-800" id="q-current-title">題目列表</h2>
-            <p class="text-xs text-slate-500 mt-0.5" id="q-current-meta"></p>
+    <div class="panel p-6">
+      <div class="flex items-center justify-between mb-5 pb-4 border-b border-slate-100 flex-wrap gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </span>
+            <h2 class="text-base font-bold text-slate-800" id="q-current-title">題目列表</h2>
           </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <input id="q-search" type="text" placeholder="搜尋題目文字..." class="w-full border border-slate-200 bg-white py-2 pl-3 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-800 focus:outline-none transition-colors" style="border-radius:0px;max-width:260px;" />
-          </div>
+          <p class="text-xs text-slate-500 mt-1" id="q-current-meta">請先選擇教師與章節</p>
+        </div>
+        <div class="relative w-full sm:w-72">
+          <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input id="q-search" type="text" placeholder="搜尋題目關鍵字..." class="input-modern w-full pl-9" />
         </div>
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm font-sans border-collapse">
+
+      <div class="overflow-x-auto rounded-xl border border-slate-100">
+        <table class="w-full text-left text-sm border-collapse">
           <thead>
-            <tr class="bg-slate-100/80 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
-              <th class="py-3.5 px-4 w-10 text-center">#</th>
-              <th class="py-3.5 px-4">題目</th>
-              <th class="py-3.5 px-4">選項</th>
-              <th class="py-3.5 px-4">答案</th>
-              <th class="py-3.5 px-4 text-center w-20">操作</th>
+            <tr class="bg-slate-50/80 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <th class="py-3 px-4 w-12 text-center">#</th>
+              <th class="py-3 px-4">題目內容 / 詳解</th>
+              <th class="py-3 px-4">選項</th>
+              <th class="py-3 px-4 text-center w-24">正確答案</th>
+              <th class="py-3 px-4 text-center w-20">操作</th>
             </tr>
           </thead>
-          <tbody id="q-tbody" class="divide-y divide-slate-200"></tbody>
+          <tbody id="q-tbody" class="divide-y divide-slate-100 bg-white"></tbody>
         </table>
+        <p id="q-empty" class="empty-msg hidden py-10 text-center text-sm text-slate-400">請先選擇教師與章節</p>
       </div>
-      <p id="q-empty" class="empty-msg hidden">請先選擇教師與章節</p>
     </div>
   </main>
 
@@ -96,124 +108,214 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style is:global>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-  /* ── Reset & Base ── */
-  :root { --black: #111; --gray-1: #333; --gray-2: #666; --gray-3: #999; --gray-4: #ccc; --gray-bg: #f5f5f5; --white: #fff; --border: #e5e5e5; --radius: 12px; }
-  body { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  :root {
+    --color-primary: #16a34a;
+    --border-color: #e2e8f0;
+  }
 
   /* ── Top Nav ── */
-  .topnav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
-  .topnav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; }
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  }
+  .topnav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 24px;
+  }
   .topnav-left { display: flex; align-items: center; gap: 12px; }
-  .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
-  .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
-  .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
-  .topnav-tabs { display: flex; align-items: center; gap: 8px; }
+  .topnav-logo { font-size: 20px; font-weight: 800; color: #16a34a; text-decoration: none; font-family: "Pacifico", cursive; }
+  .topnav-divider { width: 1px; height: 18px; background: #e2e8f0; }
+  .topnav-subtitle { font-size: 13px; color: #64748b; font-weight: 600; }
+  .topnav-tabs { display: flex; align-items: center; gap: 6px; }
   .topnav-tab {
     position: relative;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-3, #64748b);
+    color: #64748b;
     background: transparent;
     border: none;
-    padding: 16px 10px;
+    padding: 8px 14px;
+    border-radius: 9999px;
     cursor: pointer;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
   }
-  .topnav-tab::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2.5px;
-    background: #16a34a;
-    border-radius: 9999px;
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  .topnav-tab:hover {
+    color: #16a34a;
+    background: rgba(22, 163, 74, 0.08);
   }
-  .topnav-tab:hover { color: #16a34a; }
-  .topnav-tab:hover::after { width: 100%; left: 0; }
-  .topnav-tab.active { color: #16a34a; font-weight: 600; }
-  .topnav-tab.active::after { width: 100%; left: 0; }
+  .topnav-tab.active {
+    color: #15803d;
+    background: rgba(22, 163, 74, 0.12);
+    font-weight: 600;
+  }
   .topnav-right { display: flex; align-items: center; gap: 16px; }
   .profile-menu { position: relative; }
-  .profile-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 8px; transition: background 0.15s; }
-  .profile-btn:hover { background: var(--gray-bg); }
-  .avatar { width: 30px; height: 30px; border-radius: 8px; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .chevron { width: 14px; height: 14px; color: var(--gray-4); transition: transform 0.2s; }
-  .chevron.open { transform: rotate(180deg); }
-  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 240px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
-  .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-  .dropdown-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-  .dropdown-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-3); }
-  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gray-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .dropdown-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 13px; color: var(--gray-2); background: none; border: none; cursor: pointer; transition: background 0.15s; }
-  .dropdown-item:hover { background: var(--gray-bg); }
-  .dropdown-item.danger { color: #e53e3e; }
-  .dropdown-item.danger:hover { background: #fff5f5; }
-
-  /* ── Main Content ── */
-  .main-content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
-
-  /* ── Section Bar ── */
-  .section-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .section-title { font-size: 15px; font-weight: 600; color: var(--black); }
-  .section-count { font-size: 12px; color: var(--gray-3); }
-
-  /* ── Stats Grid — chapter cards ── */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-  .chapter-card {
-    background: #fff; border: 1px solid var(--border); border-radius: 16px;
-    padding: 16px 18px; cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    display: flex; flex-direction: column; gap: 6px;
+  .profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    transition: all 0.2s;
   }
-  .chapter-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.05); border-color: #16a34a; }
-  .chapter-card.sel { border-color: #16a34a; background: #f7fef9; box-shadow: 0 0 0 2px rgba(22,163,74,0.12); }
-  .cc-title { font-size: 14px; font-weight: 600; color: var(--black); word-break: break-all; }
-  .cc-meta { font-size: 11px; color: var(--gray-3); }
-  .cc-badge { align-self: flex-start; font-size: 10px; font-weight: 600; padding: 1px 8px; border-radius: 9999px; letter-spacing: 0.02em; }
-  .cc-badge.open { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
-  .cc-badge.closed { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+  .profile-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background: #16a34a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    overflow: hidden;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .chevron { width: 14px; height: 14px; color: #94a3b8; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 220px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .dropdown-head { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+  .dropdown-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 600; color: #334155; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 0 0 16px 16px;
+  }
+  .dropdown-item:hover { background: #f8fafc; }
+  .dropdown-item.danger { color: #ef4444; }
+  .dropdown-item.danger:hover { background: #fef2f2; }
 
-  /* ── Panel ── */
-  .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s; }
-  .panel:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-  .panel.p-5 { padding: 20px; }
-  .panel-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  /* ── Main Content & Panels ── */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+  .panel {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(12px);
+    transition: box-shadow 0.2s;
+  }
 
-  .empty-msg { padding: 40px; text-align: center; font-size: 13px; color: var(--gray-3); }
+  /* ── Chapter Cards ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .chapter-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  }
+  .chapter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border-color: #16a34a;
+  }
+  .chapter-card.sel {
+    border-color: #16a34a;
+    background: #f0fdf4;
+    box-shadow: 0 0 0 2px rgba(22,163,74,0.2);
+  }
+  .cc-title { font-size: 14px; font-weight: 700; color: #1e293b; word-break: break-all; }
+  .cc-meta { font-size: 12px; color: #64748b; }
+  .cc-badge { align-self: flex-start; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
+  .cc-badge.open { background: #dcfce7; color: #15803d; }
+  .cc-badge.closed { background: #f1f5f9; color: #64748b; }
 
   /* ── Question rows ── */
   .q-cell { max-width: 420px; }
-  .q-text { font-size: 13px; color: var(--gray-1); line-height: 1.6; word-break: break-word; }
-  .q-opts { font-size: 11px; color: var(--gray-3); line-height: 1.6; word-break: break-word; white-space: pre-line; }
-  .q-ans { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; border-radius: 6px; font-size: 12px; font-weight: 600; }
-  .del-btn { padding: 4px 10px; font-size: 11px; font-weight: 500; color: #dc2626; border: 1px solid #fca5a5; background: #fff; border-radius: 0px; cursor: pointer; transition: all 0.15s; }
-  .del-btn:hover { background: #fff5f5; border-color: #feb2b2; }
+  .q-text { font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.6; word-break: break-word; }
+  .q-opts { font-size: 12px; color: #64748b; line-height: 1.6; word-break: break-word; white-space: pre-line; }
+  .q-ans { display: inline-flex; align-items: center; justify-content: center; padding: 2px 10px; background: #dcfce7; color: #15803d; border-radius: 9999px; font-size: 12px; font-weight: 700; }
+  
+  .input-modern {
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #334155;
+    background: #fff;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .input-modern:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  }
+
+  .del-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #ef4444;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .del-btn:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
   /* ── Toast ── */
   .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 50; display: flex; flex-direction: column; gap: 8px; }
-  .toast-item { padding: 12px 20px; border-radius: 10px; background: var(--black); color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.12); animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .toast-item { padding: 10px 18px; border-radius: 12px; background: #1e293b; color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); animation: toastIn 0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
   .toast-item.out { animation: toastOut 0.2s forwards; }
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(8px); } }
 
-  /* ── Responsive ── */
   @media (max-width: 768px) {
-    .topnav-inner { padding: 0 16px; height: 50px; }
+    .topnav-inner { padding: 0 16px; height: 54px; }
     .topnav-subtitle { display: none; }
     .topnav-divider { display: none; }
-    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .topnav-tabs::-webkit-scrollbar { display: none; }
     .topnav-tab { white-space: nowrap; padding: 6px 10px; font-size: 12px; }
-    .topnav-right { gap: 8px; }
-    .main-content { padding: 20px 16px; }
-    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   }
 </style>
 
@@ -253,7 +355,7 @@ function showToast(msg) {
   const el = document.createElement('div');
   el.className = 'toast-item'; el.textContent = msg;
   w.appendChild(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2500);
 }
 
 function esc(s) {
@@ -262,20 +364,16 @@ function esc(s) {
 }
 
 const db = window.fbDB;
-let TEACHERS = null;      // Teacherquestion snapshot
-let QUESTIONDATA = {};    // { teacherKey: { chapterId: {...} } } — lazy per-chapter cache
-let curSel = null;        // { teacherKey, chapterId, chapter }
+let TEACHERS = null;
+let QUESTIONDATA = {};
+let curSel = null;
 let qFilter = '';
-let qLoading = false;
 
-/* ── Load teachers (lightweight) first ── */
 async function loadAll() {
   try {
-    showToast('載入中...');
     const tSnap = await db.ref('Teacherquestion').once('value');
     TEACHERS = tSnap.exists() ? tSnap.val() : null;
     renderTeacherSelect();
-    showToast('題庫清單已載入');
   } catch (e) {
     console.error(e);
     showToast('載入失敗');
@@ -290,7 +388,7 @@ function renderTeacherSelect() {
     return;
   }
   const keys = Object.keys(TEACHERS);
-  sel.innerHTML = '<option value="">選擇教師（' + keys.length + ' 位）</option>';
+  sel.innerHTML = '<option value="">選擇教師（共 ' + keys.length + ' 位）</option>';
   keys.forEach(k => {
     const o = document.createElement('option');
     o.value = k;
@@ -322,7 +420,7 @@ function renderChapters(teacherKey) {
     const ch = chapters[chId] || {};
     const card = document.createElement('div');
     card.className = 'chapter-card' + (curSel && curSel.chapterId === chId ? ' sel' : '');
-    const openBadge = ch.open ? '<span class="cc-badge open">開放</span>' : '<span class="cc-badge closed">未開放</span>';
+    const openBadge = ch.open ? '<span class="cc-badge open">開放中</span>' : '<span class="cc-badge closed">未開放</span>';
     card.innerHTML =
       '<div class="cc-title">' + esc(ch.name || chId) + '</div>' +
       '<div class="cc-meta">' + esc(ch.subject || '') + '　・　' + (ch.question_count || 0) + ' 題</div>' +
@@ -351,11 +449,8 @@ async function loadQuestions() {
   empty.classList.remove('hidden');
   empty.textContent = '載入中...';
 
-  // 若未快取才抓取（lazy，單章節快）
   if (!QUESTIONDATA[tk] || !QUESTIONDATA[tk][chId]) {
-    qLoading = true;
     const snap = await db.ref('QuestionData/' + tk + '/' + chId).once('value');
-    qLoading = false;
     if (!QUESTIONDATA[tk]) QUESTIONDATA[tk] = {};
     QUESTIONDATA[tk][chId] = snap.exists() ? snap.val() : null;
   }
@@ -380,7 +475,7 @@ function renderQuestions() {
   const data = QUESTIONDATA[curSel.teacherKey] && QUESTIONDATA[curSel.teacherKey][curSel.chapterId];
   document.getElementById('q-current-title').textContent = curSel.chapter.name || curSel.chapterId;
   document.getElementById('q-current-meta').textContent =
-    (curSel.chapter.subject || '') + '　・　' + (data ? Object.keys(data).length : 0) + ' 題';
+    (curSel.chapter.subject || '') + '　・　共 ' + (data ? Object.keys(data).length : 0) + ' 題';
   if (!data || !Object.keys(data).length) {
     empty.classList.remove('hidden');
     empty.textContent = '此章節尚無題目';
@@ -396,13 +491,13 @@ function renderQuestions() {
     if (fq && !text.toLowerCase().includes(fq)) return;
     idx++;
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-200 align-top';
+    tr.className = 'hover:bg-slate-50/80 transition-colors align-top';
     tr.innerHTML =
-      '<td class="py-3 px-4 text-xs text-slate-400 text-center">' + idx + '</td>' +
+      '<td class="py-3 px-4 text-xs font-medium text-slate-400 text-center">' + idx + '</td>' +
       '<td class="py-3 px-4 q-cell"><div class="q-text">' + esc(text) + '</div>' +
-        (q.explanation ? '<div class="q-opts mt-1">詳解：' + esc(q.explanation) + '</div>' : '') + '</td>' +
-      '<td class="py-3 px-4 q-cell"><div class="q-opts">' + esc(formatOptions(q)) + '</div></td>' +
-      '<td class="py-3 px-4"><span class="q-ans">' + esc(q.answer || '-') + '</span></td>' +
+        (q.explanation ? '<div class="q-opts mt-1.5 text-slate-500 font-medium bg-slate-50 p-2 rounded-lg">💡 詳解：' + esc(q.explanation) + '</div>' : '') + '</td>' +
+      '<td class="py-3 px-4 q-cell"><div class="q-opts font-sans">' + esc(formatOptions(q)) + '</div></td>' +
+      '<td class="py-3 px-4 text-center"><span class="q-ans">' + esc(q.answer || '-') + '</span></td>' +
       '<td class="py-3 px-4 text-center"><button class="del-btn" type="button">刪除</button></td>';
     const delBtn = tr.querySelector('.del-btn');
     const fullPath = 'QuestionData/' + curSel.teacherKey + '/' + curSel.chapterId + '/' + qKey;

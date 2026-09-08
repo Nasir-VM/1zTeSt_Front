@@ -13,7 +13,9 @@ import Layout from '../../layouts/Layout.astro';
         <span class="topnav-subtitle">管理後台</span>
       </div>
       <div class="topnav-tabs">
-        <button data-tab="dashboard" class="topnav-tab active">總覽</button>
+        <a href="/admin/home" class="topnav-tab active">總覽</a>
+        <a href="/admin/questions" class="topnav-tab">題目</a>
+        <a href="/admin/records" class="topnav-tab">成績</a>
         <a href="/ttvs/admin" class="topnav-tab">TTVS</a>
         <a href="/" class="topnav-tab">回首頁</a>
       </div>
@@ -25,7 +27,7 @@ import Layout from '../../layouts/Layout.astro';
           </button>
           <div id="profile-dropdown" class="dropdown">
             <div class="dropdown-head">
-              <p class="dropdown-label">管理員</p>
+              <p class="dropdown-label">管理員帳號</p>
               <p id="dropdown-email" class="dropdown-email"></p>
             </div>
             <button id="dropdown-logout" class="dropdown-item danger">登出</button>
@@ -37,279 +39,363 @@ import Layout from '../../layouts/Layout.astro';
 
   <!-- Content -->
   <main class="main-content w-full flex-1">
-    <!-- User List -->
     <section id="tab-dashboard" class="tab-content">
-      <div id="stats-grid" class="stats-grid"></div>
+      <!-- Top Stats Grid -->
+      <div id="stats-grid" class="stats-grid mb-8"></div>
 
       <!-- Teacher Whitelist Management (指派 & 解除權限) -->
-      <div class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white" style="border-radius:0px;">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
+      <div class="panel p-6 mb-8">
+        <div class="flex items-center justify-between mb-5 pb-4 border-b border-slate-100 flex-wrap gap-4">
           <div>
-            <h2 class="text-sm font-bold text-slate-800">指派權限教師管理</h2>
-            <p class="text-xs text-slate-500 mt-0.5">授權教師使用題庫管理、成績管理與 TTVS PVQC 管理存取權限。</p>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-green-100 text-green-700">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </span>
+              <h2 class="text-base font-bold text-slate-800">指派權限教師管理</h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">授權教師使用題庫管理、成績管理與 TTVS PVQC 管理存取權限。</p>
           </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <input id="pvqc-email-input" type="email" placeholder="teacher@example.com" class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-64" style="border-radius:0px;" />
-            <button id="btn-pvqc-add" class="btn-green text-xs font-semibold px-4 py-2 bg-green-600 text-white hover:bg-green-700 transition" style="white-space:nowrap;border-radius:0px;">指派教師權限</button>
+          <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <input id="pvqc-email-input" type="email" placeholder="teacher@example.com" class="input-modern flex-1 sm:w-64" />
+            <button id="btn-pvqc-add" class="btn-green-modern">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              指派教師
+            </button>
           </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-sans border-collapse">
+        <div class="overflow-x-auto rounded-xl border border-slate-100">
+          <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="bg-slate-100/80 border-b border-slate-200 font-bold text-slate-600 uppercase tracking-wider">
-                <th class="py-2.5 px-4">權限教師 Email</th>
-                <th class="py-2.5 px-4">指派管理員</th>
-                <th class="py-2.5 px-4">指派時間</th>
-                <th class="py-2.5 px-4 text-center w-28">操作</th>
+              <tr class="bg-slate-50/80 border-b border-slate-100 font-semibold text-slate-500 uppercase tracking-wider">
+                <th class="py-3 px-4">權限教師 Email</th>
+                <th class="py-3 px-4">指派管理員</th>
+                <th class="py-3 px-4">指派時間</th>
+                <th class="py-3 px-4 text-center w-28">操作</th>
               </tr>
             </thead>
-            <tbody id="wl-tbody" class="divide-y divide-slate-200"></tbody>
+            <tbody id="wl-tbody" class="divide-y divide-slate-100 bg-white"></tbody>
           </table>
-          <p id="wl-empty" class="hidden py-6 text-center text-xs text-slate-400">目前尚無指派的權限教師</p>
+          <p id="wl-empty" class="hidden py-8 text-center text-xs text-slate-400">目前尚無指派的權限教師</p>
         </div>
       </div>
 
-      <div class="section-bar">
-        <h2 class="section-title">用戶列表</h2>
-        <span id="user-count" class="section-count"></span>
-      </div>
-      <div class="panel !rounded-none border border-slate-200 shadow-none overflow-hidden" style="border-radius:0px;">
-        <div class="panel-search border-b border-slate-200 p-3 bg-slate-50/50">
-          <div class="relative w-full max-w-md">
+      <!-- User List -->
+      <div class="panel p-6">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </span>
+            <h2 class="text-base font-bold text-slate-800">全站用戶列表</h2>
+            <span id="user-count" class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">載入中...</span>
+          </div>
+          <div class="relative w-full sm:w-72">
             <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input id="user-search" type="text" placeholder="搜尋 Email、姓名或學號..." class="w-full border border-slate-200 bg-white py-2 pl-9 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-800 transition-colors" style="border-radius:0px;" />
+            <input id="user-search" type="text" placeholder="搜尋 Email、姓名或學號..." class="input-modern w-full pl-9" />
           </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm font-sans border-collapse">
+
+        <div class="overflow-x-auto rounded-xl border border-slate-100">
+          <table class="w-full text-left text-sm border-collapse">
             <thead>
-              <tr class="bg-slate-100/80 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
-                <th class="py-3.5 px-4 w-12 text-center">#</th>
-                <th class="py-3.5 px-4">Email / 帳號</th>
-                <th class="py-3.5 px-4">姓名</th>
-                <th class="py-3.5 px-4">學號</th>
-                <th class="py-3.5 px-4 text-center">身份權限</th>
-                <th class="py-3.5 px-4 text-center w-24">操作</th>
+              <tr class="bg-slate-50/80 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th class="py-3 px-4 w-12 text-center">#</th>
+                <th class="py-3 px-4">Email / 帳號</th>
+                <th class="py-3 px-4">姓名</th>
+                <th class="py-3 px-4">學號</th>
+                <th class="py-3 px-4 text-center">身份權限</th>
+                <th class="py-3 px-4 text-center w-24">操作</th>
               </tr>
             </thead>
-            <tbody id="users-list" class="divide-y divide-slate-200"></tbody>
+            <tbody id="users-list" class="divide-y divide-slate-100 bg-white"></tbody>
           </table>
+          <div id="load-more-wrap" class="hidden border-t border-slate-100 text-center py-3 bg-slate-50/50">
+            <button id="btn-load-more" class="btn-outline-sm">載入更多用戶</button>
+          </div>
+          <p id="users-empty" class="empty-msg hidden py-10 text-center text-sm text-slate-400">尚無用戶資料</p>
         </div>
-        <div id="load-more-wrap" class="hidden border-t border-slate-200 text-center py-4 bg-slate-50">
-          <button id="btn-load-more" style="padding:8px 24px;font-size:12px;font-weight:600;color:var(--gray-2);background:#fff;border:1px solid var(--border);border-radius:0px;cursor:pointer;transition:all 0.2s;">載入更多用戶</button>
-        </div>
-        <p id="users-empty" class="empty-msg hidden py-10 text-center text-sm text-slate-400">尚無用戶資料</p>
       </div>
     </section>
-
-    <!-- Whitelist — removed -->
-    <section id="tab-whitelist" class="tab-content hidden"></section>
   </main>
 
   <div id="toast" class="toast-wrap"></div>
 </Layout>
 
 <style is:global>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
   /* ── Reset & Base ── */
-  :root { --black: #111; --gray-1: #333; --gray-2: #666; --gray-3: #999; --gray-4: #ccc; --gray-bg: #f5f5f5; --white: #fff; --border: #e5e5e5; --radius: 12px; }
-  body { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  :root {
+    --color-primary: #16a34a;
+    --border-color: #e2e8f0;
+  }
 
   /* ── Top Nav ── */
-  .topnav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
-  .topnav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; }
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  }
+  .topnav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 24px;
+  }
   .topnav-left { display: flex; align-items: center; gap: 12px; }
-  .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
-  .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
-  .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
-  .topnav-tabs { display: flex; align-items: center; gap: 8px; }
+  .topnav-logo { font-size: 20px; font-weight: 800; color: #16a34a; text-decoration: none; font-family: "Pacifico", cursive; }
+  .topnav-divider { width: 1px; height: 18px; background: #e2e8f0; }
+  .topnav-subtitle { font-size: 13px; color: #64748b; font-weight: 600; }
+  .topnav-tabs { display: flex; align-items: center; gap: 6px; }
   .topnav-tab {
     position: relative;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-3, #64748b);
+    color: #64748b;
     background: transparent;
     border: none;
-    padding: 16px 10px;
+    padding: 8px 14px;
+    border-radius: 9999px;
     cursor: pointer;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
   }
-  .topnav-tab::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2.5px;
-    background: #16a34a;
-    border-radius: 9999px;
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
   .topnav-tab:hover {
     color: #16a34a;
-  }
-  .topnav-tab:hover::after {
-    width: 100%;
-    left: 0;
+    background: rgba(22, 163, 74, 0.08);
   }
   .topnav-tab.active {
-    color: #16a34a;
+    color: #15803d;
+    background: rgba(22, 163, 74, 0.12);
     font-weight: 600;
   }
-  .topnav-tab.active::after {
-    width: 100%;
-    left: 0;
-  }
   .topnav-right { display: flex; align-items: center; gap: 16px; }
-  .load-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-3); }
-  .load-dot span { width: 6px; height: 6px; border-radius: 50%; background: var(--black); animation: pulse 1.2s ease infinite; }
   .profile-menu { position: relative; }
-  .profile-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 8px; transition: background 0.15s; }
-  .profile-btn:hover { background: var(--gray-bg); }
-  .avatar { width: 30px; height: 30px; border-radius: 8px; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; }
+  .profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    transition: all 0.2s;
+  }
+  .profile-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background: #16a34a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    overflow: hidden;
+  }
   .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .profile-email { font-size: 13px; color: var(--gray-2); font-weight: 500; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .chevron { width: 14px; height: 14px; color: var(--gray-4); transition: transform 0.2s; }
+  .chevron { width: 14px; height: 14px; color: #94a3b8; transition: transform 0.2s; }
   .chevron.open { transform: rotate(180deg); }
-  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 240px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 220px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
   .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-  .dropdown-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-  .dropdown-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-3); }
-  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gray-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .dropdown-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 13px; color: var(--gray-2); background: none; border: none; cursor: pointer; transition: background 0.15s; }
-  .dropdown-item:hover { background: var(--gray-bg); }
-  .dropdown-item.danger { color: #e53e3e; }
-  .dropdown-item.danger:hover { background: #fff5f5; }
-
-  /* ── Main Content ── */
-  .main-content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
-  .tab-content { animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ── Stats Grid — illustration cards ── */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
-  :global(.stat-card) {
-    background: #fff; border: 1px solid var(--border); border-radius: 16px;
-    padding: 0; overflow: hidden; opacity: 0; transform: translateY(12px);
-    animation: statIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
-    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
-    display: flex; flex-direction: column; align-items: center;
-  }
-  :global(.stat-card:hover) { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.05); border-color: #d5d5d5; }
-  :global(.stat-illust) {
-    width: 100%; height: 120px; object-fit: contain; padding: 16px 20px 8px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04));
-    transition: transform 0.3s;
-  }
-  :global(.stat-card:hover .stat-illust) { transform: scale(1.05); }
-  :global(.stat-info) { padding: 4px 16px 18px; text-align: center; width: 100%; }
-  :global(.stat-label) { font-size: 12px; font-weight: 500; color: var(--gray-3); margin-bottom: 4px; }
-  :global(.stat-value) { font-size: 30px; font-weight: 700; color: var(--black); letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
-  :global(.stat-sub) { font-size: 11px; color: var(--gray-4); margin-top: 6px; }
-  @keyframes statIn { to { opacity: 1; transform: translateY(0); } }
-  .stats-grid :global(.stat-skeleton) { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; animation: pulse 1.5s ease infinite; }
-
-  /* ── Section Bar ── */
-  .section-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .section-title { font-size: 15px; font-weight: 600; color: var(--black); }
-  .section-count { font-size: 12px; color: var(--gray-3); }
-  .section-desc { font-size: 14px; color: var(--gray-2); line-height: 1.6; margin-bottom: 20px; }
-
-  /* ── Panel ── */
-  .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s; }
-  .panel:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-  .panel.p-5 { padding: 20px; }
-  .panel-search { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--gray-4); }
-  .input-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); margin-bottom: 6px; }
-
-  /* ── Search Input ── */
-  .search-input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px 10px 36px; font-size: 13px; color: var(--gray-1); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
-  .search-input:focus { border-color: var(--black); box-shadow: 0 0 0 2px rgba(0,0,0,0.06); }
-  .search-input::placeholder { color: var(--gray-4); }
-
-  /* ── Table ── */
-  .data-table { width: 100%; text-align: left; font-size: 13px; }
-  .data-table th { padding: 12px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-3); border-bottom: 1px solid var(--border); }
-  .data-table td { padding: 14px 20px; border-bottom: 1px solid #f5f5f5; color: var(--gray-1); }
-  .data-table tr:last-child td { border-bottom: none; }
-  :global(#users-tbody tr), :global(#wl-tbody tr) { transition: background 0.15s; }
-  :global(#users-tbody tr:hover), :global(#wl-tbody tr:hover) { background: #fafafa; }
-  .empty-msg { padding: 40px; text-align: center; font-size: 13px; color: var(--gray-3); }
-
-  /* ── Users Card List ── */
-  :global(.users-list) { display: flex; flex-direction: column; }
-  :global(.user-card) {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 20px; border-bottom: 1px solid #f5f5f5;
+  .dropdown-head { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+  .dropdown-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 600; color: #334155; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    background: none;
+    border: none;
+    cursor: pointer;
     transition: background 0.15s;
+    border-radius: 0 0 16px 16px;
   }
-  :global(.user-card:last-child) { border-bottom: none; }
-  :global(.user-card:hover) { background: #fafafa; }
-  :global(.user-card-info) { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-  :global(.user-card-email) {
-    font-size: 13px; font-weight: 600; color: var(--gray-1);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  .dropdown-item:hover { background: #f8fafc; }
+  .dropdown-item.danger { color: #ef4444; }
+  .dropdown-item.danger:hover { background: #fef2f2; }
+
+  /* ── Main Content & Panels ── */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+  .panel {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(12px);
+    transition: box-shadow 0.2s;
   }
-  :global(.user-card-meta) { font-size: 12px; color: var(--gray-3); }
-  :global(.user-card-actions) { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 12px; }
+  .panel:hover { box-shadow: 0 8px 25px -4px rgba(0, 0, 0, 0.06); }
 
-  /* ── Buttons ── */
-  .btn-dark { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: var(--black); border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-  .btn-dark:hover { background: #333; transform: translateY(-1px); }
-  .btn-dark:active { transform: scale(0.97); }
-  .btn-green { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: #fff; background: #22c55e; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-  .btn-green:hover { background: #16a34a; transform: translateY(-1px); }
-  .btn-green:active { transform: scale(0.97); }
-  :global(.btn-danger) { display: inline-flex; align-items: center; padding: 6px 12px; font-size: 12px; font-weight: 500; color: #e53e3e; border: 1px solid #fed7d7; background: #fff; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
-  :global(.btn-danger:hover) { background: #fff5f5; border-color: #feb2b2; }
-  :global(.btn-ghost) { font-size: 12px; color: var(--gray-4); background: none; border: none; cursor: default; }
+  /* ── Stats Grid ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  :global(.stat-card-modern) {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+  :global(.stat-card-modern:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border-color: #cbd5e1;
+  }
+  :global(.stat-icon-wrap) {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  :global(.stat-info-modern) { min-width: 0; flex: 1; }
+  :global(.stat-label-modern) { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 2px; }
+  :global(.stat-value-modern) { font-size: 26px; font-weight: 800; color: #1e293b; line-height: 1.1; letter-spacing: -0.02em; }
+  :global(.stat-sub-modern) { font-size: 11px; color: #94a3b8; margin-top: 4px; font-weight: 500; }
 
-  /* ── Badges ── */
-  :global(.role-badge) { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
-  :global(.role-admin) { background: #faf5ff; color: #6d28d9; border: 1px solid #ede9fe; }
-  :global(.role-teacher) { background: #f0f7ff; color: #1d4ed8; border: 1px solid #dbeafe; }
-  :global(.role-student) { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+  /* ── Form Controls & Buttons ── */
+  .input-modern {
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #334155;
+    background: #fff;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .input-modern:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  }
+  .btn-green-modern {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #16a34a;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+    white-space: nowrap;
+  }
+  .btn-green-modern:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3); }
+  .btn-green-modern:active { transform: scale(0.97); }
+
+  .btn-outline-sm {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-outline-sm:hover { background: #f1f5f9; border-color: #94a3b8; }
+
+  /* ── Role Badges ── */
+  :global(.role-badge) {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  :global(.role-admin) { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+  :global(.role-teacher) { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  :global(.role-student) { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+  /* ── Action buttons ── */
+  :global(.btn-action-del) {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #ef4444;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  :global(.btn-action-del:hover) {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+  }
 
   /* ── Toast ── */
   .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 50; display: flex; flex-direction: column; gap: 8px; }
-  :global(.toast-item) { padding: 12px 20px; border-radius: 10px; background: var(--black); color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.12); animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+  :global(.toast-item) {
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: #1e293b;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    animation: toastIn 0.25s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
   :global(.toast-item.out) { animation: toastOut 0.2s forwards; }
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(8px); } }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-  /* ── Responsive ── */
   @media (max-width: 768px) {
-    .topnav-inner { padding: 0 16px; height: 50px; }
+    .topnav-inner { padding: 0 16px; height: 54px; }
     .topnav-subtitle { display: none; }
     .topnav-divider { display: none; }
-    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .topnav-tabs::-webkit-scrollbar { display: none; }
     .topnav-tab { white-space: nowrap; padding: 6px 10px; font-size: 12px; }
-    .topnav-right { gap: 8px; }
-    .profile-email { display: none; }
-    .main-content { padding: 20px 16px; }
-    .stats-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 24px; }
-    :global(.stat-value) { font-size: 22px; }
-    .section-bar { margin-bottom: 10px; }
-    .data-table th, .data-table td { padding: 10px 12px; font-size: 12px; }
-    :global(.user-card) { padding: 12px 14px; }
-    :global(.user-card-email) { font-size: 12px; }
-    :global(.user-card-meta) { font-size: 11px; }
-    :global(.user-card-actions) { margin-left: 8px; }
-    .btn-dark { padding: 8px 14px; font-size: 12px; }
-    .panel-search { padding: 10px 12px; }
-    .search-input { padding: 8px 12px 8px 32px; font-size: 12px; }
-  }
-  @media (max-width: 480px) {
-    .topnav-inner { padding: 0 12px; }
-    .topnav-logo { font-size: 16px; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   }
 </style>
 
@@ -347,50 +433,20 @@ document.getElementById('profile-trigger')?.addEventListener('click', e => { e.s
 document.addEventListener('click', () => { if (ddOpen) { ddOpen = false; dd.classList.remove('open'); chev.classList.remove('open'); } });
 dd?.addEventListener('click', e => e.stopPropagation());
 
-/* ── Loading ── */
-function showLoading() {}
-function hideLoading() {}
-
 /* ── Toast ── */
 function showToast(msg) {
   const w = document.getElementById('toast');
   const el = document.createElement('div');
   el.className = 'toast-item'; el.textContent = msg;
   w.appendChild(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2500);
 }
-
-/* ── Helpers ── */
-function mkEl(tag, attrs) {
-  const e = document.createElement(tag);
-  if (attrs) Object.entries(attrs).forEach(([k, v]) => { if (k === 'className') e.className = v; else if (k === 'textContent') e.textContent = v; else e.setAttribute(k, v); });
-  for (let i = 2; i < arguments.length; i++) { const c = arguments[i]; if (c != null) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
-  return e;
-}
-
-/* ── Tabs ── */
-let currentTab = 'dashboard';
-document.querySelectorAll('.topnav-tab[data-tab]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
-    if (tab === currentTab) return;
-    document.querySelectorAll('.topnav-tab[data-tab]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
-    const t = document.getElementById('tab-' + tab);
-    t.classList.remove('hidden');
-    t.style.animation = 'none'; t.offsetHeight; t.style.animation = '';
-    currentTab = tab;
-    if (tab === 'whitelist') loadWhitelist();
-  });
-});
 
 /* ── Dashboard ── */
 async function loadDashboard() {
-  showLoading();
   try {
     const cached = cacheGet('dashboard');
-    if (cached) { renderStats(cached.stats); renderUsers(cached.users); hideLoading(); return; }
+    if (cached) { renderStats(cached.stats); renderUsers(cached.users); return; }
     const [sSnap, tSnap, qSnap, aSnap, qdSnap] = await Promise.all([
       firebase.database().ref('1zTeStsys/Studentaccount').once('value'),
       firebase.database().ref('1zTeStsys/Teacheraccount').once('value'),
@@ -412,44 +468,66 @@ async function loadDashboard() {
     renderStats(stats); renderUsers(allU);
     loadWhitelist();
   } catch (e) { console.error(e); showToast('載入失敗'); }
-  hideLoading();
 }
 
 function renderStats(s) {
-  const illustMap = {
-    '會員數': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj72XC7BDxBcvN8ukOQFdnubPQxgEdxg7BYJAcHpIIXKQJahBhuJFzY3-gWOEWr7RLJsqHifHNKKyDMT6tFw1Jw1TLcJ8a4ZGXCwbAqHBHQq_91QLGT-DAgZtabix0cztyJGJngTSQiLlJD/s800/cat_study.png',
-    '章節': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjDuKsQjh9yiTox7xuwyEsO81xO7qSIPz9LmFfyXU58DYGIiFlUNkoeAkVFAt8u3QVmfif-jve_qSIf54fIyez1fuo9xAxonbCKS4RXFr24hGbACkanDNTXy_8kJLa99q-8ZAh3FNLUT6CH/s800/test_print_mondaiyoushi.png',
-    '題目': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhxdrlsTW_fS0mA8lWrpvkt03gX4l3r9KhPOoyurCoU-ipXuYRJfc9DtvjqDVj1HNGhE3Qy53U8-A94sqNkEGVt2TYfwD65r-MPavcs5dbBaQQw5N3KJScwPf-rX1RS47sM4hi63_AvwXtN/s800/test_touan_100ten.png',
-    '測驗紀錄': 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjrCuctKWY_-p3O9FQ0JtJO1zirAhjZweaoDDbAR6j8YoAwTg9eoOC3_B6wZuJuXRLyJOB-X2cTRFmfVflSD0SOwPYqzB4zV6Ave8DKynvfjh2RPZ-sozPe1Doj32wFc3zwmR7fQUsBf4e1/s800/test_touan.png'
-  };
   const cards = [
-    { l: '會員數', v: s.totalMembers, sub: '學生 ' + s.totalStudents + '　教師 ' + s.totalTeachers },
-    { l: '章節', v: s.totalChapters },
-    { l: '題目', v: s.totalQuestions, link: BP + '/admin/questions' },
-    { l: '測驗紀錄', v: s.totalScores, link: BP + '/admin/records' }
+    {
+      l: '全站會員總數',
+      v: s.totalMembers,
+      sub: '學生 ' + s.totalStudents + ' 位 / 教師 ' + s.totalTeachers + ' 位',
+      bg: 'bg-emerald-50 text-emerald-600',
+      icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>'
+    },
+    {
+      l: '現有題庫章節',
+      v: s.totalChapters,
+      sub: '教師建立之章節題庫',
+      bg: 'bg-blue-50 text-blue-600',
+      icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>'
+    },
+    {
+      l: '收錄題目總數',
+      v: s.totalQuestions,
+      sub: '點擊前往題目管理 →',
+      link: BP + '/admin/questions',
+      bg: 'bg-purple-50 text-purple-600',
+      icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>'
+    },
+    {
+      l: '測驗紀錄筆數',
+      v: s.totalScores,
+      sub: '點擊前往成績管理 →',
+      link: BP + '/admin/records',
+      bg: 'bg-amber-50 text-amber-600',
+      icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>'
+    }
   ];
-  const g = document.getElementById('stats-grid'); g.replaceChildren();
-  cards.forEach((c, i) => {
-    const img = mkEl('img', { className: 'stat-illust', src: illustMap[c.l] || '', alt: c.l, loading: 'lazy' });
-    const info = mkEl('div', { className: 'stat-info' },
-      mkEl('p', { className: 'stat-label' }, c.l),
-      mkEl('p', { className: 'stat-value' }, String(c.v))
-    );
-    if (c.sub) info.appendChild(mkEl('p', { className: 'stat-sub' }, c.sub));
-    const card = mkEl('div', { className: 'stat-card' }, img, info);
+  const g = document.getElementById('stats-grid');
+  if (!g) return;
+  g.replaceChildren();
+  cards.forEach((c) => {
+    const card = document.createElement('div');
+    card.className = 'stat-card-modern';
+    card.innerHTML = `
+      <div class="stat-icon-wrap ${c.bg}">${c.icon}</div>
+      <div class="stat-info-modern">
+        <p class="stat-label-modern">${c.l}</p>
+        <p class="stat-value-modern">${c.v}</p>
+        <p class="stat-sub-modern">${c.sub}</p>
+      </div>
+    `;
     if (c.link) {
       card.style.cursor = 'pointer';
-      card.title = '前往查看';
       card.addEventListener('click', () => { window.location.href = c.link; });
     }
-    card.style.animationDelay = (i * 0.06) + 's';
     g.appendChild(card);
   });
 }
 
 let allUsers = [];
 let displayedCount = 0;
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 function renderUsers(users, append) {
   if (!append) {
     allUsers = users;
@@ -473,18 +551,18 @@ function renderUsers(users, append) {
 
   slice.forEach((u, i) => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-200';
+    tr.className = 'hover:bg-slate-50/80 transition-colors';
 
-    const idxTd = `<td class="py-3.5 px-4 text-xs font-medium text-slate-400 text-center">${start + i + 1}</td>`;
-    const emailTd = `<td class="py-3.5 px-4 text-xs font-semibold text-slate-800 tracking-tight">${u.email}</td>`;
-    const nameTd = `<td class="py-3.5 px-4 text-xs font-normal text-slate-600">${u.name || '-'}</td>`;
-    const stunumTd = `<td class="py-3.5 px-4 text-xs font-normal text-slate-500">${u.stunum || '-'}</td>`;
-    const roleBadge = `<span class="role-badge !rounded-none ${cm[u.role] || ''}">${rm[u.role] || u.role}</span>`;
+    const idxTd = `<td class="py-3 px-4 text-xs font-medium text-slate-400 text-center">${start + i + 1}</td>`;
+    const emailTd = `<td class="py-3 px-4 text-xs font-semibold text-slate-800 tracking-tight">${u.email}</td>`;
+    const nameTd = `<td class="py-3 px-4 text-xs font-normal text-slate-600">${u.name || '-'}</td>`;
+    const stunumTd = `<td class="py-3 px-4 text-xs font-normal text-slate-500">${u.stunum || '-'}</td>`;
+    const roleBadge = `<span class="role-badge ${cm[u.role] || ''}">${rm[u.role] || u.role}</span>`;
     const roleTd = `<td class="py-3 px-4 text-center">${roleBadge}</td>`;
 
     let actionBtn = `<span class="text-xs text-slate-300">-</span>`;
     if (u.role !== 'admin') {
-      actionBtn = `<button class="btn-danger-square del-user-btn" style="padding:4px 10px;font-size:11px;font-weight:500;color:#dc2626;border:1px solid #fca5a5;background:#fff;border-radius:0px;cursor:pointer;transition:all 0.15s;">刪除</button>`;
+      actionBtn = `<button class="btn-action-del del-user-btn">刪除</button>`;
     }
     const actionTd = `<td class="py-3 px-4 text-center">${actionBtn}</td>`;
 
@@ -600,12 +678,12 @@ function renderWL(data) {
     const d = data[k];
     const em = d.email || k.replace(/,/g, '.');
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-200';
+    tr.className = 'hover:bg-slate-50/80 transition-colors';
 
     const emailTd = `<td class="py-3 px-4 font-semibold text-slate-800">${em}</td>`;
     const adminTd = `<td class="py-3 px-4 text-slate-500">${d.addedBy || '—'}</td>`;
     const timeTd = `<td class="py-3 px-4 text-slate-500">${d.createdAt ? new Date(d.createdAt).toLocaleDateString('zh-TW') : '—'}</td>`;
-    const actionTd = `<td class="py-3 px-4 text-center"><button class="btn-revoke-btn" style="padding:4px 10px;font-size:11px;font-weight:500;color:#dc2626;border:1px solid #fca5a5;background:#fff;border-radius:0px;cursor:pointer;transition:all 0.15s;">解除權限</button></td>`;
+    const actionTd = `<td class="py-3 px-4 text-center"><button class="btn-action-del btn-revoke-btn">解除權限</button></td>`;
 
     tr.innerHTML = emailTd + adminTd + timeTd + actionTd;
     const btnRevoke = tr.querySelector('.btn-revoke-btn');
@@ -627,18 +705,9 @@ function renderWL(data) {
     tb.appendChild(tr);
   });
 }
-document.getElementById('btn-wl-add')?.addEventListener('click', async () => {
-  const em = document.getElementById('wl-email').value.trim();
-  if (!em) { showToast('請輸入 email'); return; }
-  const san = window.sanitizeEmail(em);
-  await firebase.database().ref('config/teacherWhitelist/' + san).set({ email: em, addedBy: user.email, createdAt: new Date().toISOString() });
-  showToast('已加入 ' + em); document.getElementById('wl-email').value = '';
-  cacheInvalidate('whitelist'); cacheInvalidate('dashboard'); loadWhitelist();
-});
 
 /* ── Logout ── */
 async function doLogout() { try { await firebase.auth().signOut(); } catch(e) {} localStorage.removeItem('fb_user'); window.location.href = BP + '/admin/login'; }
-document.getElementById('logout-btn')?.addEventListener('click', doLogout);
 document.getElementById('dropdown-logout')?.addEventListener('click', doLogout);
 
 ensureAdmin().then(loadDashboard);

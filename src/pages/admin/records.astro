@@ -27,7 +27,7 @@ import Layout from '../../layouts/Layout.astro';
           </button>
           <div id="profile-dropdown" class="dropdown">
             <div class="dropdown-head">
-              <p class="dropdown-label">管理員</p>
+              <p class="dropdown-label">管理員帳號</p>
               <p id="dropdown-email" class="dropdown-email"></p>
             </div>
             <button id="dropdown-logout" class="dropdown-item danger">登出</button>
@@ -39,49 +39,60 @@ import Layout from '../../layouts/Layout.astro';
 
   <!-- Content -->
   <main class="main-content w-full flex-1">
-    <div class="section-bar">
-      <h2 class="section-title">成績管理</h2>
-      <span class="section-count">瀏覽與編輯所有成績</span>
-    </div>
-
-    <!-- Data source tabs -->
-    <div class="flex items-center gap-2 mb-6 border-b border-slate-200 pb-3">
-      <button data-src="quiz" class="src-tab active">QUIZSCORES 一般測驗</button>
-      <button data-src="pvqc" class="src-tab">PVQCSCORES TTVS 成績</button>
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div>
+        <h1 class="text-xl font-bold text-slate-800">全校測驗成績總覽</h1>
+        <p class="text-xs text-slate-500 mt-1">即時檢視各科測驗作答紀錄、歷史成績與修改學生作答分數</p>
+      </div>
+      <!-- Data source pill switch -->
+      <div class="flex items-center p-1 bg-slate-200/70 rounded-full">
+        <button data-src="quiz" class="src-tab-pill active">一般測驗成績</button>
+        <button data-src="pvqc" class="src-tab-pill">TTVS 專業英語成績</button>
+      </div>
     </div>
 
     <!-- QUIZSCORES panel -->
-    <section id="panel-quiz" class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white" style="border-radius:0px;">
-      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
+    <section id="panel-quiz" class="panel p-6 mb-8">
+      <div class="flex items-center justify-between mb-5 pb-4 border-b border-slate-100 flex-wrap gap-4">
         <div>
-          <h2 class="text-sm font-bold text-slate-800">一般測驗成績</h2>
-          <p class="text-xs text-slate-500 mt-0.5">教師 → 日期 → 學生 → 作答紀錄（點擊展開）</p>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </span>
+            <h2 class="text-base font-bold text-slate-800">一般測驗成績列表</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">教師 → 測驗日期 → 學生姓名 → 歷次作答（點擊層級可展開收合）</p>
         </div>
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <input id="quiz-search" type="text" placeholder="搜尋學生/姓名..." class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-56" style="border-radius:0px;" />
-          <button id="btn-expand-all-quiz" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部展開</button>
-          <button id="btn-collapse-all" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部收合</button>
+        <div class="flex items-center gap-2.5 w-full sm:w-auto">
+          <input id="quiz-search" type="text" placeholder="搜尋學生姓名或學號..." class="input-modern flex-1 sm:w-60" />
+          <button id="btn-expand-all-quiz" class="btn-outline-sm">全部展開</button>
+          <button id="btn-collapse-all" class="btn-outline-sm">全部收合</button>
         </div>
       </div>
       <div id="quiz-tree" class="space-y-3"></div>
-      <p id="quiz-empty" class="hidden py-8 text-center text-sm text-slate-400">尚無測驗成績</p>
+      <p id="quiz-empty" class="hidden py-10 text-center text-sm text-slate-400">尚無測驗成績</p>
     </section>
 
     <!-- PVQCSCORES panel -->
-    <section id="panel-pvqc" class="panel p-5 mb-6 border border-slate-200 shadow-sm bg-white hidden" style="border-radius:0px;">
-      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 flex-wrap gap-3">
+    <section id="panel-pvqc" class="panel p-6 mb-8 hidden">
+      <div class="flex items-center justify-between mb-5 pb-4 border-b border-slate-100 flex-wrap gap-4">
         <div>
-          <h2 class="text-sm font-bold text-slate-800">TTVS 成績</h2>
-          <p class="text-xs text-slate-500 mt-0.5">_ttvs 教師即時成績　・　教師遷移成績（日期 → 學生 → 類別）</p>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </span>
+            <h2 class="text-base font-bold text-slate-800">TTVS PVQC 成績列表</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">_ttvs 教師即時成績　・　教師遷移成績（日期 → 學生 → 測驗類別）</p>
         </div>
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <input id="pvqc-search" type="text" placeholder="搜尋學生/姓名..." class="border border-slate-200 px-3 py-2 text-xs text-slate-700 focus:border-slate-800 focus:outline-none flex-1 sm:w-56" style="border-radius:0px;" />
-          <button id="btn-expand-all-pvqc" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部展開</button>
-          <button id="btn-collapse-all-pvqc" class="text-xs font-semibold px-3 py-2 border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition" style="border-radius:0px;">全部收合</button>
+        <div class="flex items-center gap-2.5 w-full sm:w-auto">
+          <input id="pvqc-search" type="text" placeholder="搜尋學生姓名或學號..." class="input-modern flex-1 sm:w-60" />
+          <button id="btn-expand-all-pvqc" class="btn-outline-sm">全部展開</button>
+          <button id="btn-collapse-all-pvqc" class="btn-outline-sm">全部收合</button>
         </div>
       </div>
       <div id="pvqc-tree" class="space-y-3"></div>
-      <p id="pvqc-empty" class="hidden py-8 text-center text-sm text-slate-400">尚無 TTVS 成績</p>
+      <p id="pvqc-empty" class="hidden py-10 text-center text-sm text-slate-400">尚無 TTVS 成績</p>
     </section>
   </main>
 
@@ -89,136 +100,291 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style is:global>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-  /* ── Reset & Base ── */
-  :root { --black: #111; --gray-1: #333; --gray-2: #666; --gray-3: #999; --gray-4: #ccc; --gray-bg: #f5f5f5; --white: #fff; --border: #e5e5e5; --radius: 12px; }
-  body { font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  :root {
+    --color-primary: #16a34a;
+    --border-color: #e2e8f0;
+  }
 
   /* ── Top Nav ── */
-  .topnav { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
-  .topnav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 24px; }
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  }
+  .topnav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 24px;
+  }
   .topnav-left { display: flex; align-items: center; gap: 12px; }
-  .topnav-logo { font-size: 18px; font-weight: 700; color: var(--black); text-decoration: none; letter-spacing: -0.02em; }
-  .topnav-divider { width: 1px; height: 18px; background: var(--gray-4); }
-  .topnav-subtitle { font-size: 13px; color: var(--gray-3); font-weight: 500; }
-  .topnav-tabs { display: flex; align-items: center; gap: 8px; }
+  .topnav-logo { font-size: 20px; font-weight: 800; color: #16a34a; text-decoration: none; font-family: "Pacifico", cursive; }
+  .topnav-divider { width: 1px; height: 18px; background: #e2e8f0; }
+  .topnav-subtitle { font-size: 13px; color: #64748b; font-weight: 600; }
+  .topnav-tabs { display: flex; align-items: center; gap: 6px; }
   .topnav-tab {
     position: relative;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-3, #64748b);
+    color: #64748b;
     background: transparent;
     border: none;
-    padding: 16px 10px;
+    padding: 8px 14px;
+    border-radius: 9999px;
     cursor: pointer;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
   }
-  .topnav-tab::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2.5px;
-    background: #16a34a;
-    border-radius: 9999px;
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  .topnav-tab:hover {
+    color: #16a34a;
+    background: rgba(22, 163, 74, 0.08);
   }
-  .topnav-tab:hover { color: #16a34a; }
-  .topnav-tab:hover::after { width: 100%; left: 0; }
-  .topnav-tab.active { color: #16a34a; font-weight: 600; }
-  .topnav-tab.active::after { width: 100%; left: 0; }
+  .topnav-tab.active {
+    color: #15803d;
+    background: rgba(22, 163, 74, 0.12);
+    font-weight: 600;
+  }
   .topnav-right { display: flex; align-items: center; gap: 16px; }
   .profile-menu { position: relative; }
-  .profile-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 8px; transition: background 0.15s; }
-  .profile-btn:hover { background: var(--gray-bg); }
-  .avatar { width: 30px; height: 30px; border-radius: 8px; background: var(--black); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; overflow: hidden; }
+  .profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    transition: all 0.2s;
+  }
+  .profile-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background: #16a34a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    overflow: hidden;
+  }
   .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .chevron { width: 14px; height: 14px; color: var(--gray-4); transition: transform 0.2s; }
+  .chevron { width: 14px; height: 14px; color: #94a3b8; transition: transform 0.2s; }
   .chevron.open { transform: rotate(180deg); }
-  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 240px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.08); opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 220px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
   .dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-  .dropdown-head { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-  .dropdown-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-3); }
-  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gray-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .dropdown-item { display: block; width: 100%; text-align: left; padding: 10px 16px; font-size: 13px; color: var(--gray-2); background: none; border: none; cursor: pointer; transition: background 0.15s; }
-  .dropdown-item:hover { background: var(--gray-bg); }
-  .dropdown-item.danger { color: #e53e3e; }
-  .dropdown-item.danger:hover { background: #fff5f5; }
+  .dropdown-head { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+  .dropdown-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+  .dropdown-email { margin-top: 2px; font-size: 13px; font-weight: 600; color: #334155; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 0 0 16px 16px;
+  }
+  .dropdown-item:hover { background: #f8fafc; }
+  .dropdown-item.danger { color: #ef4444; }
+  .dropdown-item.danger:hover { background: #fef2f2; }
 
-  /* ── Main Content ── */
-  .main-content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  /* ── Main Content & Panels ── */
+  .main-content { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+  .panel {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(12px);
+    transition: box-shadow 0.2s;
+  }
 
-  /* ── Section Bar ── */
-  .section-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .section-title { font-size: 15px; font-weight: 600; color: var(--black); }
-  .section-count { font-size: 12px; color: var(--gray-3); }
+  /* ── Source Pill Tabs ── */
+  .src-tab-pill {
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    border-radius: 9999px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .src-tab-pill.active {
+    background: #fff;
+    color: #15803d;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
 
-  /* ── Source tabs (underline style, matches topnav) ── */
-  .src-tab { padding: 7px 14px; font-size: 13px; font-weight: 500; color: var(--gray-2); background: transparent; border: none; cursor: pointer; transition: color 0.15s, border-color 0.15s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-  .src-tab:hover { color: #16a34a; }
-  .src-tab.active { color: #16a34a; border-bottom-color: #16a34a; font-weight: 600; }
-
-  /* ── Panel ── */
-  .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s; }
-  .panel:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-  .panel.p-5 { padding: 20px; }
-
-  /* ── Tree ── */
-  .tree-node { border: 1px solid var(--border); background: #fff; }
-  .node-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; user-select: none; }
-  .node-head:hover { background: var(--gray-bg); }
-  .node-icon { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0; font-size: 12px; color: #fff; }
-  .node-icon.k-teacher { background: #1f2937; }
+  /* ── Tree View ── */
+  .tree-node {
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  }
+  .node-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .node-head:hover { background: #f8fafc; }
+  .node-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .node-icon.k-teacher { background: #334155; }
   .node-icon.k-date { background: #16a34a; }
   .node-icon.k-student { background: #2563eb; }
   .node-icon.k-attempt { background: #d97706; }
   .node-main { flex: 1; min-width: 0; }
-  .node-title { font-size: 13px; font-weight: 600; color: var(--gray-1); word-break: break-all; }
-  .node-meta { font-size: 11px; color: var(--gray-3); margin-top: 1px; }
-  .node-children { border-top: 1px solid #f3f4f6; margin: 0 0 0 22px; padding: 10px 0 10px 18px; border-left: 2px solid #e5e5e5; background: #fcfcfc; display: flex; flex-direction: column; gap: 6px; }
-  .caret { display: inline-block; width: 16px; height: 16px; flex-shrink: 0; color: #94a3b8; transition: transform 0.15s; }
+  .node-title { font-size: 13.5px; font-weight: 700; color: #1e293b; word-break: break-all; }
+  .node-meta { font-size: 11.5px; color: #64748b; margin-top: 1px; }
+  .node-children {
+    border-top: 1px solid #f1f5f9;
+    margin: 0 0 0 20px;
+    padding: 12px 14px 12px 16px;
+    border-left: 2px solid #cbd5e1;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .caret { display: inline-block; width: 16px; height: 16px; flex-shrink: 0; color: #94a3b8; transition: transform 0.2s; }
   .caret.open { transform: rotate(90deg); }
 
-  /* ── Score rows ── */
-  .score-row { display: flex; align-items: center; gap: 12px; padding: 9px 12px; background: #fff; border: 1px solid #eef0f2; border-radius: 8px; transition: border-color 0.15s, box-shadow 0.15s; }
-  .score-row:hover { border-color: #d6d3d1; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-  .score-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; padding: 6px 8px; background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; flex-shrink: 0; }
-  .score-badge-num { font-size: 14px; font-weight: 700; color: #15803d; line-height: 1.1; font-variant-numeric: tabular-nums; }
-  .score-badge-total { font-size: 9px; color: #86b79a; line-height: 1.2; }
+  /* ── Score Rows ── */
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .score-row:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+  .score-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 54px;
+    padding: 6px 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .score-badge-num { font-size: 16px; font-weight: 800; color: #15803d; line-height: 1.1; }
+  .score-badge-total { font-size: 10px; color: #86efac; font-weight: 600; line-height: 1.2; }
   .score-info { flex: 1; min-width: 0; }
-  .score-name { font-size: 13px; font-weight: 600; color: #111; }
-  .score-sub { font-size: 11px; color: #999; margin-top: 1px; word-break: break-all; }
+  .score-name { font-size: 13.5px; font-weight: 700; color: #1e293b; }
+  .score-sub { font-size: 11.5px; color: #64748b; margin-top: 2px; word-break: break-all; }
   .score-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .btn-mini { padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border-radius: 6px; }
-  .btn-mini.green { background: #16a34a; color: #fff; border: 1px solid #16a34a; }
+  .btn-mini {
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 8px;
+    border: none;
+  }
+  .btn-mini.green { background: #16a34a; color: #fff; }
   .btn-mini.green:hover { background: #15803d; }
-  .btn-mini.red { background: #fff; color: #dc2626; border: 1px solid #fca5a5; }
-  .btn-mini.red:hover { background: #fff5f5; }
+  .btn-mini.red { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+  .btn-mini.red:hover { background: #fee2e2; color: #dc2626; }
 
-  .no-match { padding: 20px; text-align: center; font-size: 12px; color: #999; background: #fff; border: 1px dashed var(--border); }
+  .input-modern {
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #334155;
+    background: #fff;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .input-modern:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  }
+  .btn-outline-sm {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-outline-sm:hover { background: #f1f5f9; border-color: #94a3b8; }
 
   /* ── Toast ── */
   .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 50; display: flex; flex-direction: column; gap: 8px; }
-  .toast-item { padding: 12px 20px; border-radius: 10px; background: var(--black); color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.12); animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .toast-item { padding: 10px 18px; border-radius: 12px; background: #1e293b; color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); animation: toastIn 0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
   .toast-item.out { animation: toastOut 0.2s forwards; }
   @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(8px); } }
 
-  /* ── Responsive ── */
   @media (max-width: 768px) {
-    .topnav-inner { padding: 0 16px; height: 50px; }
+    .topnav-inner { padding: 0 16px; height: 54px; }
     .topnav-subtitle { display: none; }
     .topnav-divider { display: none; }
-    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
+    .topnav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .topnav-tabs::-webkit-scrollbar { display: none; }
     .topnav-tab { white-space: nowrap; padding: 6px 10px; font-size: 12px; }
-    .topnav-right { gap: 8px; }
-    .main-content { padding: 20px 16px; }
-    .score-actions { flex-direction: column; }
   }
 </style>
 
@@ -258,7 +424,7 @@ function showToast(msg) {
   const el = document.createElement('div');
   el.className = 'toast-item'; el.textContent = msg;
   w.appendChild(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2800);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 220); }, 2500);
 }
 
 function esc(s) {
@@ -271,9 +437,9 @@ let quizData = null;
 let pvqcData = null;
 
 /* ── Tab switching ── */
-document.querySelectorAll('.src-tab').forEach(btn => {
+document.querySelectorAll('.src-tab-pill').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.src-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.src-tab-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const isQuiz = btn.dataset.src === 'quiz';
     document.getElementById('panel-quiz').classList.toggle('hidden', !isQuiz);
@@ -283,9 +449,14 @@ document.querySelectorAll('.src-tab').forEach(btn => {
 
 /* ══════════ QUIZSCORES ══════════ */
 async function loadQuiz() {
-  const snap = await db.ref('QUIZSCORES').once('value');
-  quizData = snap.exists() ? snap.val() : null;
-  renderQuiz();
+  try {
+    const snap = await db.ref('QUIZSCORES').once('value');
+    quizData = snap.exists() ? snap.val() : null;
+    renderQuiz();
+  } catch(e) {
+    console.error(e);
+    showToast('載入成績失敗');
+  }
 }
 
 function quizScorePath(teacherKey, dateKey, studentSan, attemptKey, innerKey) {
@@ -296,13 +467,13 @@ function quizScorePath(teacherKey, dateKey, studentSan, attemptKey, innerKey) {
 
 async function editScore(path, cache, refresh) {
   const { value: v } = await Swal.fire({
-    title: '輸入新分數',
-    text: '目前：' + (cache && cache.score != null ? cache.score + (cache.total != null ? ' / ' + cache.total : '') : '-'),
+    title: '修改學生測驗分數',
+    text: '目前分數：' + (cache && cache.score != null ? cache.score + (cache.total != null ? ' / ' + cache.total : '') : '-'),
     input: 'number',
     inputAttributes: { min: '0', step: '1' },
     inputValue: cache && cache.score != null ? cache.score : '',
     showCancelButton: true,
-    confirmButtonText: '儲存',
+    confirmButtonText: '確認修改',
     cancelButtonText: '取消',
     confirmButtonColor: '#16a34a'
   });
@@ -316,7 +487,7 @@ async function editScore(path, cache, refresh) {
 }
 
 async function deleteRecord(path, name, refresh) {
-  if (!confirm('確定刪除 ' + (name || '這筆') + ' 的成績？此操作無法復原！')) return;
+  if (!confirm('確定刪除 ' + (name || '這筆') + ' 的成績紀錄？此操作無法復原！')) return;
   try {
     await db.ref(path).remove();
     showToast('已刪除紀錄');
@@ -359,7 +530,6 @@ function renderQuiz() {
               attemptKeys.forEach(attemptKey => {
                 const inner = attempts[attemptKey];
                 if (inner && inner.score !== undefined) {
-                  // 舊格式：attemptKey 直接是成績
                   const fullPath = quizScorePath(teacherKey, dateKey, studentSan, attemptKey);
                   box.appendChild(buildScoreRow({
                     name: inner.name || inner.student || attemptKey,
@@ -369,7 +539,6 @@ function renderQuiz() {
                     delCb: () => deleteRecord(fullPath, inner.name || inner.student || attemptKey, renderQuiz)
                   }));
                 } else {
-                  // 新格式：attemptKey 下還有一層真正的成績
                   const innerKeys = inner && typeof inner === 'object' ? Object.keys(inner) : [];
                   const attemptNode = buildNode('attempt', attemptKey, innerKeys.length + ' 筆成績', (box) => {
                     innerKeys.forEach(innerKey => {
@@ -404,9 +573,13 @@ function renderQuiz() {
 
 /* ══════════ PVQCSCORES ══════════ */
 async function loadPvqc() {
-  const snap = await db.ref('PVQCSCORES').once('value');
-  pvqcData = snap.exists() ? snap.val() : null;
-  renderPvqc();
+  try {
+    const snap = await db.ref('PVQCSCORES').once('value');
+    pvqcData = snap.exists() ? snap.val() : null;
+    renderPvqc();
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 function renderPvqc() {
@@ -425,10 +598,9 @@ function renderPvqc() {
   Object.keys(pvqcData).sort().forEach(rootKey => {
     let rootLabel = '資料區';
 
-    // ── 已知結構一：_ttvs/{teacherSan}/ttvs/{attempt} ──
     if (rootKey === '_ttvs') {
       rootLabel = 'TTVS 教師即時成績';
-const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
+      const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
         Object.keys(pvqcData[rootKey] || {}).forEach(teacherSan => {
           const teacherNode = buildNode('teacher', teacherSan.replace(/,/g, '.'), '教師', (box) => {
             const sub = pvqcData[rootKey][teacherSan] || {};
@@ -443,12 +615,9 @@ const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
       return;
     }
 
-    // ── 已知結構二：{teacherSan}/{dateKey}/{studentId}/{pvqc_scoresX|pvqc_totalscores}/{attempt} ──
-    // hi@nasirlin,net 是第一層教師 key，其下是日期
     if (pvqcData[rootKey] && typeof pvqcData[rootKey] === 'object') {
       const firstLevel = pvqcData[rootKey];
       const firstKeys = Object.keys(firstLevel);
-      // 檢查第二層是否為日期（有第三層學生ID）
       const looksLikeDateTree = firstKeys.length > 0 && firstKeys.every(dk => {
         const v = firstLevel[dk];
         if (!v || typeof v !== 'object') return false;
@@ -489,7 +658,6 @@ const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
       }
     }
 
-    // ── 未知結構：通用巡覽 ──
     const rootNode = buildNode('folder', rootKey, rootLabel, (box) => {
       walkPvqc('PVQCSCORES/' + rootKey, pvqcData[rootKey], box, q);
     });
@@ -506,7 +674,7 @@ function walkPvqc(pathPrefix, data, parentBox, q) {
   if (!data || typeof data !== 'object') return;
   const keys = Object.keys(data);
   if (!keys.length) {
-    parentBox.appendChild(buildText('（空）'));
+    parentBox.appendChild(buildText('（無資料）'));
     return;
   }
 
@@ -545,7 +713,7 @@ const KIND_META = {
   date:    { icon: '日', cls: 'k-date' },
   student: { icon: '生', cls: 'k-student' },
   attempt: { icon: '答', cls: 'k-attempt' },
-  folder:  { icon: '⊞', cls: 'k-attempt' },
+  folder:  { icon: '📁', cls: 'k-attempt' },
   blank:   { icon: '·', cls: 'k-date' }
 };
 
@@ -592,7 +760,7 @@ function collapseNode(wrap) {
 
 function buildText(t) {
   const d = document.createElement('div');
-  d.className = 'no-match';
+  d.className = 'py-4 text-center text-xs text-slate-400 bg-white rounded-lg border border-dashed border-slate-200';
   d.textContent = t;
   return d;
 }
@@ -609,7 +777,7 @@ function buildScoreRow(opts) {
       (opts.sub ? '<div class="score-sub">' + esc(opts.sub) + '</div>' : '') +
     '</div>' +
     '<div class="score-actions">' +
-      '<button class="btn-mini green btn-edit-score">修改</button>' +
+      '<button class="btn-mini green btn-edit-score">修改分數</button>' +
       '<button class="btn-mini red btn-del-score">刪除</button>' +
     '</div>';
   row.querySelector('.btn-edit-score').addEventListener('click', opts.editCb);
@@ -618,7 +786,6 @@ function buildScoreRow(opts) {
 }
 
 function expandAllNodes(container) {
-  // 由上而下遞迴展開
   const stack = [container];
   while (stack.length) {
     const el = stack.pop();
