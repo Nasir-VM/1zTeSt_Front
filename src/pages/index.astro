@@ -4,15 +4,6 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 <Layout title="首頁">
-  <div id="splash" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center" style="background:#14532d;">
-    <svg class="mb-8" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-      <path d="m15 5 4 4"/>
-    </svg>
-    <div class="h-1.5 w-48 overflow-hidden rounded-full bg-white/20">
-      <div id="splash-bar" class="h-full w-0 rounded-full bg-white transition-all duration-[1200ms] ease-out"></div>
-    </div>
-  </div>
   <Header />
   <main class="relative min-h-screen pt-16">
     <canvas id="cursor-canvas" class="pointer-events-none fixed inset-0 z-50" style="width:100vw;height:100vh"></canvas>
@@ -295,20 +286,6 @@ import Footer from '../components/Footer.astro';
         goBtn.textContent = '前往測驗吧';
       }
     }
-  })();
-
-  (function() {
-    const shown = sessionStorage.getItem('splash_shown');
-    if (shown) { document.getElementById('splash').style.display = 'none'; return; }
-    const bar = document.getElementById('splash-bar');
-    const splash = document.getElementById('splash');
-    requestAnimationFrame(() => { bar.style.width = '100%'; });
-    setTimeout(() => {
-      splash.style.transition = 'opacity 0.4s ease';
-      splash.style.opacity = '0';
-      setTimeout(() => { splash.style.display = 'none'; }, 400);
-    }, 1300);
-    sessionStorage.setItem('splash_shown', '1');
   })();
 </script>
 

@@ -35,9 +35,10 @@ const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://accounts.google.com" />
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-  <link rel="dns-prefetch" href="https://accounts.google.com" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC:wght@400;500;700&family=LXGW+WenKai+Lite&family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/iansui@latest/index.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" is:inline></script>
   <!-- GSAP Animation Library (Deferred) -->
   <script defer src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" is:inline></script>
@@ -57,7 +58,6 @@ const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
     gtag('config', 'G-2J28ZVEPZF');
   </script>
   <style is:global>
-    @import url('https://cdn.jsdelivr.net/fontsource/fonts/iansui@latest/index.css');
     @tailwind base;
     @tailwind components;
     @tailwind utilities;
