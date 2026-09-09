@@ -1,84 +1,115 @@
 {
   "rules": {
+    ".read": false,
+    ".write": false,
+
     "1zTeStsys": {
-      ".read": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()",
+      ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
       "Studentaccount": {
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
         "$sanitizedEmail": {
-          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
-          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
+          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
         }
       },
       "Teacheraccount": {
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
         "$sanitizedEmail": {
-          ".read": "auth != null",
-          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
-          "Teacherscores": {
-            ".read": "auth != null",
-            ".write": "auth != null"
-          }
+          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
         }
+      },
+      "Teacherpassword": {
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+        ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
       }
     },
+
     "Teacherquestion": {
-      ".read": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()",
+      ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
       "$sanitizedEmail": {
         ".read": "auth != null",
-        ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+        ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
         "chapters": {
           "$chapterId": {
-            ".read": "auth != null",
-            "questions": {
-              ".read": "auth != null",
-              "$questionId": {
-                ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
-              }
-            }
+            ".read": "auth != null && (root.child('Teacherquestion').child($sanitizedEmail).child('chapters').child($chapterId).child('open').val() === true || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+            ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
           }
         }
       }
     },
-    "config": {
-      "admins": {
-        ".read": "auth != null",
-        ".write": "auth != null"
-      },
-      "teacherWhitelist": {
-        ".read": "auth != null",
-        "$email": {
-          ".read": "auth != null",
-          ".write": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()"
+
+    "QuestionData": {
+      ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+      "$sanitizedEmail": {
+        "$chapterId": {
+          ".read": "auth != null && (root.child('Teacherquestion').child($sanitizedEmail).child('chapters').child($chapterId).child('open').val() === true || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $sanitizedEmail || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
         }
       }
     },
+
+    "config": {
+      "admins": {
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+        ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+        "$email": {
+          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $email || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+          ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
+        }
+      },
+      "teacherWhitelist": {
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+        ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+        "$email": {
+          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $email || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+          ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
+        }
+      }
+    },
+
     "QUIZSCORES": {
-      ".read": "auth != null",
-      ".write": "auth != null && (!data.exists() || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+      ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
       "$teacherSan": {
-        ".read": "auth != null",
-        ".write": "auth != null && (!data.exists() || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
+        ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+        "$dateKey": {
+          "$studentSan": {
+            ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $studentSan || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+            ".write": "auth != null && ((auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $studentSan && root.child('Teacherquestion').child($teacherSan).exists()) || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
+          }
+        }
       }
     },
+
     "pvqc": {
-      ".read": "auth != null",
-      ".write": "auth != null"
+      ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+      ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
     },
+
     "PVQCSCORES": {
-      ".read": "auth != null",
-      ".write": "auth != null && (!data.exists() || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+      ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+      "_ttvs": {
+        "$studentSan": {
+          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $studentSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $studentSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
+        }
+      },
       "$teacherSan": {
-        ".read": "auth != null",
-        ".write": "auth != null && (!data.exists() || auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists() || root.child('1zTeStsys/Teacheraccount').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())"
+        ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com' || root.child('config/teacherWhitelist').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
+        ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $teacherSan || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
       }
     },
+
     "ttvs": {
       "words": {
-        ".read": "auth != null",
-        ".write": "auth != null && root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists()"
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+        ".write": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
       },
       "scores": {
+        ".read": "auth != null && (auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
         "$userId": {
-          ".read": "auth != null && (auth.uid === $userId || root.child('config/admins').child(auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',')).exists())",
-          ".write": "auth != null && auth.uid === $userId"
+          ".read": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $userId || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')",
+          ".write": "auth != null && (auth.token.email.replace('.', ',').replace('#', ',').replace('$', ',').replace('/', ',') === $userId || auth.token.email === 'nasir101405@gmail.com' || auth.token.email === 'ovisnasir@gmail.com')"
         }
       }
     }
