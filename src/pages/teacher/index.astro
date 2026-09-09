@@ -249,6 +249,8 @@ import Footer from '../../components/Footer.astro';
   :global(.toggle-track.on .toggle-dot) { transform: translateX(16px); }
   :global(.manage-btn) { padding: 6px 14px; font-size: 12px; font-weight: 500; color: #fff; background: #1e3a5f; border: 1px solid #1e3a5f; border-radius: 6px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
   :global(.manage-btn:hover) { background: #163049; transform: translateY(-1px); }
+  :global(.edit-btn) { padding: 6px 12px; font-size: 12px; font-weight: 500; color: #475569; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
+  :global(.edit-btn:hover) { background: #f8fafc; color: #0f172a; border-color: #94a3b8; transform: translateY(-1px); }
   :global(.delete-btn) { padding: 6px 12px; font-size: 12px; font-weight: 500; color: #e53e3e; background: #fff; border: 1px solid #fed7d7; border-radius: 6px; cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); }
   :global(.delete-btn:hover) { background: #fff5f5; transform: translateY(-1px); }
   :global(.empty-state) { text-align: center; padding: 40px 20px; }
@@ -352,6 +354,47 @@ function renderChapters() {
     limitIn.addEventListener('change', async () => { await firebase.database().ref(ch.dbPath + '/limit').set(parseInt(limitIn.value) || 0); showToast('已更新上限'); });
     const manageBtn = mkEl('button', { className: 'manage-btn' }, '管理題目');
     manageBtn.addEventListener('click', () => openChapter(ch));
+    const renameBtn = mkEl('button', { className: 'edit-btn' }, '改名');
+    renameBtn.addEventListener('click', async () => {
+      const { value: formValues } = await Swal.fire({
+        title: '修改章節名稱與科目',
+        html:
+          '<div style="text-align:left;display:flex;flex-direction:column;gap:12px;margin-top:10px;">' +
+            '<div><label style="font-size:12px;font-weight:600;color:#64748b;">科目</label>' +
+            '<input id="swal-subject" class="swal2-input" style="width:100%;margin:4px 0 0;font-size:14px;box-sizing:border-box;" value="' + (ch.subject || '') + '" placeholder="例：英文、數學"></div>' +
+            '<div><label style="font-size:12px;font-weight:600;color:#64748b;">章節名稱</label>' +
+            '<input id="swal-name" class="swal2-input" style="width:100%;margin:4px 0 0;font-size:14px;box-sizing:border-box;" value="' + (ch.name || '') + '" placeholder="例：第一章"></div>' +
+          '</div>',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: '儲存修改',
+        cancelButtonText: '取消',
+        confirmButtonColor: '#16a34a',
+        preConfirm: () => {
+          const name = document.getElementById('swal-name').value.trim();
+          const subject = document.getElementById('swal-subject').value.trim();
+          if (!name) {
+            Swal.showValidationMessage('章節名稱不能為空');
+            return false;
+          }
+          return { name, subject };
+        }
+      });
+
+      if (formValues) {
+        try {
+          await firebase.database().ref(ch.dbPath).update({
+            name: formValues.name,
+            subject: formValues.subject
+          });
+          showToast('章節已更新');
+          loadChapters();
+        } catch(e) {
+          console.error(e);
+          Swal.fire({ title: '修改失敗', text: e.message || e, icon: 'error' });
+        }
+      }
+    });
     const delBtn = mkEl('button', { className: 'delete-btn' }, '刪除');
     delBtn.addEventListener('click', async () => {
       Swal.fire({ title: '確定刪除此章節？', text: '此操作無法復原', icon: 'warning', showCancelButton: true, confirmButtonText: '確定刪除', cancelButtonText: '取消', confirmButtonColor: '#e53e3e' }).then(async (r) => { if (r.isConfirmed) { await firebase.database().ref(ch.dbPath).remove(); showToast('已刪除章節'); loadChapters(); } });
@@ -361,7 +404,7 @@ function renderChapters() {
     acTrack.appendChild(mkEl('div', { className: 'toggle-dot' }));
     acTrack.addEventListener('click', async () => { const on = acTrack.classList.toggle('on'); await firebase.database().ref(ch.dbPath + '/antiChe').set(on); showToast(on ? '防作弊已開啟' : '防作弊已關閉'); });
     rightItems.push(mkEl('span', { className: 'text-xs text-gray-400' }, '🔒'), acTrack);
-    rightItems.push(limitIn, manageBtn, delBtn);
+    rightItems.push(limitIn, manageBtn, renameBtn, delBtn);
     const row = mkEl('div', { className: 'chapter-row' }, left, mkEl('div', { className: 'flex items-center gap-2 flex-wrap justify-end' }, ...rightItems));
     row.style.opacity = '0'; row.style.transform = 'translateY(8px)';
     el.appendChild(row);
