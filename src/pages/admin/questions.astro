@@ -494,9 +494,9 @@ function renderQuestions() {
     tr.className = 'hover:bg-slate-50/80 transition-colors align-top';
     tr.innerHTML =
       '<td class="py-3 px-4 text-xs font-medium text-slate-400 text-center">' + idx + '</td>' +
-      '<td class="py-3 px-4 q-cell"><div class="q-text">' + esc(text) + '</div>' +
-        (q.explanation ? '<div class="q-opts mt-1.5 text-slate-500 font-medium bg-slate-50 p-2 rounded-lg">💡 詳解：' + esc(q.explanation) + '</div>' : '') + '</td>' +
-      '<td class="py-3 px-4 q-cell"><div class="q-opts font-sans">' + esc(formatOptions(q)) + '</div></td>' +
+      '<td class="py-3 px-4 q-cell"><div class="q-text leading-relaxed">' + (window.formatRichText ? window.formatRichText(text) : esc(text)) + '</div>' +
+        (q.explanation ? '<div class="q-opts mt-1.5 text-slate-500 font-medium bg-slate-50 p-2 rounded-lg">💡 詳解：' + (window.formatRichText ? window.formatRichText(q.explanation) : esc(q.explanation)) + '</div>' : '') + '</td>' +
+      '<td class="py-3 px-4 q-cell"><div class="q-opts font-sans">' + (window.formatRichText ? window.formatRichText(formatOptions(q), true) : esc(formatOptions(q))) + '</div></td>' +
       '<td class="py-3 px-4 text-center"><span class="q-ans">' + esc(q.answer || '-') + '</span></td>' +
       '<td class="py-3 px-4 text-center"><button class="del-btn" type="button">刪除</button></td>';
     const delBtn = tr.querySelector('.del-btn');

@@ -270,6 +270,77 @@ const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
       return window.ADMIN_EMAILS.includes((email || '').toLowerCase());
     };
 
+    window.viewImage = function(url) {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          imageUrl: url,
+          imageAlt: '圖片預覽',
+          showConfirmButton: false,
+          showCloseButton: true,
+          backdrop: 'rgba(15, 23, 42, 0.75)',
+          customClass: {
+            popup: 'rounded-2xl overflow-hidden p-2 max-w-2xl bg-white shadow-2xl',
+            image: 'max-h-[75vh] object-contain rounded-xl m-0'
+          }
+        });
+      } else {
+        window.open(url, '_blank');
+      }
+    };
+
+    window.formatRichText = function(rawText, isInline, forPdf) {
+      if (!rawText) return '';
+      var text = String(rawText);
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      var mdImgRegex = /!\[(.*?)\]\(((?:https?:\/\/|data:image\/)[^\s\)]+)\)/gi;
+      var rawImgUrlRegex = /(https?:\/\/[^\s<>"'，。！？（）\(\)]+\.(?:png|jpe?g|gif|webp|svg|bmp|avif)(?:\?[^\s<>"'，。！？（）\(\)]*)?|https?:\/\/(?:i\.)?imgur\.com\/[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)?(?:\?[^\s<>"'，。！？（）\(\)]*)?|https?:\/\/(?:i\.)?ibb\.co\/[a-zA-Z0-9\/]+(?:\.[a-zA-Z0-9]+)?(?:\?[^\s<>"'，。！？（）\(\)]*)?|data:image\/(?:png|jpe?g|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=]+)/gi;
+
+      var images = [];
+      function addImage(url, alt) {
+        var cleanUrl = (url || '').trim().replace(/[.,;:!?]+$/, '');
+        var placeholder = '___IMG_PLACEHOLDER_' + images.length + '___';
+        images.push({ url: cleanUrl, alt: alt || '題目圖片' });
+        return placeholder;
+      }
+
+      text = text.replace(mdImgRegex, function(_, alt, url) {
+        return addImage(url, alt);
+      });
+
+      text = text.replace(rawImgUrlRegex, function(url) {
+        return addImage(url, '');
+      });
+
+      var safeText = escapeHtml(text);
+      safeText = safeText.replace(/\n/g, '<br>');
+
+      images.forEach(function(img, i) {
+        var placeholder = '___IMG_PLACEHOLDER_' + i + '___';
+        var imgHtml;
+        var safeUrl = img.url.replace(/"/g, '&quot;');
+        var safeAlt = escapeHtml(img.alt);
+        if (forPdf) {
+          imgHtml = '<div style="margin:8px 0;"><img src="' + safeUrl + '" alt="' + safeAlt + '" referrerpolicy="no-referrer" style="max-height:180px;max-width:100%;object-fit:contain;border-radius:6px;border:1px solid #cbd5e1;display:block;" /></div>';
+        } else if (isInline) {
+          imgHtml = '<img src="' + safeUrl + '" alt="' + safeAlt + '" referrerpolicy="no-referrer" loading="lazy" onerror="if(!this.dataset.retry){this.dataset.retry=\'1\';this.src=\'https://wsrv.nl/?url=\'+encodeURIComponent(this.src);}" class="inline-block max-h-16 max-w-full rounded border border-slate-200 object-contain align-middle mx-1 cursor-pointer hover:opacity-90 transition" onclick="event.stopPropagation();if(window.viewImage)window.viewImage(\'' + safeUrl + '\')" />';
+        } else {
+          imgHtml = '<div class="my-2.5 block max-w-full"><img src="' + safeUrl + '" alt="' + safeAlt + '" referrerpolicy="no-referrer" loading="lazy" onerror="if(!this.dataset.retry){this.dataset.retry=\'1\';this.src=\'https://wsrv.nl/?url=\'+encodeURIComponent(this.src);}" class="max-h-80 max-w-full rounded-xl border border-slate-200/90 shadow-sm object-contain bg-white transition hover:shadow-md cursor-zoom-in" onclick="event.stopPropagation();if(window.viewImage)window.viewImage(\'' + safeUrl + '\')" /></div>';
+        }
+        safeText = safeText.replace(placeholder, imgHtml);
+      });
+
+      return safeText;
+    };
+
     window.BASE_PATH = '';
     window.appURL = function(path) {
       return window.BASE_PATH + (path.startsWith('/') ? path : '/' + path);

@@ -481,7 +481,17 @@ function renderQuestionPage() {
   const pageItems = allQuestionKeys.slice(start, end);
 
   pageItems.forEach((q) => {
-    const left = mkEl('div', { className: 'flex-1' }, mkEl('p', { className: 'font-medium text-gray-700' }, q.question || ''), mkEl('p', { className: 'mt-1 text-xs text-gray-400' }, 'A: ' + (q.A||'-') + ' | B: ' + (q.B||'-') + ' | C: ' + (q.C||'-') + ' | D: ' + (q.D||'-')), mkEl('p', { className: 'mt-0.5 text-xs text-gray-600' }, '答案: ' + q.answer + (q.explanation ? ' | 詳解: ' + q.explanation : '')));
+    const qTextEl = mkEl('div', { className: 'font-medium text-gray-700 leading-relaxed' });
+    qTextEl.innerHTML = window.formatRichText ? window.formatRichText(q.question || '') : (q.question || '');
+    const optA = window.formatRichText ? window.formatRichText(q.A || '-', true) : (q.A || '-');
+    const optB = window.formatRichText ? window.formatRichText(q.B || '-', true) : (q.B || '-');
+    const optC = window.formatRichText ? window.formatRichText(q.C || '-', true) : (q.C || '-');
+    const optD = window.formatRichText ? window.formatRichText(q.D || '-', true) : (q.D || '-');
+    const optsEl = mkEl('div', { className: 'mt-1.5 text-xs text-gray-500 flex flex-wrap gap-x-3 gap-y-1' });
+    optsEl.innerHTML = '<span>A: ' + optA + '</span><span>B: ' + optB + '</span><span>C: ' + optC + '</span><span>D: ' + optD + '</span>';
+    const ansEl = mkEl('div', { className: 'mt-1 text-xs text-gray-600' });
+    ansEl.innerHTML = '<strong>答案:</strong> ' + (q.answer || '-') + (q.explanation ? ' | <strong>詳解:</strong> ' + (window.formatRichText ? window.formatRichText(q.explanation, true) : q.explanation) : '');
+    const left = mkEl('div', { className: 'flex-1 pr-4' }, qTextEl, optsEl, ansEl);
     const editBtn = mkEl('button', { className: 'manage-btn' }, '編輯');
     editBtn.addEventListener('click', () => { editingQuestionKey = q._key; document.getElementById('q-text').value = q.question || ''; document.getElementById('q-a').value = q.A || ''; document.getElementById('q-b').value = q.B || ''; document.getElementById('q-c').value = q.C || ''; document.getElementById('q-d').value = q.D || ''; document.getElementById('q-answer').value = q.answer || ''; document.getElementById('q-explanation').value = q.explanation || ''; document.getElementById('question-form').classList.remove('hidden'); document.getElementById('question-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     const delBtn = mkEl('button', { className: 'delete-btn' }, '刪除');
