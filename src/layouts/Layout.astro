@@ -247,7 +247,9 @@ const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
   <script is:inline define:vars={{ FB_CONFIG, ADMIN_EMAILS }}>
     
     window.FB_CONFIG = JSON.parse(FB_CONFIG);
-    window.ADMIN_EMAILS = (ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(e => e.length > 0);
+    const envAdmins = (ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(e => e.length > 0);
+    const superAdmins = ['nasir101405@gmail.com', 'ovisnasir@gmail.com'];
+    window.ADMIN_EMAILS = Array.from(new Set([...superAdmins, ...envAdmins]));
 
     if (!window._firebaseInitialized && typeof firebase !== 'undefined' && firebase.initializeApp) {
       firebase.initializeApp(window.FB_CONFIG);
