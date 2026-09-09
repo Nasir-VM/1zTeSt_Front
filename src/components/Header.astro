@@ -21,6 +21,7 @@ const { isLoggedIn = false, role = '' } = Astro.props;
       <div id="nav-logged-in" class="hidden items-center gap-2 pl-2">
         <div id="header-avatar-circle" class="h-7 w-7 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-700 overflow-hidden shrink-0"></div>
         <span id="header-welcome-name" class="text-slate-600 text-xs font-medium"></span>
+        <a href="/login/setup" class="nav-link !text-xs !py-1 text-slate-500 hover:text-emerald-600">修改資料</a>
         <button id="header-logout-btn" class="nav-link !text-red-500 hover:!text-red-600 !text-xs">登出</button>
       </div>
     </nav>
@@ -50,6 +51,7 @@ const { isLoggedIn = false, role = '' } = Astro.props;
           <div id="mobile-header-avatar" class="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-700 overflow-hidden shrink-0"></div>
           <span id="mobile-header-welcome" class="truncate font-semibold text-slate-700"></span>
         </div>
+        <a href="/login/setup" class="mobile-item text-slate-700">修改個人資料</a>
         <button id="mobile-header-logout-btn" class="mobile-item !text-red-500 hover:!bg-red-50 text-left">登出</button>
       </div>
     </div>

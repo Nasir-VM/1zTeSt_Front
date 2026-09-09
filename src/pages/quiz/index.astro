@@ -11,15 +11,6 @@ import Footer from '../../components/Footer.astro';
     <div class="mx-auto max-w-3xl px-4 py-12">
       <h1 class="mb-8 text-2xl font-bold text-slate-800">測驗 GOGOGO</h1>
 
-      <!-- Student Info Banner -->
-      <div id="student-info-banner" class="mb-6 rounded-xl border border-slate-100 bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex-1 text-center">
-          <span class="text-xs text-slate-400 block mb-0.5">目前登入學生</span>
-          <span id="student-display-info" class="text-sm font-bold text-slate-700">載入中...</span>
-        </div>
-        <a href="/login/setup" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-green-600">修改個人資料</a>
-      </div>
-
       <div id="step-teacher" class="card p-6 mb-6">
         <div class="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <img src="/student-online.png" alt="線上學習" class="h-32 sm:h-40 w-auto object-contain shrink-0 pointer-events-none" loading="lazy" />
@@ -1042,14 +1033,10 @@ if (saved) document.getElementById('teacher-email').value = saved;
     .then(snap => {
       if (snap.exists()) {
         const profile = snap.val();
-        document.getElementById('student-display-info').textContent =
-          `${profile.name || '未填寫'}（學號: ${profile.stunum || '未填寫'}）`;
-      } else {
-        document.getElementById('student-display-info').textContent = user.name || user.email;
+        const el = document.getElementById('student-display-info');
+        if (el) el.textContent = `${profile.name || '未填寫'}（學號: ${profile.stunum || '未填寫'}）`;
       }
     })
-    .catch(() => {
-      document.getElementById('student-display-info').textContent = user.name || user.email;
-    });
+    .catch(() => {});
 })();
 </script>
