@@ -4,7 +4,6 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 ---
 <Layout title="學生測驗">
-  <div id="auth-guard" style="position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center"></div>
   <Header isLoggedIn={true} role="student" />
   <main class="relative min-h-screen pt-16">
     <div class="blur-circle right-[-10%] top-[10%] h-[300px] w-[300px] bg-green-400/10"></div>
@@ -302,8 +301,21 @@ import Footer from '../../components/Footer.astro';
 
 <script is:inline>
 const BP = (typeof window !== 'undefined' && window.BASE_PATH) ? window.BASE_PATH : '';
-const user = JSON.parse(localStorage.getItem('fb_user') || 'null');
-if (!user || !user.email) { window.location.href = BP + '/'; } else { document.getElementById('auth-guard')?.remove(); }
+let user = JSON.parse(localStorage.getItem('fb_user') || 'null');
+if (!user || !user.email) {
+  if (window.firebase && window.firebase.auth) {
+    window.firebase.auth().onAuthStateChanged(function(fbUser) {
+      if (fbUser && fbUser.email) {
+        user = { email: fbUser.email, name: fbUser.displayName || fbUser.email, role: 'student' };
+        localStorage.setItem('fb_user', JSON.stringify(user));
+      } else {
+        window.location.href = BP + '/';
+      }
+    });
+  } else {
+    window.location.href = BP + '/';
+  }
+}
 
 function html(strings, ...vals) {
   return strings.reduce((acc, s, i) => acc + s + (vals[i] !== undefined ? vals[i] : ''), '');
