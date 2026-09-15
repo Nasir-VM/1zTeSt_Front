@@ -126,60 +126,11 @@ import Footer from '../components/Footer.astro';
       </div>
     </section>
 
-    <!-- Marquee -->
-    <section class="reveal relative overflow-hidden border-y border-green-100 py-14" style="background:#f8faf6;">
-      <div class="marquee-mask overflow-hidden">
-        <div class="flex animate-marquee-loop gap-12 whitespace-nowrap">
-          <span class="text-base text-slate-500">教師可自建題庫、管理章節</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">學生即時作答、查看成績</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">支援選擇題</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">Google 帳號快速登入</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">CSV 批次匯入題目</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">教師可開放或關閉章節</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">成績管理與統計</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">一鍵 Google 登入</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">教師可自建題庫、管理章節</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">學生即時作答、查看成績</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">支援選擇題</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">Google 帳號快速登入</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">CSV 批次匯入題目</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">教師可開放或關閉章節</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">成績管理與統計</span>
-          <span class="text-base text-slate-300">/</span>
-          <span class="text-base text-slate-500">一鍵 Google 登入</span>
-        </div>
-      </div>
-    </section>
   </main>
   <Footer />
 </Layout>
 
 <style>
-  .marquee-mask {
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-  }
-  @keyframes marqueeLoop {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-50%); }
-  }
-  .animate-marquee-loop {
-    animation: marqueeLoop 50s linear infinite;
-  }
   .fade-in {
     animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
