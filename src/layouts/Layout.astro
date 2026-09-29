@@ -270,6 +270,82 @@ const ADMIN_EMAILS = import.meta.env.PUBLIC_ADMIN_EMAILS;
       return window.ADMIN_EMAILS.includes((email || '').toLowerCase());
     };
 
+    /* ── Quiz answer normalization ──
+       The DB `answer` field is free text and is inconsistently authored:
+       "B" / "b" / "A,B" / "B. 60%" / "60%" (option content) all appear.
+       Everything downstream (grading, review, PDF) resolves it through here
+       so a question is never graded by comparing option text against a letter. */
+    window.quizAnswer = (function() {
+      var LETTERS = ['A', 'B', 'C', 'D'];
+
+      /* Non-empty options, in letter order: [{ letter, text }] */
+      function options(q) {
+        var out = [];
+        LETTERS.forEach(function(L) {
+          var v = q && q[L];
+          if (v !== undefined && v !== null && String(v) !== '') out.push({ letter: L, text: String(v) });
+        });
+        return out;
+      }
+
+      function norm(s) { return String(s == null ? '' : s).replace(/\s+/g, '').toLowerCase(); }
+
+      /* Resolve any authored `answer` format into the list of option letters. */
+      function letters(q) {
+        var raw = q && q.answer !== undefined && q.answer !== null ? String(q.answer).trim() : '';
+        if (!raw) return [];
+        var opts = options(q);
+        var found = [];
+        function add(L) {
+          if (opts.some(function(o) { return o.letter === L; }) && found.indexOf(L) === -1) found.push(L);
+        }
+
+        /* 1. Canonical: a letter or a list of letters — "B", "b", "A,B", "A B", "A、C" */
+        var compact = raw.replace(/[\s,，、;；/|＋+]+/g, '');
+        if (/^[A-Da-d]+$/.test(compact)) compact.toUpperCase().split('').forEach(add);
+
+        /* 2. Letter prefix + content — "B. 60%", "B) 60%", "B：60%" */
+        if (!found.length) {
+          var m = raw.match(/^([A-Da-d])\s*[).、．:：\-–—]\s*/);
+          if (m) add(m[1].toUpperCase());
+        }
+
+        /* 3. Exact option content — "60%" */
+        if (!found.length) opts.forEach(function(o) { if (o.text === raw) add(o.letter); });
+
+        /* 4. Option content ignoring case and whitespace */
+        if (!found.length) {
+          var t = norm(raw);
+          opts.forEach(function(o) { if (norm(o.text) === t) add(o.letter); });
+        }
+
+        return found;
+      }
+
+      /* Single selected letter vs. the resolved correct letter(s). */
+      function isCorrect(q, selectedLetter) {
+        if (!selectedLetter) return false;
+        return letters(q).indexOf(selectedLetter) !== -1;
+      }
+
+      /* "B（60%）" — letter plus content, for review/PDF readouts. */
+      function label(q, letter) {
+        if (!letter) return '';
+        var raw = q && q[letter];
+        if (raw === undefined || raw === null || String(raw) === '') return letter;
+        return letter + '（' + String(raw) + '）';
+      }
+
+      /* The full correct answer readout, e.g. "B（60%）" or "A（x）、B（y）". */
+      function correctLabel(q) {
+        var ls = letters(q);
+        if (!ls.length) return '未設定';
+        return ls.map(function(L) { return label(q, L); }).join('、');
+      }
+
+      return { LETTERS: LETTERS, options: options, letters: letters, isCorrect: isCorrect, label: label, correctLabel: correctLabel };
+    })();
+
     window.viewImage = function(url) {
       if (typeof Swal !== 'undefined') {
         Swal.fire({
